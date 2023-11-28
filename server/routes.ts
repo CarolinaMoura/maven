@@ -1,12 +1,8 @@
 import { ObjectId } from "mongodb";
-
-import { Router, getExpressRouter } from "./framework/router";
-
-import { Friend, Post, User, WebSession } from "./app";
-import { PostDoc, PostOptions } from "./concepts/post";
+import { Document, Tag, User, WebSession } from "./app";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
-import Responses from "./responses";
+import { Router, getExpressRouter } from "./framework/router";
 
 class Routes {
   @Router.get("/session")
@@ -57,84 +53,58 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
-  @Router.get("/posts")
-  async getPosts(author?: string) {
-    let posts;
-    if (author) {
-      const id = (await User.getUserByUsername(author))._id;
-      posts = await Post.getByAuthor(id);
-    } else {
-      posts = await Post.getPosts({});
+  // Tag routes
+  @Router.post("tag")
+  async createTag(name: string, isLanguage: boolean) {
+    return await Tag.createTag(name, isLanguage);
+  }
+  @Router.post("tag/attach")
+  async attachTag(tag: string, attachedTo: string) {
+    return await Tag.attachTag(new ObjectId(tag), new ObjectId(attachedTo));
+  }
+  @Router.get("tag")
+  async getTags() {
+    return await Tag.getTags();
+  }
+  @Router.get("tag/language")
+  async getLanguageTags() {
+    return await Tag.getLanguageTags();
+  }
+  @Router.get("tag/object/:object")
+  async getObjectTags(object: string) {
+    return await Tag.getObjectTags(new ObjectId(object));
+  }
+  @Router.get("tag/tag/:tag")
+  async getTaggedObjects(tag: string) {
+    return await Tag.getTaggedObjects(new ObjectId(tag));
+  }
+
+  // Document routes
+  @Router.post("document")
+  async createDocument(session: WebSessionDoc, title: string, author: string, content: string, originalLanguage: string) {
+    const user = WebSession.getUser(session);
+    const languageId = await Tag.getTagId(originalLanguage);
+    if (!(await Tag.checkTagIsLanguage(languageId))) {
+      throw new Error("Tag is not a language!");
     }
-    return Responses.posts(posts);
+    return await Document.createDocument(title, author, content, user, languageId);
   }
-
-  @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, options?: PostOptions) {
-    const user = WebSession.getUser(session);
-    const created = await Post.create(user, content, options);
-    return { msg: created.msg, post: await Responses.post(created.post) };
+  @Router.get("document")
+  async getDocuments() {
+    return await Document.getDocuments();
   }
-
-  @Router.patch("/posts/:_id")
-  async updatePost(session: WebSessionDoc, _id: ObjectId, update: Partial<PostDoc>) {
-    const user = WebSession.getUser(session);
-    await Post.isAuthor(user, _id);
-    return await Post.update(_id, update);
+  @Router.get("document/:id")
+  async getDocument(id: string) {
+    return await Document.getDocument(new ObjectId(id));
   }
-
-  @Router.delete("/posts/:_id")
-  async deletePost(session: WebSessionDoc, _id: ObjectId) {
+  @Router.delete("document/:id")
+  async deleteDocument(session: WebSessionDoc, id: string) {
     const user = WebSession.getUser(session);
-    await Post.isAuthor(user, _id);
-    return Post.delete(_id);
-  }
-
-  @Router.get("/friends")
-  async getFriends(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
-    return await User.idsToUsernames(await Friend.getFriends(user));
-  }
-
-  @Router.delete("/friends/:friend")
-  async removeFriend(session: WebSessionDoc, friend: string) {
-    const user = WebSession.getUser(session);
-    const friendId = (await User.getUserByUsername(friend))._id;
-    return await Friend.removeFriend(user, friendId);
-  }
-
-  @Router.get("/friend/requests")
-  async getRequests(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
-    return await Responses.friendRequests(await Friend.getRequests(user));
-  }
-
-  @Router.post("/friend/requests/:to")
-  async sendFriendRequest(session: WebSessionDoc, to: string) {
-    const user = WebSession.getUser(session);
-    const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.sendRequest(user, toId);
-  }
-
-  @Router.delete("/friend/requests/:to")
-  async removeFriendRequest(session: WebSessionDoc, to: string) {
-    const user = WebSession.getUser(session);
-    const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.removeRequest(user, toId);
-  }
-
-  @Router.put("/friend/accept/:from")
-  async acceptFriendRequest(session: WebSessionDoc, from: string) {
-    const user = WebSession.getUser(session);
-    const fromId = (await User.getUserByUsername(from))._id;
-    return await Friend.acceptRequest(fromId, user);
-  }
-
-  @Router.put("/friend/reject/:from")
-  async rejectFriendRequest(session: WebSessionDoc, from: string) {
-    const user = WebSession.getUser(session);
-    const fromId = (await User.getUserByUsername(from))._id;
-    return await Friend.rejectRequest(fromId, user);
+    const document = await Document.getDocument(new ObjectId(id));
+    if (!user.equals(document.uploader)) {
+      throw new Error("User is not the uploader!");
+    }
+    return await Document.deleteDocument(new ObjectId(id));
   }
 }
 
