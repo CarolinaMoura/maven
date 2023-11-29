@@ -35,6 +35,7 @@ onBeforeMount(async () => {
 
 <template>
   <section class="sections" v-if="loaded && sections.length !== 0">
+    <h2>Original Text</h2>
     <article v-for="section in sections" :key="section._id" @click="logSection(section)">
       <SectionComponent v-if="editing !== section._id" :section="section" @editPost="updateEditing" />
       <!-- <SectionTranslationForm v-else :section="section" @refreshPosts="getSections" @editPost="updateEditing" /> -->
@@ -45,20 +46,26 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+h2 {
+  margin-left: 50px;
+  margin-bottom: 0px;
+}
+
 .sections {
   display: flex;
   flex-direction: column;
   gap: 1em;
-  align-items: flex-start;
 }
 
 article {
   background-color: var(--base-bg);
-  border-radius: 1em;
-  padding: 1em;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 1px 0;
+  margin-left: 50px;
+  width: 50%; 
   cursor: pointer;
-  width: 60%; 
-  margin: 0 auto; 
 }
 
 </style>
