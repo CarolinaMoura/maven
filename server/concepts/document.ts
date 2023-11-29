@@ -16,9 +16,11 @@ export default class DocumentConcept {
     await this.documents.createOne({ title, author, content, uploader, originalLanguage });
     return { msg: "Created document!" };
   }
+
   async getDocuments() {
     return await this.documents.readMany({});
   }
+  
   async getDocument(id: ObjectId) {
     const document = await this.documents.readOne({ _id: id });
     if (document === null) {
