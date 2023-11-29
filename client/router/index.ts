@@ -35,7 +35,7 @@ const router = createRouter({
       },
     },
     {
-      path: "/translation",
+      path: "/translation_test",
       name: "Translation",
       component: TranslationView,
     },

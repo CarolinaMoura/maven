@@ -108,7 +108,7 @@ class Routes {
   }
 
   // Section routes
-  @Router.get("section")
+  @Router.get("/section")
   async getSections() {
     return await Section.getSections();
   }

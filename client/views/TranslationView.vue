@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SectionListComponent from "@/components/Section/SectionListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
@@ -9,7 +10,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
   <main>
     <h1>Translation Page</h1>
     <section>
-      <h1 v-if="isLoggedIn">Translations</h1>
+      <h1 v-if="isLoggedIn"></h1>
       <h1 v-else>Please login!</h1>
     </section>
     <SectionListComponent />
