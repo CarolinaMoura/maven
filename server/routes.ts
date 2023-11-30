@@ -114,10 +114,12 @@ class Routes {
   /////////////////////
   //     Section     //
   /////////////////////
-  @Router.get("/section")
-  async getSections() {
-    return await Section.getSections();
+  @Router.get("/section/:id")
+  async getSection(id: ObjectId) {
+    return await Section.getSection(id);
   }
+
+  @Router
 
   // Section Translation
   @Router.post("sectionTranslation")
