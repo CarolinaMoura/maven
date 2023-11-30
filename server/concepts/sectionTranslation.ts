@@ -26,6 +26,11 @@ export default class SectionTranslationConcept {
     return await this.sectionTranslations.updateOne({ _id: id }, { translation });
   }
 
+  async deleteSectionTranslation(id: ObjectId) {
+    await this.sectionTranslations.deleteOne({ _id: id });
+    return { msg: "Translation deleted successfully!" };
+  }
+
   async getSectionTranslation(id: ObjectId) {
     const sectionTranslation = await this.sectionTranslations.readOne({ _id: id });
     if (sectionTranslation === null) {
