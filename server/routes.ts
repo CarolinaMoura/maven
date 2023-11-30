@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
 import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
+import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
-
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -84,14 +84,24 @@ class Routes {
   ////////////////////
   //    Document    //
   ////////////////////
-  @Router.post("document")
-  async createDocument(session: WebSessionDoc, title: string, author: string, content: string, originalLanguage: string) {
+  @Router.post("/document")
+  async createDocument(session: WebSessionDoc, title: string, authors: Author[], year: number, domain: string, content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
+
     const languageId = await Tag.getTagId(originalLanguage);
     if (!(await Tag.checkTagIsLanguage(languageId))) {
       throw new Error("Tag is not a language!");
     }
-    const documentId = await Document.createDocument(title, author, content, user, languageId);
+
+    // see if tag exists for domain, and if not create a tag for it
+    let domainId;
+    try {
+      domainId = await Tag.getTagId(domain);
+    } catch (e) {
+      domainId = (await Tag.createTag(domain, false)).tagId;
+    }
+
+    const documentId = await Document.createDocument(title, authors, year, domainId, content, user, languageId);
     await Tag.attachTag(languageId, documentId);
     return { msg: "Created document!" };
   }

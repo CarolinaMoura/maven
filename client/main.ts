@@ -1,4 +1,5 @@
 import "@/assets/main.css";
+import "@mdi/font/css/materialdesignicons.css";
 import "purecss";
 
 import { createPinia } from "pinia";
