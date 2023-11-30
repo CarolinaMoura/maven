@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import { useTagStore } from "../../stores/tags";
 import { fetchy } from "../../utils/fetchy";
+const tagStore = useTagStore();
+const { languageTags, contentTags } = storeToRefs(useTagStore());
 
 const DOMAINS = ["Computer Science", "Biology"];
-const LANGUAGES = ["English", "Turkish"];
+const LANGUAGES = languageTags;
 
 // keeps track of if form is open or not
 const formOpen = ref(false);
@@ -31,6 +35,7 @@ function deleteAuthor(idx: number) {
 
 async function submitRequest() {
   if (isFormValid.value) {
+    console.log(originalLanguage.value[0].toUpperCase() + originalLanguage.value.slice(1));
     try {
       await fetchy("/api/document", "POST", {
         body: {
@@ -39,16 +44,17 @@ async function submitRequest() {
           year: Number.parseInt(year.value),
           domain: domain.value,
           content: content.value,
-          originalLanguage: originalLanguage.value,
+          originalLanguage: originalLanguage.value[0].toUpperCase() + originalLanguage.value.slice(1),
         },
       });
+      await tagStore.getLanguageTags();
       emit("refreshDocuments");
     } catch (e) {
       return;
     }
   }
 
-  formOpen.value = false;
+  // formOpen.value = false;
 }
 
 const domainRule = [
@@ -71,7 +77,6 @@ const yearRules = [
     return "Field cannot be empty.";
   },
   (v: string) => {
-    console.log("v ", v);
     const validYear = new RegExp("^[0-9]{4}$");
     if (validYear.test(v)) return true;
     return "Must be a valid year";
@@ -109,7 +114,7 @@ const closeForm = () => {
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
               <v-col :sm="4"><v-select label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-select></v-col>
-              <v-col :sm="4"><v-select label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-select></v-col>
+              <v-col :sm="4"><v-combobox label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-combobox></v-col>
             </v-row>
 
             <v-row>

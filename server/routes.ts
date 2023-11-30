@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
 import { Author } from "./concepts/document";
+import { TagDoc } from "./concepts/tag";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -65,8 +66,8 @@ class Routes {
     return await Tag.attachTag(new ObjectId(tag), new ObjectId(attachedTo));
   }
   @Router.get("/tag")
-  async getTags() {
-    return await Tag.getTags();
+  async getTags(query: Partial<TagDoc>) {
+    return await Tag.getTags(query);
   }
   @Router.get("/tag/language")
   async getLanguageTags() {
@@ -88,15 +89,18 @@ class Routes {
   async createDocument(session: WebSessionDoc, title: string, authors: Author[], year: number, domain: string, content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
 
-    const languageId = await Tag.getTagId(originalLanguage);
-    if (!(await Tag.checkTagIsLanguage(languageId))) {
-      throw new Error("Tag is not a language!");
+    // see if tag exists for language, and if not create a tag for it
+    let languageId;
+    try {
+      languageId = await Tag.getTagId(originalLanguage, true);
+    } catch (e) {
+      languageId = (await Tag.createTag(originalLanguage, true)).tagId;
     }
 
     // see if tag exists for domain, and if not create a tag for it
     let domainId;
     try {
-      domainId = await Tag.getTagId(domain);
+      domainId = await Tag.getTagId(domain, false);
     } catch (e) {
       domainId = (await Tag.createTag(domain, false)).tagId;
     }
