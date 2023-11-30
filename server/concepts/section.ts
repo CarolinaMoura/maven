@@ -16,8 +16,9 @@ export default class SectionConcept {
     return await this.sections.readMany({});
   }
   async getSection(id: ObjectId) {
+    console.log(id);
     const section = await this.sections.readOne({ _id: id });
-    if (section === null) {
+    if (!section) {
       throw new Error("Section not found!");
     }
     return section;

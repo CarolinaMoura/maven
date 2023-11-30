@@ -1,7 +1,6 @@
-import { ObjectId } from "mongodb";
-
 export interface ISectionTranslation {
+  _id: string;
   translation: string;
-  translator: ObjectId;
-  section: ObjectId;
+  translator: string;
+  section: string;
 }

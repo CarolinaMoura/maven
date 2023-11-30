@@ -38,7 +38,7 @@ onBeforeMount(async () => {
       <article>
         <SectionComponent @click="logSection(section._id)" :section="section" />
       </article>
-      <SectionTranslationList :section="section" v-if="section._id == activeSection" class="section-translation-list" />
+      <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
       <!-- <SectionTranslationForm v-else :section="section" @refreshPosts="getSections" @editPost="updateEditing" /> -->
     </div>
   </section>
@@ -48,7 +48,6 @@ onBeforeMount(async () => {
 
 <style scoped>
 h2 {
-  margin-left: 50px;
   margin-bottom: 0px;
 }
 
@@ -56,6 +55,7 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 1em;
+  margin: 0 2rem;
 }
 
 article {
@@ -63,27 +63,26 @@ article {
   border-radius: 20px;
   padding: 20px;
   margin: 1px 0;
-  margin-left: 50px;
-  width: 50%;
+  /* margin-left: 50px; */
+  width: 100%;
+  box-sizing: border-box;
   cursor: pointer;
 }
 
 .sections-container {
-  display: flex;
-  justify-content: left;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 10px;
 }
 
-/*////////////////////
-//   Responsivity   //
-/////////////////////*/
-
-.section-translation-list {
+/* .section-translation-list {
   margin-left: 5%;
-}
+}*/
 
-@media (min-width: 1250px) {
-  .section-translation-list {
-    margin-left: 10%;
+@media (min-width: 800px) {
+  .sections-container {
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0;
   }
 }
 </style>
