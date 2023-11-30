@@ -15,9 +15,9 @@ const sectionTranslations = ref<Array<PayloadSectionTranslation>>([]);
 const getAllSectionTranslations = async () => {
   try {
     const translations = await fetchy(`/api/sectionTranslation/${props.section}`, "GET");
-    sectionTranslations.value = translations;
+    sectionTranslations.value = sectionTranslations.value.filter(() => false);
+    sectionTranslations.value.push(...translations);
   } catch (_) {
-    ``;
     return Error("Failed to get section translations");
   }
 };
@@ -42,7 +42,7 @@ onBeforeMount(async () => {
         <SectionTranslationForm v-if="isLoggedIn" @refreshSectionTranslations="getAllSectionTranslations" :section="props.section" />
         <div class="section-translation-list grid-1em">
           <div v-if="sectionTranslations.length" v-for="translation in sectionTranslations" :key="translation._id">
-            <SectionTranslationCard :sectionTranslation="translation" />
+            <SectionTranslationCard :sectionTranslation="translation" @refreshSectionTranslations="getAllSectionTranslations" />
           </div>
           <p v-else>Nothing to see here... Be the first to translate!</p>
         </div>
