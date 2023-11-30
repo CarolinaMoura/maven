@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import TranslationRequestList from "@/components/Translation/TranslationRequestList.vue";
+import TranslationRequestForm from "@/components/TranslationRequest/TranslationRequestForm.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
@@ -14,6 +15,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
       <h1 v-else>Please login!</h1>
     </section>
     <TranslationRequestList />
+    <TranslationRequestForm />
   </main>
 </template>
 

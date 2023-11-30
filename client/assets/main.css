@@ -10,6 +10,16 @@
   --primary-text: #474747;
 }
 
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  padding: 8px 16px;
+}
+
+.btn-primary:hover {
+  /* TODO: define hover styles */
+}
+
 button.btn-small {
   font-size: 80%;
 }
@@ -34,4 +44,10 @@ a.button {
   justify-content: center;
   align-items: center;
   gap: 1em;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: .5em;
 }
