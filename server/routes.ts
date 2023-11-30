@@ -119,7 +119,7 @@ class Routes {
     return await Section.getSection(id);
   }
 
-  @Router.get("/section/:text")
+  @Router.get("/section")
   async splitIntoSections(text: string) {
     return await Section.splitIntoSections(text);
   }

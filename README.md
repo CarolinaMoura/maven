@@ -13,10 +13,10 @@ Takes in an id (ObjectId) and returns a SectionDoc correspondent to that id.
 ### Split a text into sections
 
 ```
-/section/:text
+/section/?text
 ```
 
-Takes in a text (string) and returns a list of SectionDoc, corresponding to a split of "text" into sections. Section order obeys the original text's order.
+Takes in a query text (string) and returns a list of SectionDoc, corresponding to a split of "text" into sections. Section order obeys the original text's order.
 
 # 6.1040 Social Media Frontend Starter Code
 
