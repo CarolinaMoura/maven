@@ -87,7 +87,9 @@ class Routes {
     if (!(await Tag.checkTagIsLanguage(languageId))) {
       throw new Error("Tag is not a language!");
     }
-    return await Document.createDocument(title, author, content, user, languageId);
+    const documentId = await Document.createDocument(title, author, content, user, languageId);
+    await Tag.attachTag(languageId, documentId);
+    return { msg: "Created document!" };
   }
   @Router.get("/document")
   async getDocuments() {
@@ -104,6 +106,7 @@ class Routes {
     if (!user.equals(document.uploader)) {
       throw new Error("You did not upload this document!");
     }
+    await Tag.deleteTagAttachment(document.originalLanguage, document._id);
     return await Document.deleteDocument(new ObjectId(id));
   }
 
