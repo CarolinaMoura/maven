@@ -132,7 +132,14 @@ class Routes {
     return await Section.splitIntoSections(text);
   }
 
-  // Section Translation
+  ////////////////////////////////
+  //     SectionTranslation     //
+  ////////////////////////////////
+  @Router.get("/sectionTranslation/:section")
+  async getAllSectionTranslations(section: string) {
+    return await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
+  }
+
   @Router.post("/sectionTranslation")
   async createSectionTranslation(session: WebSessionDoc, translation: string, section: string) {
     const user = WebSession.getUser(session);
