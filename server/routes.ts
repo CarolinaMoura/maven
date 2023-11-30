@@ -137,7 +137,15 @@ class Routes {
   ////////////////////////////////
   @Router.get("/sectionTranslation/:section")
   async getAllSectionTranslations(section: string) {
-    return await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
+    const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
+    return await Promise.all(
+      sectionTranslations.map(async (translation) => {
+        return {
+          translatorName: await User.getUserById(translation.translator).then((user) => user.username),
+          ...translation,
+        };
+      }),
+    );
   }
 
   @Router.post("/sectionTranslation")
