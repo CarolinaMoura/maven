@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
+import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app"
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -102,9 +102,15 @@ class Routes {
     const user = WebSession.getUser(session);
     const document = await Document.getDocument(new ObjectId(id));
     if (!user.equals(document.uploader)) {
-      throw new Error("User is not the uploader!");
+      throw new Error("You did not upload this document!");
     }
     return await Document.deleteDocument(new ObjectId(id));
+  }
+  
+  // Section routes
+  @Router.get("/section")
+  async getSections() {
+    return await Section.getSections();
   }
 
   // Section Translation

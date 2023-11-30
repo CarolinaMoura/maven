@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TranslationRequestList from "@/components/Translation/TranslationRequestList.vue";
+import SectionListComponent from "@/components/Section/SectionListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
@@ -8,12 +8,12 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 <template>
   <main>
-    <h1>Home Page</h1>
+    <h1>Translation Page</h1>
     <section>
       <h1 v-if="isLoggedIn"></h1>
       <h1 v-else>Please login!</h1>
     </section>
-    <TranslationRequestList />
+    <SectionListComponent />
   </main>
 </template>
 
