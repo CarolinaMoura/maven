@@ -14,7 +14,6 @@ const sectionTranslations = ref<Array<ISectionTranslation>>([]);
 const getAllSectionTranslations = async () => {
   try {
     const translations = await fetchy(`/api/sectionTranslation/${props.section}`, "GET");
-    console.log("entrei e ", sectionTranslations.value);
     sectionTranslations.value = translations;
   } catch (_) {
     ``;

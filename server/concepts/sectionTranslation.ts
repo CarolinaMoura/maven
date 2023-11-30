@@ -15,8 +15,6 @@ export default class SectionTranslationConcept {
     return { msg: "Created section translation!" };
   }
   async getSectionTranslations(filter: Filter<SectionTranslationDoc>) {
-    console.log(await this.sectionTranslations.readMany({}));
-    console.log(filter);
     return await this.sectionTranslations.readMany(filter);
   }
   async getSectionTranslation(id: ObjectId) {
