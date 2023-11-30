@@ -6,6 +6,7 @@ import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import SettingView from "../views/SettingView.vue";
+import TagView from "../views/TagView.vue";
 import TranslationView from "../views/TranslationView.vue";
 
 const router = createRouter({
@@ -38,6 +39,11 @@ const router = createRouter({
       path: "/translation_test",
       name: "Translation",
       component: TranslationView,
+    },
+    {
+      path: "/tag",
+      name: "Tag",
+      component: TagView,
     },
     {
       path: "/:catchAll(.*)",

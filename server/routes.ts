@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app"
+import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -54,59 +54,62 @@ class Routes {
   }
 
   // Tag routes
-  @Router.post("tag")
+  @Router.post("/tag")
   async createTag(name: string, isLanguage: boolean) {
     return await Tag.createTag(name, isLanguage);
   }
-  @Router.post("tag/attach")
+  @Router.post("/tag/attach")
   async attachTag(tag: string, attachedTo: string) {
     return await Tag.attachTag(new ObjectId(tag), new ObjectId(attachedTo));
   }
-  @Router.get("tag")
+  @Router.get("/tag")
   async getTags() {
     return await Tag.getTags();
   }
-  @Router.get("tag/language")
+  @Router.get("/tag/language")
   async getLanguageTags() {
     return await Tag.getLanguageTags();
   }
-  @Router.get("tag/object/:object")
+  @Router.get("/tag/object/:object")
   async getObjectTags(object: string) {
     return await Tag.getObjectTags(new ObjectId(object));
   }
-  @Router.get("tag/tag/:tag")
+  @Router.get("/tag/tag/:tag")
   async getTaggedObjects(tag: string) {
     return await Tag.getTaggedObjects(new ObjectId(tag));
   }
 
   // Document routes
-  @Router.post("document")
+  @Router.post("/document")
   async createDocument(session: WebSessionDoc, title: string, author: string, content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
     const languageId = await Tag.getTagId(originalLanguage);
     if (!(await Tag.checkTagIsLanguage(languageId))) {
       throw new Error("Tag is not a language!");
     }
-    return await Document.createDocument(title, author, content, user, languageId);
+    const documentId = await Document.createDocument(title, author, content, user, languageId);
+    await Tag.attachTag(languageId, documentId);
+    return { msg: "Created document!" };
   }
-  @Router.get("document")
+  @Router.get("/document")
   async getDocuments() {
     return await Document.getDocuments();
   }
-  @Router.get("document/:id")
+  @Router.get("/document/:id")
   async getDocument(id: string) {
     return await Document.getDocument(new ObjectId(id));
   }
-  @Router.delete("document/:id")
+  @Router.delete("/document/:id")
   async deleteDocument(session: WebSessionDoc, id: string) {
     const user = WebSession.getUser(session);
     const document = await Document.getDocument(new ObjectId(id));
     if (!user.equals(document.uploader)) {
       throw new Error("You did not upload this document!");
     }
+    await Tag.deleteTagAttachment(document.originalLanguage, document._id);
     return await Document.deleteDocument(new ObjectId(id));
   }
-  
+
   // Section routes
   @Router.get("/section")
   async getSections() {
@@ -114,7 +117,7 @@ class Routes {
   }
 
   // Section Translation
-  @Router.post("sectionTranslation")
+  @Router.post("/sectionTranslation")
   async createSectionTranslation(session: WebSessionDoc, translation: string, section: string) {
     const user = WebSession.getUser(session);
     const sectionId = new ObjectId(section);
