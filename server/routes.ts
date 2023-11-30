@@ -120,6 +120,11 @@ class Routes {
   }
 
   @Router.get("/section")
+  async getSections() {
+    return await Section.getSections();
+  }
+
+  @Router.get("/section")
   async splitIntoSections(text: string) {
     return await Section.splitIntoSections(text);
   }
