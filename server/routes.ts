@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app"
+import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -53,7 +53,9 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
-  // Tag routes
+  /////////////////////
+  //       Tag       //
+  /////////////////////
   @Router.post("tag")
   async createTag(name: string, isLanguage: boolean) {
     return await Tag.createTag(name, isLanguage);
@@ -79,7 +81,9 @@ class Routes {
     return await Tag.getTaggedObjects(new ObjectId(tag));
   }
 
-  // Document routes
+  ////////////////////
+  //    Document    //
+  ////////////////////
   @Router.post("document")
   async createDocument(session: WebSessionDoc, title: string, author: string, content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
@@ -106,8 +110,10 @@ class Routes {
     }
     return await Document.deleteDocument(new ObjectId(id));
   }
-  
-  // Section routes
+
+  /////////////////////
+  //     Section     //
+  /////////////////////
   @Router.get("/section")
   async getSections() {
     return await Section.getSections();
