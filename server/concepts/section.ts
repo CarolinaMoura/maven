@@ -22,6 +22,12 @@ export default class SectionConcept {
     }
     return section;
   }
+  async checkSectionExists(id: ObjectId) {
+    const section = await this.sections.readOne({ _id: id });
+    if (section === null) {
+      throw new Error("Section not found!");
+    }
+  }
 
   async splitIntoSections(text: string) {
     const sentences = text.split(/(?<=[.?!])\s+(?=[A-Z])/);
