@@ -34,9 +34,9 @@ onBeforeMount(async () => {
 <template>
   <section class="sections" v-if="loaded && sections.length !== 0">
     <h2>Original Text</h2>
-    <div class="sections-container" v-for="section in sections" :key="section._id" @click="logSection(section._id)">
+    <div class="sections-container" v-for="section in sections" :key="section._id">
       <article>
-        <SectionComponent :section="section" />
+        <SectionComponent @click="logSection(section._id)" :section="section" />
       </article>
       <SectionTranslationList :section="section" v-if="section._id == activeSection" class="section-translation-list" />
       <!-- <SectionTranslationForm v-else :section="section" @refreshPosts="getSections" @editPost="updateEditing" /> -->
