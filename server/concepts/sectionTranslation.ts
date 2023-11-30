@@ -7,7 +7,7 @@ export interface SectionTranslationDoc extends BaseDoc {
   section: ObjectId;
 }
 
-export default class SectionConcept {
+export default class SectionTranslationConcept {
   private readonly sectionTranslations = new DocCollection<SectionTranslationDoc>("sectionTranslations");
 
   async createSectionTranslation(translator: ObjectId, translation: string, section: ObjectId) {
@@ -15,6 +15,8 @@ export default class SectionConcept {
     return { msg: "Created section translation!" };
   }
   async getSectionTranslations(filter: Filter<SectionTranslationDoc>) {
+    console.log(await this.sectionTranslations.readMany({}));
+    console.log(filter);
     return await this.sectionTranslations.readMany(filter);
   }
   async getSectionTranslation(id: ObjectId) {
