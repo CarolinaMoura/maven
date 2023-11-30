@@ -3,13 +3,14 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
-import { ISectionTranslation } from "./ISectionTranslation";
+import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
+import SectionTranslationCard from "./SectionTranslationCard.vue";
 import SectionTranslationForm from "./SectionTranslationForm.vue";
 
 const userStore = useUserStore();
 const { isLoggedIn } = storeToRefs(userStore);
 const props = defineProps(["section"]);
-const sectionTranslations = ref<Array<ISectionTranslation>>([]);
+const sectionTranslations = ref<Array<PayloadSectionTranslation>>([]);
 
 const getAllSectionTranslations = async () => {
   try {
@@ -37,10 +38,13 @@ onBeforeMount(async () => {
         <h2>Translated Text</h2>
         <i>Showing all translations for section</i>
       </header>
-      <SectionTranslationForm v-if="isLoggedIn" @refreshSectionTranslations="getAllSectionTranslations" :section="props.section" />
-      <div class="section-translation-list">
-        <div v-for="translation in sectionTranslations" :key="translation._id">
-          <p>{{ translation.translation }}</p>
+      <div class="grid-1em">
+        <SectionTranslationForm v-if="isLoggedIn" @refreshSectionTranslations="getAllSectionTranslations" :section="props.section" />
+        <div class="section-translation-list grid-1em">
+          <div v-if="sectionTranslations.length" v-for="translation in sectionTranslations" :key="translation._id">
+            <SectionTranslationCard :sectionTranslation="translation" />
+          </div>
+          <p v-else>Nothing to see here... Be the first to translate!</p>
         </div>
       </div>
     </div>
@@ -57,20 +61,36 @@ header {
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-  /* align-items: center; */
+}
+
+.section-translation-container {
+  padding-bottom: 100px;
 }
 
 h2 {
   font-weight: normal;
 }
 
-.section-translation-container {
-  position: absolute;
-  overflow: auto;
+.grid-1em {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  /* justify-content: center; */
 }
 
-/* @media screen and (min-width: 768px) {
+.section-translation-list {
+  width: 100%;
+}
+
+.section-translation-container {
+  position: absolute;
+  overflow-y: auto;
+  width: 90%;
+}
+
+@media screen and (min-width: 768px) {
   .section-translation-container {
+    width: 80%;
   }
-} */
+}
 </style>
