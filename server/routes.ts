@@ -155,6 +155,18 @@ class Routes {
     await Section.checkSectionExists(sectionId);
     return await SectionTranslation.createSectionTranslation(user, translation, sectionId);
   }
+
+  @Router.patch("/sectionTranslation")
+  async updateSectionTranslation(session: WebSessionDoc, id: string, translation: string) {
+    console.log(id, translation);
+    const user = WebSession.getUser(session);
+    await SectionTranslation.checkSectionTranslationExists(new ObjectId(id));
+    const sectionTranslation = await SectionTranslation.getSectionTranslation(new ObjectId(id));
+    if (!user.equals(sectionTranslation.translator)) {
+      throw new Error("This translation is not yours!");
+    }
+    return await SectionTranslation.updateSectionTranslation(new ObjectId(id), translation);
+  }
 }
 
 export default getExpressRouter(new Routes());
