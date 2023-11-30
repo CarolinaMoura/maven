@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import { ISectionTranslation } from "./ISectionTranslation";
 import SectionTranslationForm from "./SectionTranslationForm.vue";
 
+const userStore = useUserStore();
+const { isLoggedIn } = storeToRefs(userStore);
 const props = defineProps(["section"]);
 const sectionTranslations = ref<Array<ISectionTranslation>>([]);
 
@@ -18,5 +22,5 @@ const getAllSectionTranslations = async () => {
 </script>
 
 <template>
-  <SectionTranslationForm @refreshSectionTranslations="getAllSectionTranslations" :section="props.section" />
+  <SectionTranslationForm v-if="isLoggedIn" @refreshSectionTranslations="getAllSectionTranslations" :section="props.section" />
 </template>
