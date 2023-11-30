@@ -2,8 +2,13 @@
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
+const DOMAINS = ["Computer Science", "Biology"];
+const LANGUAGES = ["English", "Turkish"];
+
 // keeps track of if form is open or not
 const formOpen = ref(false);
+
+// keeps track of if form fields are valid or not
 const isFormValid = ref(false);
 
 // keep track of field values
@@ -14,8 +19,7 @@ const domain = ref("");
 const content = ref("");
 const originalLanguage = ref("");
 
-const DOMAINS = ["Computer Science", "Biology"];
-const LANGUAGES = ["English", "Portuguese", "Spanish"];
+const emit = defineEmits(["refreshDocuments"]);
 
 function addAuthor() {
   authors.value = [...authors.value, { first: "", last: "" }];
@@ -38,13 +42,13 @@ async function submitRequest() {
           originalLanguage: originalLanguage.value,
         },
       });
+      emit("refreshDocuments");
     } catch (e) {
       return;
     }
   }
 
-  // close form
-  //   formOpen.value = false;
+  formOpen.value = false;
 }
 
 const domainRule = [

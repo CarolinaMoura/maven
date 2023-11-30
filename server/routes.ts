@@ -87,6 +87,7 @@ class Routes {
   @Router.post("/document")
   async createDocument(session: WebSessionDoc, title: string, authors: Author[], year: number, domain: string, content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
+
     const languageId = await Tag.getTagId(originalLanguage);
     if (!(await Tag.checkTagIsLanguage(languageId))) {
       throw new Error("Tag is not a language!");
