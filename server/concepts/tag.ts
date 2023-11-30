@@ -20,8 +20,8 @@ export default class TagConcept {
     if (existing !== null) {
       throw new Error("Tag already exists!");
     }
-    await this.tags.createOne({ name, isLanguage });
-    return { msg: "Created tag!" };
+    const tagId = await this.tags.createOne({ name, isLanguage });
+    return { msg: "Created tag!", tagId: tagId };
   }
   async getTags() {
     return await this.tags.readMany({});
@@ -36,6 +36,7 @@ export default class TagConcept {
     }
     return tagDoc.isLanguage;
   }
+
   async getTagId(name: string) {
     const tagDoc = await this.tags.readOne({ name });
     if (tagDoc === null) {

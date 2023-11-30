@@ -4,14 +4,18 @@ import { fetchy } from "../../utils/fetchy";
 
 // keeps track of if form is open or not
 const formOpen = ref(false);
+const isFormValid = ref(false);
 
 // keep track of field values
 const title = ref("");
-const authors = ref([{ first: "hi", last: "bye" }]);
+const authors = ref([{ first: "", last: "" }]);
 const year = ref();
-const domains = ref([]);
+const domain = ref("");
+const content = ref("");
+const originalLanguage = ref("");
 
-const DOMAINS = ["Computer Science", "Chemical Engineering"];
+const DOMAINS = ["Computer Science", "Biology"];
+const LANGUAGES = ["English", "Portuguese", "Spanish"];
 
 function addAuthor() {
   authors.value = [...authors.value, { first: "", last: "" }];
@@ -22,22 +26,33 @@ function deleteAuthor(idx: number) {
 }
 
 async function submitRequest() {
-  try {
-    await fetchy("/api/document", "POST", {
-      body: {
-        title: title.value,
-        authors: authors.value,
-        year: year.value,
-        domains: domains.value,
-      },
-    });
-  } catch (e) {
-    return;
+  if (isFormValid.value) {
+    try {
+      await fetchy("/api/document", "POST", {
+        body: {
+          title: title.value,
+          authors: authors.value,
+          year: Number.parseInt(year.value),
+          domain: domain.value,
+          content: content.value,
+          originalLanguage: originalLanguage.value,
+        },
+      });
+    } catch (e) {
+      return;
+    }
   }
 
   // close form
-  formOpen.value = false;
+  //   formOpen.value = false;
 }
+
+const domainRule = [
+  (v: string) => {
+    if (v.length > 0) return true;
+    return "Field cannot be empty.";
+  },
+];
 
 const nonEmptyRule = [
   (v: string) => {
@@ -59,14 +74,6 @@ const yearRules = [
   },
 ];
 
-/** TODO: fix rule, does not detect empty state */
-const domainRules = [
-  (v: Array<string>) => {
-    if (v.length > 0) return true;
-    return "You must choose at least one domain.";
-  },
-];
-
 const closeForm = () => {
   formOpen.value = false;
 };
@@ -85,41 +92,44 @@ const closeForm = () => {
 
   <v-dialog v-model="formOpen" width="90%">
     <v-card>
-      <v-container class="form-container">
-        <div class="row between">
-          Translation Request Form
-          <v-btn variant="plain" @click="closeForm"><v-icon>mdi-close</v-icon></v-btn>
-        </div>
+      <v-form v-model="isFormValid" @submit.prevent="submitRequest()">
+        <v-container class="form-container">
+          <div class="row between">
+            Translation Request Form
+            <v-btn variant="plain" @click="closeForm"><v-icon>mdi-close</v-icon></v-btn>
+          </div>
 
-        <div class="form-section">
-          Document Details
-          <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
-          <v-row>
-            <v-col :sm="6"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
-            <v-col :sm="6"><v-select label="Domain" v-model="domains" :items="DOMAINS" multiple :rule="domainRules"></v-select></v-col>
-          </v-row>
+          <div class="form-section">
+            Document Details
+            <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
+            <v-row>
+              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
+              <v-col :sm="4"><v-select label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-select></v-col>
+              <v-col :sm="4"><v-select label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-select></v-col>
+            </v-row>
 
-          <v-row>
-            <v-col>
-              <div v-for="(author, idx) in authors" v-bind:key="`author-${idx}`" class="row">
-                <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first"></v-text-field>
-                <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last"></v-text-field>
-                <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)"><v-icon>mdi-close</v-icon></v-btn>
-              </div>
+            <v-row>
+              <v-col>
+                <div v-for="(author, idx) in authors" v-bind:key="`author-${idx}`" class="row">
+                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first"></v-text-field>
+                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last"></v-text-field>
 
-              <button class="btn-primary" @click="addAuthor()">Add author</button>
-            </v-col>
-          </v-row>
-        </div>
+                  <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)"><v-icon>mdi-close</v-icon></v-btn>
+                </div>
 
-        <div class="form-section">
-          Document Upload
-          <v-textarea label="Document Content"></v-textarea>
-          <button class="btn-primary">Upload document</button>
-        </div>
+                <button class="btn-primary" @click="addAuthor()" type="button">Add author</button>
+              </v-col>
+            </v-row>
+          </div>
 
-        <button class="btn-primary" @click="submitRequest()">Submit request</button>
-      </v-container>
+          <div class="form-section">
+            Document Upload
+            <v-textarea label="Document Content" v-model="content" :rules="nonEmptyRule"></v-textarea>
+          </div>
+
+          <button class="btn-primary">Submit request</button>
+        </v-container>
+      </v-form>
     </v-card>
   </v-dialog>
 </template>

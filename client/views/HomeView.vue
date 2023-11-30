@@ -14,8 +14,8 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
       <h1 v-if="isLoggedIn"></h1>
       <h1 v-else>Please login!</h1>
     </section>
-    <TranslationRequestList />
     <TranslationRequestForm />
+    <TranslationRequestList />
   </main>
 </template>
 

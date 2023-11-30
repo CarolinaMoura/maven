@@ -1,9 +1,15 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 
+export interface Author {
+  first: string;
+  last: string;
+}
 export interface DocumentDoc extends BaseDoc {
   title: string;
-  author: string;
+  authors: Author[];
+  year: number;
+  domain: ObjectId;
   content: string;
   uploader: ObjectId;
   originalLanguage: ObjectId;
@@ -12,8 +18,8 @@ export interface DocumentDoc extends BaseDoc {
 export default class DocumentConcept {
   private readonly documents = new DocCollection<DocumentDoc>("documents");
 
-  async createDocument(title: string, author: string, content: string, uploader: ObjectId, originalLanguage: ObjectId) {
-    return await this.documents.createOne({ title, author, content, uploader, originalLanguage });
+  async createDocument(title: string, authors: Author[], year: number, domain: ObjectId, content: string, uploader: ObjectId, originalLanguage: ObjectId) {
+    return await this.documents.createOne({ title, authors, content, year, domain, uploader, originalLanguage });
   }
 
   async getDocuments() {
