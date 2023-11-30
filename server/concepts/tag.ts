@@ -54,4 +54,8 @@ export default class TagConcept {
   async getTaggedObjects(tag: ObjectId) {
     return await this.attachments.readMany({ tag });
   }
+  async deleteTagAttachment(tag: ObjectId, attachedTo: ObjectId) {
+    await this.attachments.deleteOne({ tag, attachedTo });
+    return { msg: "Deleted tag attachment!" };
+  }
 }
