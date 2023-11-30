@@ -140,8 +140,15 @@ class Routes {
     const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
     return await Promise.all(
       sectionTranslations.map(async (translation) => {
+        let name = "";
+        try {
+          const user = await User.getUserById(translation.translator).then((user) => user.username);
+          name = user;
+        } catch (e) {
+          name = "Deleted user";
+        }
         return {
-          translatorName: await User.getUserById(translation.translator).then((user) => user.username),
+          translatorName: name,
           ...translation,
         };
       }),
