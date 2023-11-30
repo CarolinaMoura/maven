@@ -7,5 +7,6 @@
     "source.fixAll": true,
     "source.organizeImports": true
   },
-  "typescript.preferences.importModuleSpecifier": "project-relative"
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  "editor.formatOnSave": true
 }
