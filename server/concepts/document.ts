@@ -14,7 +14,6 @@ export default class DocumentConcept {
 
   async createDocument(title: string, author: string, content: string, uploader: ObjectId, originalLanguage: ObjectId) {
     await this.documents.createOne({ title, author, content, uploader, originalLanguage });
-    return { msg: "Created document!" };
   }
 
   async getDocuments() {

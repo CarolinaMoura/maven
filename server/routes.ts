@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, Tag, User, WebSession } from "./app";
+import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app"
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -106,13 +106,21 @@ class Routes {
     }
     return await Document.deleteDocument(new ObjectId(id));
   }
-
+  
   // Section routes
   @Router.get("/section")
   async getSections() {
     return await Section.getSections();
   }
 
+  // Section Translation
+  @Router.post("sectionTranslation")
+  async createSectionTranslation(session: WebSessionDoc, translation: string, section: string) {
+    const user = WebSession.getUser(session);
+    const sectionId = new ObjectId(section);
+    await Section.checkSectionExists(sectionId);
+    return await SectionTranslation.createSectionTranslation(user, translation, sectionId);
+  }
 }
 
 export default getExpressRouter(new Routes());
