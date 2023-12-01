@@ -10,7 +10,7 @@ import WebSessionConcept from "./concepts/websession";
 export const WebSession = new WebSessionConcept();
 export const User = new UserConcept();
 export const Tag = new TagConcept();
-export const TranslationRequests = new TranslationRequestConcept();
+export const TranslationRequest = new TranslationRequestConcept();
 export const Document = new DocumentConcept();
 export const Section = new SectionConcept();
 export const SectionTranslation = new SectionTranslationConcept();
