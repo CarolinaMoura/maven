@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
 import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
 import { Author } from "./concepts/document";
-import { TagDoc } from "./concepts/tag";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
+import Responses from "./responses";
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -66,8 +66,8 @@ class Routes {
     return await Tag.attachTag(new ObjectId(tag), new ObjectId(attachedTo));
   }
   @Router.get("/tag")
-  async getTags(query: Partial<TagDoc>) {
-    return await Tag.getTags(query);
+  async getTags() {
+    return await Tag.getTags();
   }
   @Router.get("/tag/language")
   async getLanguageTags() {
@@ -111,11 +111,11 @@ class Routes {
   }
   @Router.get("/document")
   async getDocuments() {
-    return await Document.getDocuments();
+    return await Responses.documents(await Document.getDocuments());
   }
   @Router.get("/document/:id")
   async getDocument(id: string) {
-    return await Document.getDocument(new ObjectId(id));
+    return await Responses.document(await Document.getDocument(new ObjectId(id)));
   }
   @Router.delete("/document/:id")
   async deleteDocument(session: WebSessionDoc, id: string) {

@@ -33,16 +33,25 @@ function deleteAuthor(idx: number) {
   authors.value.splice(idx, 1);
 }
 
+function clearForm() {
+  formOpen.value = false;
+  title.value = "";
+  authors.value = [{ first: "", last: "" }];
+  year.value = undefined;
+  domain.value = "";
+  content.value = "";
+  originalLanguage.value = "";
+}
+
 async function submitRequest() {
   if (isFormValid.value) {
-    console.log(originalLanguage.value[0].toUpperCase() + originalLanguage.value.slice(1));
     try {
       await fetchy("/api/document", "POST", {
         body: {
           title: title.value,
           authors: authors.value,
           year: Number.parseInt(year.value),
-          domain: domain.value,
+          domain: domain.value[0].toUpperCase() + domain.value.slice(1),
           content: content.value,
           originalLanguage: originalLanguage.value[0].toUpperCase() + originalLanguage.value.slice(1),
         },
@@ -54,7 +63,7 @@ async function submitRequest() {
     }
   }
 
-  // formOpen.value = false;
+  clearForm();
 }
 
 const domainRule = [
@@ -113,7 +122,7 @@ const closeForm = () => {
             <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
-              <v-col :sm="4"><v-select label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-select></v-col>
+              <v-col :sm="4"><v-combobox label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-combobox></v-col>
               <v-col :sm="4"><v-combobox label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-combobox></v-col>
             </v-row>
 

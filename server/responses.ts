@@ -1,24 +1,24 @@
-import { TagDoc } from "./concepts/tag";
+import { Tag } from "./app";
+import { DocumentDoc } from "./concepts/document";
 
 /**
  * This class does useful conversions for the frontend.
  * For example, it converts a {@link PostDoc} into a more readable format for the frontend.
  */
 export default class Responses {
-  /**
-   * Convert TagDoc into more readable format for the frontend by only returning the name of the tag.
-   */
-  static tag(tag: TagDoc) {
-    if (!tag) {
-      return tag;
-    }
-    return { name: tag.name };
+  /** convert DocumentDoc to readable format by converting tags from ObjectId to name representation */
+
+  static async document(document: DocumentDoc) {
+    const languageTag = await Tag.getTag(document.originalLanguage);
+    const domainTag = await Tag.getTag(document.domain);
+    return { ...document, originalLanguage: languageTag?.name, domain: domainTag?.name };
   }
 
-  /**
-   * Converts array of TagDoc into more readable format for the frontend by only returning the name of the tag.
-   */
-  static tags(tags: Array<TagDoc>) {
-    return tags.map((t) => this.tag(t));
+  static async documents(documents: DocumentDoc[]) {
+    console.log("HERE");
+    const promises = documents.map(async (d) => {
+      return await this.document(d);
+    });
+    return await Promise.all(promises);
   }
 }

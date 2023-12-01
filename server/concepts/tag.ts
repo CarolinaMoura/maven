@@ -23,8 +23,13 @@ export default class TagConcept {
     const tagId = await this.tags.createOne({ name, isLanguage });
     return { msg: "Created tag!", tagId: tagId };
   }
-  async getTags(query: Partial<TagDoc>) {
-    return await this.tags.readMany(query);
+
+  async getTag(_id: ObjectId) {
+    return await this.tags.readOne({ _id });
+  }
+
+  async getTags() {
+    return await this.tags.readMany({});
   }
   async getLanguageTags() {
     return await this.tags.readMany({ isLanguage: true });
