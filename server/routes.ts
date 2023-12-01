@@ -57,7 +57,7 @@ class Routes {
   /////////////////////
   //       Tag       //
   /////////////////////
-  @Router.post("'tag")
+  @Router.post("/tag")
   async createTag(name: string, isLanguage: boolean) {
     return await Tag.createTag(name, isLanguage);
   }
