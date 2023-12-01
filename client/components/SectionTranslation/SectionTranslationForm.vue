@@ -29,7 +29,7 @@ const createSectionTranslation = async (translation: string) => {
 <template>
   <form @submit.prevent="createSectionTranslation(content)">
     <div class="form-inner-container">
-      <v-textarea placeholder="Write your own translation here" v-model="content"></v-textarea>
+      <v-textarea class="inner-text" placeholder="Write your own translation here" v-model="content"></v-textarea>
       <!-- <textarea id="content" v-model="content" placeholder="Write your own translation here" required> </textarea> -->
       <v-btn type="submit" class="pure-button-primary pure-button submit-button">Post translation</v-btn>
     </div>
@@ -42,9 +42,11 @@ const createSectionTranslation = async (translation: string) => {
 }
 
 .submit-button {
-  position: absolute;
+  /* position: absolute; */
+  /*
   bottom: 30px;
-  right: 10px;
+  right: 10px; */
+  float: right;
   background-color: var(--quaternary);
 }
 </style>
