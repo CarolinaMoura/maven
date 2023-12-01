@@ -3,7 +3,7 @@ import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, W
 import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
-import { Router } from "./framework/router";
+import { Router, getExpressRouter } from "./framework/router";
 import Responses from "./responses";
 class Routes {
   @Router.get("/session")
