@@ -171,7 +171,7 @@ class Routes {
     if (!user.equals(sectionTranslation.translator)) {
       throw new Error("This translation is not yours!");
     }
-    return await SectionTranslation.updateSectionTranslation(new ObjectId(id), translation);
+    return { sectionTranslation: await SectionTranslation.updateSectionTranslation(new ObjectId(id), translation), msg: "Translation updated successfully!" };
   }
 
   @Router.delete("/sectionTranslation/:id")

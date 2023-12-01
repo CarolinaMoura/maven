@@ -13,6 +13,7 @@ const translatorName = props.sectionTranslation.translatorName;
 const emit = defineEmits(["refreshSectionTranslations"]);
 const isEdit = ref(false);
 const edition = ref("");
+const dialog = ref(false);
 
 const userStore = useUserStore();
 const { isLoggedIn, currentUsername } = storeToRefs(userStore);
@@ -50,6 +51,11 @@ const removeSectionTranslation = async () => {
     return Error("Failed to delete translation");
   }
 };
+
+const closeDialogAndRemoveTranslation = async () => {
+  dialog.value = false;
+  await removeSectionTranslation();
+};
 </script>
 
 <template>
@@ -77,8 +83,17 @@ const removeSectionTranslation = async () => {
           <v-btn icon size="x-small" class="ml-auto" @click="enterViewMode">
             <v-icon>mdi-content-save</v-icon>
           </v-btn>
-          <v-btn icon size="x-small" class="ml-auto" @click="removeSectionTranslation">
+          <v-btn icon size="x-small" class="ml-auto">
             <v-icon>mdi-trash-can-outline</v-icon>
+            <v-dialog v-model="dialog" activator="parent" width="auto">
+              <v-card>
+                <v-card-text> Are you sure you want to delete this translation? </v-card-text>
+                <v-card-actions class="v-card-actions">
+                  <v-btn color="primary" block @click="dialog = false">NO</v-btn>
+                  <v-btn color="primary" style="padding: 0; margin: 0" block @click="closeDialogAndRemoveTranslation">YES</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-btn>
         </div>
       </v-card-title>
@@ -89,6 +104,11 @@ const removeSectionTranslation = async () => {
 </template>
 
 <style scoped>
+.v-card-actions {
+  display: flex;
+  flex-direction: column;
+}
+
 .section-translation-card {
   background-color: var(--secondary-20);
   box-sizing: border-box;
