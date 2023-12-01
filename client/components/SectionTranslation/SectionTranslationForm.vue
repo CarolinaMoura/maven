@@ -13,7 +13,10 @@ const emptyForm = () => {
 const createSectionTranslation = async (translation: string) => {
   try {
     await fetchy("/api/sectionTranslation", "POST", {
-      body: { translation, section: props.section },
+      query: {
+        section: props.section,
+        translation,
+      },
     });
     emptyForm();
     emit("refreshSectionTranslations");
@@ -26,9 +29,9 @@ const createSectionTranslation = async (translation: string) => {
 <template>
   <form @submit.prevent="createSectionTranslation(content)">
     <div class="form-inner-container">
-      <v-textarea label="Write your own translation here" v-model="content"></v-textarea>
+      <v-textarea placeholder="Write your own translation here" v-model="content"></v-textarea>
       <!-- <textarea id="content" v-model="content" placeholder="Write your own translation here" required> </textarea> -->
-      <button type="submit" class="pure-button-primary pure-button">Create Post</button>
+      <button type="submit" class="pure-button-primary pure-button">Create translation</button>
     </div>
   </form>
 </template>

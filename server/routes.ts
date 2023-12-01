@@ -142,13 +142,57 @@ class Routes {
     return await Section.splitIntoSections(text);
   }
 
-  // Section Translation
+  ////////////////////////////////
+  //     SectionTranslation     //
+  ////////////////////////////////
+  @Router.get("/sectionTranslation/:section")
+  async getAllSectionTranslations(section: string) {
+    const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
+    return await Promise.all(
+      sectionTranslations.map(async (translation) => {
+        let name = "";
+        try {
+          const user = await User.getUserById(translation.translator).then((user) => user.username);
+          name = user;
+        } catch (e) {
+          name = "Deleted user";
+        }
+        return {
+          translatorName: name,
+          ...translation,
+        };
+      }),
+    );
+  }
+
   @Router.post("/sectionTranslation")
   async createSectionTranslation(session: WebSessionDoc, translation: string, section: string) {
     const user = WebSession.getUser(session);
     const sectionId = new ObjectId(section);
     await Section.checkSectionExists(sectionId);
     return await SectionTranslation.createSectionTranslation(user, translation, sectionId);
+  }
+
+  @Router.patch("/sectionTranslation")
+  async updateSectionTranslation(session: WebSessionDoc, id: string, translation: string) {
+    const user = WebSession.getUser(session);
+    await SectionTranslation.checkSectionTranslationExists(new ObjectId(id));
+    const sectionTranslation = await SectionTranslation.getSectionTranslation(new ObjectId(id));
+    if (!user.equals(sectionTranslation.translator)) {
+      throw new Error("This translation is not yours!");
+    }
+    return { sectionTranslation: await SectionTranslation.updateSectionTranslation(new ObjectId(id), translation), msg: "Translation updated successfully!" };
+  }
+
+  @Router.delete("/sectionTranslation/:id")
+  async deleteSectionTranslation(session: WebSessionDoc, id: string) {
+    const user = WebSession.getUser(session);
+    await SectionTranslation.checkSectionTranslationExists(new ObjectId(id));
+    const sectionTranslation = await SectionTranslation.getSectionTranslation(new ObjectId(id));
+    if (!user.equals(sectionTranslation.translator)) {
+      throw new Error("This translation is not yours!");
+    }
+    return await SectionTranslation.deleteSectionTranslation(new ObjectId(id));
   }
 }
 

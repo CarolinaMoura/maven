@@ -1,24 +1,88 @@
-# API
+# API documentation
 
 ## Section
 
-### Get section by id
+- [Get section by id](#get-section-by-id)
+- [Split a text into sections](#split-a-text-into-sections)
+
+## Section Translation
+
+- [Get all section translations associated with a section](#get-all-section-translations-associated-with-a-section)
+- [Create a section translation](#create-a-section-translation)
+- [Update a section translation text](#update-a-section-translation-text)
+- [Delete a section translation](#delete-a-section-translation)
+
+##
+
+### Section
+
+####
+
+#### [Get section by id](#get-section-by-id)
 
 ```
-/section/:id
+GET: /section/:id
 ```
 
 Takes in an id (ObjectId) and returns a SectionDoc correspondent to that id.
 
-### Split a text into sections
+#### [Split a text into sections](#split-a-text-into-sections)
 
 ```
-/section/?text
+GET: /section/?text
 ```
 
 Takes in a query text (string) and returns a list of SectionDoc, corresponding to a split of "text" into sections. Section order obeys the original text's order.
 
-# 6.1040 Social Media Frontend Starter Code
+### Section Translation
+
+#### [Get all section translations associated with a section](#get-all-section-translations-associated-with-a-section)
+
+```
+GET: /sectionTranslation/:section
+```
+
+Takes in the id of a section and returns all section translations associated with it. The return object is an array of PayloadSectionTranslation's. If the author of a section translation was deleted, returns the username as "Deleted user".
+
+#### [Create a section translation](#create-a-section-translation)
+
+```
+POST: /sectionTranslation
+
+query: {
+  id: ObjectId,
+  translation: string
+}
+```
+
+If there isn't a section corresponding to "id", raises an error. Otherwise, creates a new section translation that points to that section with text "translation".
+
+#### [Update a section translation text](#update-a-section-translation-text)
+
+```
+PATCH: /sectionTranslation
+
+query: {
+  id: ObjectId,
+  translation: string
+}
+```
+
+If there isn't a section translation corresponding to "id", raises an error. If the user requesting an update isn't the owner of the translation, raises an error. Otherwise, updates the section translation's associated translation.
+
+#### [Delete a section translation](#delete-a-section-translation)
+
+```
+DELETE: /sectionTranslation
+
+query: {
+  id: ObjectId,
+}
+```
+
+If there isn't a section translation corresponding to "id", raises an error. If the user requesting the deletion isn't the owner of the translation, raises an error. Otherwise, deletes the section translation.
+
+<!-- # 6.1040 Social Media Frontend Starter Code
 
 ## Getting Started
 
@@ -43,10 +107,12 @@ To run the server, you need to create a MongoDB Atlas instance and connect your 
 3. At the Security Quickstart page, select how you want to authenticate your connection and keep the rest of the defaults. Make sure to allow access to all IPs as shown in [this slide](https://docs.google.com/presentation/d/1HJ4Lz1a2IH5oKu21fQGYgs8G2irtMqnVI9vWDheGfKM/edit#slide=id.g167b96ecbf8_0_0).
 4. Once created, click the **CONNECT** button, select **driver**, and copy the srv connection string. If using username and password, the url should look something like this: `mongodb+srv://<username>:<password>@cluster0.p82ijqd.mongodb.net/?retryWrites=true&w=majority`. Make sure to replace username and password with your actual values.
 5. Now go to your project files and create a new file at the root directory called `.env` (don't forget the 'dot' at the front). Add the line (without `<` and `>`)
-   ```
-   MONGO_SRV=<connection url>
-   ```
-   to the `.env` file.
+```
+
+MONGO_SRV=<connection url>
+
+```
+to the `.env` file.
 
 ## Running Locally
 
@@ -73,8 +139,8 @@ Under the `client/` directory, you can find the frontend starter code and locate
 1. Create a new project on Vercel and link it to your GitHub project.
 2. Under "Build & Development Settings", change "Framework Preset" to `Vue.js` and "Build Command" to `npm run build`.
 3. Add the following environment variables to your Vercel project:
-   Key: `MONGO_SRV`, Value: `<your mongo connection string from .env file>`
-   Note: only paste the right hand value after `=` (without `<` and `>`), i.e. `MONGO_SRV=<your mongo connection string>`
+Key: `MONGO_SRV`, Value: `<your mongo connection string from .env file>`
+Note: only paste the right hand value after `=` (without `<` and `>`), i.e. `MONGO_SRV=<your mongo connection string>`
 4. Deploy!
 
 ## Understanding the Structure
@@ -107,19 +173,19 @@ which includes both concept and RESTful API implementations.
 Here's an overview of the files and directories:
 
 - `server/concepts` contains the concept implementations.
-  Note that we try to keep concepts as modular and generic as possible.
+Note that we try to keep concepts as modular and generic as possible.
 - `server/concepts/errors.ts` contains the base error classes you can
-  either directly use or extend from. You are free to add more base errors
-  in that file if you need to
-  (e.g., if your route needs to return [I am a teapot](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418) error).
+either directly use or extend from. You are free to add more base errors
+in that file if you need to
+(e.g., if your route needs to return [I am a teapot](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/418) error).
 - `framework/` contains the framework code that does the magic to convert your
-  route implementations and error handling into Express handlers.
-  You should not edit this directory, but feel free to take a look!
+route implementations and error handling into Express handlers.
+You should not edit this directory, but feel free to take a look!
 - `server/app.ts` contains your app definition (i.e., concept instantiations).
 - `server/db.ts` contains the MongoDB setup code. You do not need to edit this file.
 - `server/routes.ts` contains the code for your API routes.
-  Try to keep your route definitions as simple as possible.
+Try to keep your route definitions as simple as possible.
 - `server/responses.ts` contains the code for formatting your responses and errors
-  into a more user-friendly format for the front-end. For example, it would be better
-  if your front-end receives `barish is not the author of this post` instead of
-  `64e52a1f5ffc7d0d48a0569d is not the author of this post`.
+into a more user-friendly format for the front-end. For example, it would be better
+if your front-end receives `barish is not the author of this post` instead of
+`64e52a1f5ffc7d0d48a0569d is not the author of this post`. -->

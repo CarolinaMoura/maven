@@ -7,7 +7,7 @@ export interface SectionTranslationDoc extends BaseDoc {
   section: ObjectId;
 }
 
-export default class SectionConcept {
+export default class SectionTranslationConcept {
   private readonly sectionTranslations = new DocCollection<SectionTranslationDoc>("sectionTranslations");
 
   async createSectionTranslation(translator: ObjectId, translation: string, section: ObjectId) {
@@ -17,6 +17,20 @@ export default class SectionConcept {
   async getSectionTranslations(filter: Filter<SectionTranslationDoc>) {
     return await this.sectionTranslations.readMany(filter);
   }
+
+  async checkSectionTranslationExists(id: ObjectId) {
+    return (await this.sectionTranslations.readOne({ _id: id })) !== null;
+  }
+
+  async updateSectionTranslation(id: ObjectId, translation: string) {
+    return await this.sectionTranslations.updateOne({ _id: id }, { translation });
+  }
+
+  async deleteSectionTranslation(id: ObjectId) {
+    await this.sectionTranslations.deleteOne({ _id: id });
+    return { msg: "Translation deleted successfully!" };
+  }
+
   async getSectionTranslation(id: ObjectId) {
     const sectionTranslation = await this.sectionTranslations.readOne({ _id: id });
     if (sectionTranslation === null) {
