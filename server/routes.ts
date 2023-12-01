@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, User, WebSession } from "./app";
+import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, WebSession } from "./app";
 import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
-import { Router, getExpressRouter } from "./framework/router";
+import { Router } from "./framework/router";
 import Responses from "./responses";
 class Routes {
   @Router.get("/session")
@@ -57,7 +57,7 @@ class Routes {
   /////////////////////
   //       Tag       //
   /////////////////////
-  @Router.post("tag")
+  @Router.post("'tag")
   async createTag(name: string, isLanguage: boolean) {
     return await Tag.createTag(name, isLanguage);
   }
@@ -197,6 +197,29 @@ class Routes {
       throw new Error("This translation is not yours!");
     }
     return await SectionTranslation.deleteSectionTranslation(new ObjectId(id));
+  }
+
+  /////////////////////
+  // TranslationRequest //
+  /////////////////////
+  @Router.post("/translationRequest")
+  async createTranslationRequest(session: WebSessionDoc, document: string, languageTo: string) {
+    const user = WebSession.getUser(session);
+    const documentId = new ObjectId(document);
+
+    // see if tag exists for language, and if not create a tag for it
+    let languageId;
+    try {
+      languageId = await Tag.getTagId(languageTo, true);
+    } catch (e) {
+      languageId = (await Tag.createTag(languageTo, true)).tagId;
+    }
+
+    const documentDoc = await Document.getDocument(documentId);
+    const sections = await Section.splitIntoSections(documentDoc.content);
+    const translationRequest = await TranslationRequest.createTranslationRequest(documentId, sections, languageId, user);
+    await Tag.attachTag(languageId, translationRequest);
+    return { msg: "Created translation request!" };
   }
 }
 
