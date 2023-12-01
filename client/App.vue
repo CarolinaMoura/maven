@@ -29,7 +29,7 @@ onBeforeMount(async () => {
     <nav>
       <div class="title">
         <RouterLink :to="{ name: 'Home' }">
-          <h1>Maven</h1>
+          <h1>maven</h1>
         </RouterLink>
       </div>
       <ul>
