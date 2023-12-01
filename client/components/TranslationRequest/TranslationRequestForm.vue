@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import { useTagStore } from "../../stores/tags";
 import { fetchy } from "../../utils/fetchy";
+const tagStore = useTagStore();
+const { languageTags } = storeToRefs(useTagStore());
 
 const DOMAINS = ["Computer Science", "Biology"];
-const LANGUAGES = ["English", "Turkish"];
+const LANGUAGES = languageTags;
 
 // keeps track of if form is open or not
 const formOpen = ref(false);
@@ -29,6 +33,16 @@ function deleteAuthor(idx: number) {
   authors.value.splice(idx, 1);
 }
 
+function clearForm() {
+  formOpen.value = false;
+  title.value = "";
+  authors.value = [{ first: "", last: "" }];
+  year.value = undefined;
+  domain.value = "";
+  content.value = "";
+  originalLanguage.value = "";
+}
+
 async function submitRequest() {
   if (isFormValid.value) {
     try {
@@ -37,18 +51,19 @@ async function submitRequest() {
           title: title.value,
           authors: authors.value,
           year: Number.parseInt(year.value),
-          domain: domain.value,
+          domain: domain.value[0].toUpperCase() + domain.value.slice(1),
           content: content.value,
-          originalLanguage: originalLanguage.value,
+          originalLanguage: originalLanguage.value[0].toUpperCase() + originalLanguage.value.slice(1),
         },
       });
+      await tagStore.getLanguageTags();
       emit("refreshDocuments");
     } catch (e) {
       return;
     }
   }
 
-  formOpen.value = false;
+  clearForm();
 }
 
 const domainRule = [
@@ -71,7 +86,6 @@ const yearRules = [
     return "Field cannot be empty.";
   },
   (v: string) => {
-    console.log("v ", v);
     const validYear = new RegExp("^[0-9]{4}$");
     if (validYear.test(v)) return true;
     return "Must be a valid year";
@@ -108,8 +122,8 @@ const closeForm = () => {
             <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
-              <v-col :sm="4"><v-select label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-select></v-col>
-              <v-col :sm="4"><v-select label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-select></v-col>
+              <v-col :sm="4"><v-combobox label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-combobox></v-col>
+              <v-col :sm="4"><v-combobox label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-combobox></v-col>
             </v-row>
 
             <v-row>

@@ -27,6 +27,7 @@ const props = defineProps(["document"]);
     </p>
 
     <p>{{ `Published ${props.document.year}` }}</p>
+    <p>{{ props.document.originalLanguage }}</p>
     <p>{{ props.document.domain }}</p>
   </div>
 </template>
