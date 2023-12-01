@@ -4,6 +4,7 @@ import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
+import Responses from "./responses";
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -88,15 +89,18 @@ class Routes {
   async createDocument(session: WebSessionDoc, title: string, authors: Author[], year: number, domain: string, content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
 
-    const languageId = await Tag.getTagId(originalLanguage);
-    if (!(await Tag.checkTagIsLanguage(languageId))) {
-      throw new Error("Tag is not a language!");
+    // see if tag exists for language, and if not create a tag for it
+    let languageId;
+    try {
+      languageId = await Tag.getTagId(originalLanguage, true);
+    } catch (e) {
+      languageId = (await Tag.createTag(originalLanguage, true)).tagId;
     }
 
     // see if tag exists for domain, and if not create a tag for it
     let domainId;
     try {
-      domainId = await Tag.getTagId(domain);
+      domainId = await Tag.getTagId(domain, false);
     } catch (e) {
       domainId = (await Tag.createTag(domain, false)).tagId;
     }
@@ -107,11 +111,11 @@ class Routes {
   }
   @Router.get("/document")
   async getDocuments() {
-    return await Document.getDocuments();
+    return await Responses.documents(await Document.getDocuments());
   }
   @Router.get("/document/:id")
   async getDocument(id: string) {
-    return await Document.getDocument(new ObjectId(id));
+    return await Responses.document(await Document.getDocument(new ObjectId(id)));
   }
   @Router.delete("/document/:id")
   async deleteDocument(session: WebSessionDoc, id: string) {
