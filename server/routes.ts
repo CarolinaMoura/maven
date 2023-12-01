@@ -199,9 +199,9 @@ class Routes {
     return await SectionTranslation.deleteSectionTranslation(new ObjectId(id));
   }
 
-  /////////////////////
+  ////////////////////////
   // TranslationRequest //
-  /////////////////////
+  ///////////////////////
   @Router.post("/translationRequest")
   async createTranslationRequest(session: WebSessionDoc, document: string, languageTo: string) {
     const user = WebSession.getUser(session);
