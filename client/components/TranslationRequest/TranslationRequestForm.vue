@@ -4,7 +4,7 @@ import { ref } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { fetchy } from "../../utils/fetchy";
 const tagStore = useTagStore();
-const { languageTags, contentTags } = storeToRefs(useTagStore());
+const { languageTags } = storeToRefs(useTagStore());
 
 const DOMAINS = ["Computer Science", "Biology"];
 const LANGUAGES = languageTags;
