@@ -32,13 +32,16 @@ onBeforeMount(async () => {
 
 <template>
   <section class="sections" v-if="loaded && sections.length !== 0">
-    <h2>Original Text</h2>
+    <div class="header-container">
+      <h2>Original Text</h2>
+      <h2 class="instruction" v-if="!activeSection">(select a section)</h2>
+    </div>
     <div class="sections-container" v-for="section in sections" :key="section._id">
-      <article @click="logSection(section._id)">
+      <article @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }">
         <SectionComponent :section="section" />
       </article>
-      <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
-      <!-- <SectionTranslationForm v-else :section="section" @refreshPosts="getSections" @editPost="updateEditing" /> -->
+      <SectionTranslationList :section="section._id" v-if="section._id == activeSection"
+        class="section-translation-list" />
     </div>
   </section>
   <p v-else-if="loaded">No sections found</p>
@@ -48,6 +51,22 @@ onBeforeMount(async () => {
 <style scoped>
 h2 {
   margin-bottom: 0px;
+}
+
+.instruction {
+  margin-left: auto;
+  overflow-y: auto;
+  width: 90%;
+}
+
+.active-section {
+  border: 2px solid rgb(15, 133, 78)
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
 .sections {
@@ -62,7 +81,6 @@ article {
   border-radius: 20px;
   padding: 20px;
   margin: 1px 0;
-  /* margin-left: 50px; */
   width: 100%;
   box-sizing: border-box;
   cursor: pointer;
@@ -73,10 +91,6 @@ article {
   grid-template-columns: 2fr 1fr;
   grid-gap: 10px;
 }
-
-/* .section-translation-list {
-  margin-left: 5%;
-}*/
 
 @media (min-width: 800px) {
   .sections-container {
