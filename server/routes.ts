@@ -81,7 +81,7 @@ class Routes {
 
   @Router.get("/tag/object/:object")
   async getObjectTags(object: string) {
-    return await Tag.getObjectTags(new ObjectId(object));
+    return await Responses.attachments(await Tag.getObjectTags(new ObjectId(object)));
   }
   @Router.get("/tag/tag/:tag")
   async getTaggedObjects(tag: string) {
@@ -105,8 +105,15 @@ class Routes {
     });
     const tagsId = await Promise.all(promises);
 
-    const documentId = await Document.createDocument(title, authors, year, tagsId, content, user, languageId);
+    const documentId = await Document.createDocument(title, authors, year, content, user, languageId);
     await Tag.attachTag(languageId, documentId);
+
+    // attach tags to document
+    const tagsPromises = tagsId.map(async (tagId) => {
+      return await Tag.attachTag(tagId, documentId);
+    });
+    await Promise.all(tagsPromises);
+
     return { msg: "Created document!", _id: documentId };
   }
   @Router.get("/document")

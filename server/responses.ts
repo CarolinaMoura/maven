@@ -1,5 +1,6 @@
 import { Tag, User } from "./app";
 import { DocumentDoc } from "./concepts/document";
+import { AttachmentDoc } from "./concepts/tag";
 import { TranslationRequestDoc } from "./concepts/translationRequest";
 
 /**
@@ -11,11 +12,8 @@ export default class Responses {
 
   static async document(document: DocumentDoc) {
     const languageTag = await Tag.getTag(document.originalLanguage);
-    const promises = document.tags.map(async (t) => {
-      return (await Tag.getTag(t))?.name;
-    });
-    const tags = await Promise.all(promises);
-    return { ...document, originalLanguage: languageTag?.name, tags };
+
+    return { ...document, originalLanguage: languageTag?.name };
   }
 
   static async documents(documents: DocumentDoc[]) {
@@ -35,6 +33,13 @@ export default class Responses {
   static async translationRequests(translationRequests: TranslationRequestDoc[]) {
     const promises = translationRequests.map(async (t) => {
       return await this.translationRequest(t);
+    });
+    return await Promise.all(promises);
+  }
+
+  static async attachments(attachments: AttachmentDoc[]) {
+    const promises = attachments.map(async (a) => {
+      return (await Tag.getTag(a.tag))?.name;
     });
     return await Promise.all(promises);
   }

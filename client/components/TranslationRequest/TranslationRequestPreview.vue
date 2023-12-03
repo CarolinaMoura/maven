@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Tag from "@/components/Tag/Tag.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
@@ -8,10 +9,13 @@ const { currentUsername } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 const document = ref();
+const tags = ref();
 
 onBeforeMount(async () => {
   const fetchedDocument = await fetchy(`/api/document/${props.request.document}`, "GET");
+  const fetchedTags = await fetchy(`/api/tag/object/${fetchedDocument._id}`, "GET");
   document.value = fetchedDocument;
+  tags.value = fetchedTags;
   loaded.value = true;
 });
 
@@ -25,9 +29,9 @@ async function deleteRequest() {
 </script>
 
 <template>
-  <div v-if="loaded" class="preview-container column">
+  <v-card v-if="loaded" class="preview-card card" hover>
     <v-btn v-if="currentUsername === request.requester" variant="plain" @click="deleteRequest"><v-icon>mdi-trash-can</v-icon></v-btn>
-    <p>{{ document.title }}</p>
+    <h3>{{ document.title }}</h3>
     <p>
       {{
         document.authors
@@ -40,20 +44,23 @@ async function deleteRequest() {
 
     <p>{{ `Published ${document.year}` }}</p>
     <p>{{ `${document.originalLanguage} ==> ${request.languageTo}` }}</p>
-    <p v-for="tag in document.tags" :key="tag">{{ tag }}</p>
+
+    <div class="row">
+      <Tag v-for="tag in tags" :key="tag">{{ tag }}</Tag>
+    </div>
     <RouterLink :to="{ name: 'Translation', params: { id: props.request._id } }">View Translations</RouterLink>
-    <!-- TODO -->
     <v-btn>request translation in a different language</v-btn>
-  </div>
+  </v-card>
+
   <div v-else class="preview-container column">Loading...</div>
 </template>
 
 <style>
-.preview-container {
+.preview-card.card {
   align-items: start;
-  background-color: var(--secondary);
+  background-color: var(--secondary-20);
   border-radius: 10px;
-  padding: 1em;
+  padding: 1.5em;
   margin-bottom: 1em;
 }
 </style>

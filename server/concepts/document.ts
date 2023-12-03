@@ -9,7 +9,6 @@ export interface DocumentDoc extends BaseDoc {
   title: string;
   authors: Author[];
   year: number;
-  tags: ObjectId[];
   content: string;
   uploader: ObjectId;
   originalLanguage: ObjectId;
@@ -18,8 +17,8 @@ export interface DocumentDoc extends BaseDoc {
 export default class DocumentConcept {
   private readonly documents = new DocCollection<DocumentDoc>("documents");
 
-  async createDocument(title: string, authors: Author[], year: number, tags: ObjectId[], content: string, uploader: ObjectId, originalLanguage: ObjectId) {
-    return await this.documents.createOne({ title, authors, content, year, tags, uploader, originalLanguage });
+  async createDocument(title: string, authors: Author[], year: number, content: string, uploader: ObjectId, originalLanguage: ObjectId) {
+    return await this.documents.createOne({ title, authors, content, year, uploader, originalLanguage });
   }
 
   async getDocuments() {
