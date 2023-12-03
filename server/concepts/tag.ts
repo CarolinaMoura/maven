@@ -34,6 +34,9 @@ export default class TagConcept {
   async getLanguageTags() {
     return await this.tags.readMany({ isLanguage: true });
   }
+  async getOtherTags() {
+    return await this.tags.readMany({ isLanguage: false });
+  }
   async checkTagIsLanguage(tag: ObjectId) {
     const tagDoc = await this.tags.readOne({ _id: tag });
     if (tagDoc === null) {
@@ -42,8 +45,8 @@ export default class TagConcept {
     return tagDoc.isLanguage;
   }
 
-  async getTagId(name: string, isLanguage: boolean) {
-    const tagDoc = await this.tags.readOne({ name, isLanguage });
+  async getTagId(name: string) {
+    const tagDoc = await this.tags.readOne({ name });
     if (tagDoc === null) {
       throw new Error(`Tag ${name} not found!`);
     }

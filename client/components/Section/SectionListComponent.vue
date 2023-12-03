@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
+import { fetchy } from "../../utils/fetchy";
 import SectionTranslationList from "../SectionTranslation/SectionTranslationList.vue";
 import SectionComponent from "./SectionComponent.vue";
 
+const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
-let sections = ref<Array<Record<string, any>>>([]);
+const sections = ref();
+
+// let sections = ref<Array<Record<string, any>>>([]);
 let editing = ref("");
 const activeSection = ref<string>("");
 
 async function getSections() {
   let sectionResults;
   try {
-    sectionResults = await fetchy("/api/section", "GET", {});
+    const sectionPromises = props.sectionsIds.map(async (id: string) => {
+      return await fetchy(`/api/section/${id}`, "GET");
+    });
+    sectionResults = await Promise.all(sectionPromises);
   } catch (_) {
     return;
   }
@@ -40,8 +46,7 @@ onBeforeMount(async () => {
       <article @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }">
         <SectionComponent :section="section" />
       </article>
-      <SectionTranslationList :section="section._id" v-if="section._id == activeSection"
-        class="section-translation-list" />
+      <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
     </div>
   </section>
   <p v-else-if="loaded">No sections found</p>
@@ -60,7 +65,7 @@ h2 {
 }
 
 .active-section {
-  border: 2px solid rgb(15, 133, 78)
+  border: 2px solid rgb(15, 133, 78);
 }
 
 .header-container {

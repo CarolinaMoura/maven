@@ -73,9 +73,15 @@ class Routes {
   async getLanguageTags() {
     return await Tag.getLanguageTags();
   }
+
+  @Router.get("/tag/other")
+  async getOtherTags() {
+    return await Tag.getOtherTags();
+  }
+
   @Router.get("/tag/object/:object")
   async getObjectTags(object: string) {
-    return await Tag.getObjectTags(new ObjectId(object));
+    return await Responses.attachments(await Tag.getObjectTags(new ObjectId(object)));
   }
   @Router.get("/tag/tag/:tag")
   async getTaggedObjects(tag: string) {
@@ -86,28 +92,29 @@ class Routes {
   //    Document    //
   ////////////////////
   @Router.post("/document")
-  async createDocument(session: WebSessionDoc, title: string, authors: Author[], year: number, domain: string, content: string, originalLanguage: string) {
+  async createDocument(session: WebSessionDoc, title: string, authors: Author[], year: number, tags: string[], content: string, originalLanguage: string) {
     const user = WebSession.getUser(session);
 
-    // see if tag exists for language, and if not create a tag for it
-    let languageId;
-    try {
-      languageId = await Tag.getTagId(originalLanguage, true);
-    } catch (e) {
-      languageId = (await Tag.createTag(originalLanguage, true)).tagId;
+    const languageId = await Tag.getTagId(originalLanguage);
+    if (!(await Tag.checkTagIsLanguage(languageId))) {
+      throw new Error("Tag is not a language!");
     }
 
-    // see if tag exists for domain, and if not create a tag for it
-    let domainId;
-    try {
-      domainId = await Tag.getTagId(domain, false);
-    } catch (e) {
-      domainId = (await Tag.createTag(domain, false)).tagId;
-    }
+    const promises = tags.map(async (t) => {
+      return await Tag.getTagId(t);
+    });
+    const tagsId = await Promise.all(promises);
 
-    const documentId = await Document.createDocument(title, authors, year, domainId, content, user, languageId);
+    const documentId = await Document.createDocument(title, authors, year, content, user, languageId);
     await Tag.attachTag(languageId, documentId);
-    return { msg: "Created document!" };
+
+    // attach tags to document
+    const tagsPromises = tagsId.map(async (tagId) => {
+      return await Tag.attachTag(tagId, documentId);
+    });
+    await Promise.all(tagsPromises);
+
+    return { msg: "Created document!", _id: documentId };
   }
   @Router.get("/document")
   async getDocuments() {
@@ -207,12 +214,9 @@ class Routes {
     const user = WebSession.getUser(session);
     const documentId = new ObjectId(document);
 
-    // see if tag exists for language, and if not create a tag for it
-    let languageId;
-    try {
-      languageId = await Tag.getTagId(languageTo, true);
-    } catch (e) {
-      languageId = (await Tag.createTag(languageTo, true)).tagId;
+    const languageId = await Tag.getTagId(languageTo);
+    if (!(await Tag.checkTagIsLanguage(languageId))) {
+      throw new Error("Tag is not a language!");
     }
 
     const documentDoc = await Document.getDocument(documentId);
@@ -220,6 +224,27 @@ class Routes {
     const translationRequest = await TranslationRequest.createTranslationRequest(documentId, sections, languageId, user);
     await Tag.attachTag(languageId, translationRequest);
     return { msg: "Created translation request!" };
+  }
+
+  @Router.delete("/translationRequest/:id")
+  async deleteTranslationRequest(session: WebSessionDoc, id: string) {
+    const user = WebSession.getUser(session);
+    const request = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+    if (!user.equals(request.requester)) {
+      throw new Error("You did not create this request!");
+    }
+    await Tag.deleteTagAttachment(request.languageTo, request._id);
+    return await TranslationRequest.deleteTranslationRequest(new ObjectId(id));
+  }
+
+  @Router.get("/translationRequest")
+  async getTranslationRequests() {
+    return await Responses.translationRequests(await TranslationRequest.getTranslationRequests());
+  }
+
+  @Router.get("/translationRequest/:id")
+  async getTranslationRequest(id: string) {
+    return await Responses.translationRequest(await TranslationRequest.getTranslationRequest(new ObjectId(id)));
   }
 }
 

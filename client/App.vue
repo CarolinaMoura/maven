@@ -18,6 +18,7 @@ onBeforeMount(async () => {
   try {
     await userStore.updateSession();
     await tagStore.getLanguageTags();
+    await tagStore.getOtherTags();
   } catch {
     // User is not logged in
   }
@@ -36,9 +37,9 @@ onBeforeMount(async () => {
         <li>
           <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
-        <li>
+        <!-- <li>
           <RouterLink :to="{ name: 'Translation' }" :class="{ underline: currentRouteName == 'Translation' }"> TranslationTest </RouterLink>
-        </li>
+        </li> -->
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
         </li>
