@@ -41,6 +41,9 @@ async function deleteRequest() {
     <p>{{ `Published ${document.year}` }}</p>
     <p>{{ `${document.originalLanguage} ==> ${request.languageTo}` }}</p>
     <p v-for="tag in document.tags" :key="tag">{{ tag }}</p>
+    <RouterLink :to="{ name: 'Translation', params: { id: props.request._id } }">View Translations</RouterLink>
+    <!-- TODO -->
+    <v-btn>request translation in a different language</v-btn>
   </div>
   <div v-else class="preview-container column">Loading...</div>
 </template>
