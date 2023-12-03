@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useUserStore } from "../../stores/user";
@@ -73,8 +72,6 @@ async function getVotes() {
   }
 }
 
-// await getVotes();
-
 </script>
 
 <template>
@@ -89,7 +86,7 @@ async function getVotes() {
           @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <VoteComponent :section="props.sectionTranslation._id" :initUpvotes="upvotes" :initDownvotes="downvotes" />
+        <!-- <VoteComponent :section="props.sectionTranslation._id" :initUpvotes="upvotes" :initDownvotes="downvotes" /> -->
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
