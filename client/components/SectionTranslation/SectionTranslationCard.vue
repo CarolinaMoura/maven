@@ -4,6 +4,7 @@ import { ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
+// import VoteComponent from "./components/Vote/VoteComponent.vue";
 
 interface SectionTranslationProps {
   sectionTranslation: PayloadSectionTranslation;
@@ -66,10 +67,11 @@ const closeDialogAndRemoveTranslation = async () => {
           <b>Translator: </b>
           <u>{{ translatorName }}</u>
         </div>
-        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto" @click="enterEditMode">
+        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto"
+          @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <span v-else>Upvote button</span>
+        <!-- <span v-else>Upvote button</span> -->
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
@@ -97,8 +99,8 @@ const closeDialogAndRemoveTranslation = async () => {
           </v-btn>
         </div>
       </v-card-title>
-      <!-- <v-card-title>Translation:</v-card-title> -->
-      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation" v-model="edition"></v-textarea>
+      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation"
+        v-model="edition"></v-textarea>
     </div>
   </v-card>
 </template>
