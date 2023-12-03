@@ -6,7 +6,7 @@ import { fetchy } from "../../utils/fetchy";
 const tagStore = useTagStore();
 const { languageTags } = storeToRefs(useTagStore());
 
-const DOMAINS = ["Computer Science", "Biology"];
+const TAGS = ["Computer Science", "Biology"];
 const LANGUAGES = languageTags;
 
 // keeps track of if form is open or not
@@ -15,15 +15,19 @@ const formOpen = ref(false);
 // keeps track of if form fields are valid or not
 const isFormValid = ref(false);
 
-// keep track of field values
+// keep track of field values for document
 const title = ref("");
 const authors = ref([{ first: "", last: "" }]);
 const year = ref();
-const domain = ref("");
+const tags = ref([]);
 const content = ref("");
 const originalLanguage = ref("");
 
-const emit = defineEmits(["refreshDocuments"]);
+// keep track of field values for translationRequest
+const targetLanguage = ref("");
+const description = ref("");
+
+const emit = defineEmits(["refreshRequests"]);
 
 function addAuthor() {
   authors.value = [...authors.value, { first: "", last: "" }];
@@ -38,7 +42,7 @@ function clearForm() {
   title.value = "";
   authors.value = [{ first: "", last: "" }];
   year.value = undefined;
-  domain.value = "";
+  tags.value = [];
   content.value = "";
   originalLanguage.value = "";
 }
@@ -46,30 +50,32 @@ function clearForm() {
 async function submitRequest() {
   if (isFormValid.value) {
     try {
-      await fetchy("/api/document", "POST", {
+      // create document first
+      const document = await fetchy("/api/document", "POST", {
         body: {
           title: title.value,
           authors: authors.value,
           year: Number.parseInt(year.value),
-          domain: domain.value[0].toUpperCase() + domain.value.slice(1),
+          tags: tags.value,
           content: content.value,
-          originalLanguage: originalLanguage.value[0].toUpperCase() + originalLanguage.value.slice(1),
+          originalLanguage: originalLanguage.value,
         },
       });
-      await tagStore.getLanguageTags();
-      emit("refreshDocuments");
+
+      // then use returned id to create request
+      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value } });
+      emit("refreshRequests");
+      closeForm();
     } catch (e) {
       return;
     }
   }
-
-  clearForm();
 }
 
-const domainRule = [
-  (v: string) => {
+const selectRule = [
+  (v: Array<string>) => {
     if (v.length > 0) return true;
-    return "Field cannot be empty.";
+    return "Field cannot be empty";
   },
 ];
 
@@ -94,6 +100,7 @@ const yearRules = [
 
 const closeForm = () => {
   formOpen.value = false;
+  clearForm();
 };
 </script>
 <template>
@@ -122,8 +129,8 @@ const closeForm = () => {
             <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
-              <v-col :sm="4"><v-combobox label="Domain" v-model="domain" :items="DOMAINS" :rules="domainRule"></v-combobox></v-col>
-              <v-col :sm="4"><v-combobox label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="domainRule"></v-combobox></v-col>
+              <v-col :sm="4"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips></v-select></v-col>
+              <v-col :sm="4"><v-select label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
             </v-row>
 
             <v-row>
@@ -143,6 +150,16 @@ const closeForm = () => {
           <div class="form-section">
             Document Upload
             <v-textarea label="Document Content" v-model="content" :rules="nonEmptyRule"></v-textarea>
+          </div>
+
+          <div class="form-section">
+            Translation Request Details
+            <v-row>
+              <v-col :sm="4"><v-select label="Language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+            </v-row>
+            <v-row>
+              <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with`"></v-textarea> </v-col>
+            </v-row>
           </div>
 
           <button class="btn-primary">Submit request</button>

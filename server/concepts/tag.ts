@@ -42,8 +42,8 @@ export default class TagConcept {
     return tagDoc.isLanguage;
   }
 
-  async getTagId(name: string, isLanguage: boolean) {
-    const tagDoc = await this.tags.readOne({ name, isLanguage });
+  async getTagId(name: string) {
+    const tagDoc = await this.tags.readOne({ name });
     if (tagDoc === null) {
       throw new Error(`Tag ${name} not found!`);
     }

@@ -1,24 +1,36 @@
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
 import { Author } from "../../types";
-// const loaded = ref(false);
-// const props = defineProps(["translationRequest"]);
-// const document = ref();
+import { fetchy } from "../../utils/fetchy";
+const { currentUsername } = storeToRefs(useUserStore());
 
-// onBeforeMount(async () => {
-//   const fetchedDocument = await fetchy("/api/document", "GET", { query: { _id: props.translationRequest.document } });
-//   document.value = fetchedDocument;
-//   loaded.value = true;
-// });
+const loaded = ref(false);
+const document = ref();
 
-const props = defineProps(["document"]);
+onBeforeMount(async () => {
+  const fetchedDocument = await fetchy(`/api/document/${props.request.document}`, "GET");
+  document.value = fetchedDocument;
+  loaded.value = true;
+});
+
+const props = defineProps(["request"]);
+const emit = defineEmits(["refreshRequests"]);
+
+async function deleteRequest() {
+  await fetchy(`/api/translationRequest/${props.request._id}`, "DELETE");
+  emit("refreshRequests");
+}
 </script>
 
 <template>
-  <div class="preview-container column">
-    <p>{{ props.document.title }}</p>
+  <div v-if="loaded" class="preview-container column">
+    <v-btn v-if="currentUsername === request.requester" variant="plain" @click="deleteRequest"><v-icon>mdi-trash-can</v-icon></v-btn>
+    <p>{{ document.title }}</p>
     <p>
       {{
-        props.document.authors
+        document.authors
           .map((a: Author) => {
             return `${a.first} ${a.last}`;
           })
@@ -26,10 +38,11 @@ const props = defineProps(["document"]);
       }}
     </p>
 
-    <p>{{ `Published ${props.document.year}` }}</p>
-    <p>{{ props.document.originalLanguage }}</p>
-    <p>{{ props.document.domain }}</p>
+    <p>{{ `Published ${document.year}` }}</p>
+    <p>{{ document.originalLanguage }}</p>
+    <p v-for="tag in document.tags" :key="tag">tag</p>
   </div>
+  <div v-else class="preview-container column">Loading...</div>
 </template>
 
 <style>
