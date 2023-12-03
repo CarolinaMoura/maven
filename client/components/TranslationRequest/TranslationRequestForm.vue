@@ -3,10 +3,9 @@ import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { fetchy } from "../../utils/fetchy";
-const tagStore = useTagStore();
-const { languageTags } = storeToRefs(useTagStore());
+const { languageTags, otherTags } = storeToRefs(useTagStore());
 
-const TAGS = ["Computer Science", "Biology"];
+const TAGS = otherTags;
 const LANGUAGES = languageTags;
 
 // keeps track of if form is open or not

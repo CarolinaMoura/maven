@@ -73,6 +73,12 @@ class Routes {
   async getLanguageTags() {
     return await Tag.getLanguageTags();
   }
+
+  @Router.get("/tag/other")
+  async getOtherTags() {
+    return await Tag.getOtherTags();
+  }
+
   @Router.get("/tag/object/:object")
   async getObjectTags(object: string) {
     return await Tag.getObjectTags(new ObjectId(object));
