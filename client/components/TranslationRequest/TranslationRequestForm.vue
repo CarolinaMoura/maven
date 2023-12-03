@@ -20,10 +20,10 @@ const authors = ref([{ first: "", last: "" }]);
 const year = ref();
 const tags = ref([]);
 const content = ref("");
-const originalLanguage = ref("");
+const originalLanguage = ref();
 
 // keep track of field values for translationRequest
-const targetLanguage = ref("");
+const targetLanguage = ref();
 const description = ref("");
 
 const emit = defineEmits(["refreshRequests"]);
@@ -72,6 +72,11 @@ async function submitRequest() {
 }
 
 const selectRule = [
+  (v: string) => {
+    if (v) return true;
+    return "Field cannot be empty";
+  },
+
   (v: Array<string>) => {
     if (v.length > 0) return true;
     return "Field cannot be empty";

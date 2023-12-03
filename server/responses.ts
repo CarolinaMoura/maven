@@ -27,9 +27,9 @@ export default class Responses {
 
   /** convert TranslationRequest doc to readable format by converting requester from ObjectId to name representation */
   static async translationRequest(translationRequest: TranslationRequestDoc) {
-    const requester = translationRequest.requester;
-    const user = await User.getUserById(requester);
-    return { ...translationRequest, requester: user.username };
+    const languageTo = await Tag.getTag(translationRequest.languageTo);
+    const requester = await User.getUserById(translationRequest.requester);
+    return { ...translationRequest, requester: requester.username, languageTo: languageTo?.name };
   }
 
   static async translationRequests(translationRequests: TranslationRequestDoc[]) {

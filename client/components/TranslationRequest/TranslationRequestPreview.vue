@@ -39,8 +39,8 @@ async function deleteRequest() {
     </p>
 
     <p>{{ `Published ${document.year}` }}</p>
-    <p>{{ document.originalLanguage }}</p>
-    <p v-for="tag in document.tags" :key="tag">tag</p>
+    <p>{{ `${document.originalLanguage} ==> ${request.languageTo}` }}</p>
+    <p v-for="tag in document.tags" :key="tag">{{ tag }}</p>
   </div>
   <div v-else class="preview-container column">Loading...</div>
 </template>
