@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useUserStore } from "../../stores/user";
@@ -15,9 +14,6 @@ const emit = defineEmits(["refreshSectionTranslations"]);
 const isEdit = ref(false);
 const edition = ref("");
 const dialog = ref(false);
-
-const upvotes = ref(0);
-const downvotes = ref(0);
 
 const userStore = useUserStore();
 const { isLoggedIn, currentUsername } = storeToRefs(userStore);
@@ -60,21 +56,6 @@ const closeDialogAndRemoveTranslation = async () => {
   dialog.value = false;
   await removeSectionTranslation();
 };
-
-async function getVotes() {
-  try {
-    const votes = await fetchy("/api/votes", "GET", {
-      query: { content: props.sectionTranslation._id },
-    });
-    upvotes.value = votes.upvotes;
-    downvotes.value = votes.downvotes;
-  } catch {
-    return;
-  }
-}
-
-// await getVotes();
-
 </script>
 
 <template>
@@ -85,11 +66,10 @@ async function getVotes() {
           <b>Translator: </b>
           <u>{{ translatorName }}</u>
         </div>
-        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto"
-          @click="enterEditMode">
+        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto" @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <VoteComponent :section="props.sectionTranslation._id" :initUpvotes="upvotes" :initDownvotes="downvotes" />
+        <span v-else>Upvote button</span>
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
@@ -117,8 +97,8 @@ async function getVotes() {
           </v-btn>
         </div>
       </v-card-title>
-      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation"
-        v-model="edition"></v-textarea>
+      <!-- <v-card-title>Translation:</v-card-title> -->
+      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation" v-model="edition"></v-textarea>
     </div>
   </v-card>
 </template>

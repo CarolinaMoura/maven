@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, Vote, WebSession } from "./app";
+import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, WebSession } from "./app";
 import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -245,27 +245,6 @@ class Routes {
   @Router.get("/translationRequest/:id")
   async getTranslationRequest(id: string) {
     return await Responses.translationRequest(await TranslationRequest.getTranslationRequest(new ObjectId(id)));
-  }
-
-    ///////////////////
-    //    Upvote    //
-    //////////////////
-  @Router.get("/votes")
-  async getVotes(section: ObjectId) 
-  {
-    return await Vote.countUpvotes(section);
-  }
-
-  @Router.post("/votes/vote")
-  async vote(session: WebSessionDoc, section: ObjectId, upvote: boolean){
-    const user = WebSession.getUser(session);
-    return await Vote.vote(section, user, upvote);
-  }
-
-  @Router.patch("/votes/removeVote")
-  async removeVote(session: WebSessionDoc, section: ObjectId, upvote: boolean){
-    const user = WebSession.getUser(session);
-    return await Vote.removeVote(section, user, upvote);
   }
 }
 

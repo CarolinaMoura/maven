@@ -4,7 +4,6 @@ import SectionTranslationConcept from "./concepts/sectionTranslation";
 import TagConcept from "./concepts/tag";
 import TranslationRequestConcept from "./concepts/translationRequest";
 import UserConcept from "./concepts/user";
-import VoteConcept from "./concepts/vote";
 import WebSessionConcept from "./concepts/websession";
 
 // App Definition using concepts
@@ -15,4 +14,3 @@ export const TranslationRequest = new TranslationRequestConcept();
 export const Document = new DocumentConcept();
 export const Section = new SectionConcept();
 export const SectionTranslation = new SectionTranslationConcept();
-export const Vote = new VoteConcept();
