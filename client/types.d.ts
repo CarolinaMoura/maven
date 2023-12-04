@@ -6,4 +6,5 @@ export interface Author {
 export interface Tag {
   name: string;
   isLanguage: boolean;
+  _id?: string;
 }
