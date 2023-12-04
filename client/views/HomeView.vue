@@ -6,9 +6,11 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
+import { useTranslationRequestsStore } from "../stores/translationRequests";
 import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { translationRequests } = storeToRefs(useTranslationRequestsStore());
 const loaded = ref(false);
 const requests = ref();
 
@@ -40,7 +42,7 @@ onBeforeMount(async () => {
 
       <div>
         TRANSLATION REQUESTS
-        <TranslationRequestPreview v-for="request in requests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
+        <TranslationRequestPreview v-for="request in translationRequests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
       </div>
     </div>
   </main>
@@ -56,6 +58,7 @@ h1 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 0 1.5rem;
   width: 100%;
 }
 

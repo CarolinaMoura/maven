@@ -5,11 +5,13 @@ import { storeToRefs } from "pinia";
 import { computed, onBeforeMount } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import { useTagStore } from "./stores/tags";
+import { useTranslationRequestsStore } from "./stores/translationRequests";
 
 const currentRoute = useRoute();
 const currentRouteName = computed(() => currentRoute.name);
 const userStore = useUserStore();
 const tagStore = useTagStore();
+const translationRequestsStore = useTranslationRequestsStore();
 const { isLoggedIn } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
 
@@ -19,6 +21,7 @@ onBeforeMount(async () => {
     await userStore.updateSession();
     await tagStore.getLanguageTags();
     await tagStore.getOtherTags();
+    await translationRequestsStore.getTranslationRequests({});
   } catch {
     // User is not logged in
   }

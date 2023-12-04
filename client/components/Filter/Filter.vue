@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
+import { useTranslationRequestsStore } from "../../stores/translationRequests";
 import { Tag } from "../../types";
+
 const { languageTags, otherTags } = storeToRefs(useTagStore());
+const translationRequestsStore = useTranslationRequestsStore();
 
 // TODO
 // CHECK IF LANGUAGES ARE VALID
@@ -39,6 +42,9 @@ const emptyTag: IExtendedTag = {
 const languages = computed(() => languageTags.value.map((t: Tag) => ({ ...t, title: t.name })));
 const nonLanguages = computed(() => otherTags.value.map((t: Tag) => ({ ...t, title: t.name })));
 
+const canAppear = ref(false);
+const windowSize = ref(window.innerWidth);
+
 const select = ref([]);
 const value = ref([1800, getTodaysYear()]);
 const translations = ref<ITranslation[]>([{ from: { ...emptyTag }, to: { ...emptyTag } }]);
@@ -50,80 +56,124 @@ const addNewTranslationField = () => {
   translations.value.push(translation);
 };
 
-const submitFilters = () => {
+const submitFilters = async () => {
+  // remove unused translation lines
+  const languageIds = languages.value.map((lang) => lang._id);
+  const filteredTranslations = translations.value.filter((t) => languageIds.includes(t.from._id) && languageIds.includes(t.to._id));
+
   const filters = {
-    tags: select.value,
-    year: value.value,
-    translations: translations.value,
+    tags: select.value.map((t: Tag) => t._id ?? ""),
+    yearFrom: value.value[0],
+    yearTo: value.value[1],
+    translations: filteredTranslations.map(({ from, to }) => ({
+      from: from._id ?? "",
+      to: to._id ?? "",
+    })),
     completelyTranslated: completelyTranslated.value,
     untranslated: untranslated.value,
   };
+
+  await translationRequestsStore.getTranslationRequests(filters);
 };
+
+const clearAllFilters = async () => {
+  select.value = [];
+  value.value = [1800, getTodaysYear()];
+  translations.value = [{ from: { ...emptyTag }, to: { ...emptyTag } }];
+  completelyTranslated.value = false;
+  untranslated.value = false;
+  await translationRequestsStore.getTranslationRequests({});
+};
+
+const updateWindowSize = () => {
+  windowSize.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener("resize", updateWindowSize);
+
+  onUnmounted(() => {
+    window.removeEventListener("resize", updateWindowSize);
+  });
+});
 </script>
 
 <template>
   <section>
-    <button class="clear-all-filters">CLEAR ALL</button>
-    <div class="filter-type">
-      <h2>Work filters</h2>
-      <div class="filter-option">
-        <h4>Tags</h4>
-        <v-col cols="12">
-          <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
+    <button v-if="windowSize < 700" class="filter-button" @click="canAppear = !canAppear">
+      Advanced search
+      <v-icon v-if="canAppear" size="x-small">mdi-triangle-down</v-icon>
+    </button>
+    <div v-if="canAppear || windowSize >= 700">
+      <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button>
+      <div class="filter-type">
+        <h2>Work filters</h2>
+        <div class="filter-option">
+          <h4>
+            Tags
+            <v-tooltip text="A document with any of the selected tags will match your search">
+              <template v-slot:activator="{ props }">
+                <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+              </template>
+            </v-tooltip>
+          </h4>
+          <v-col cols="12">
+            <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
 
-          <v-combobox v-model="select" :items="nonLanguages" label="" multiple>
-            <template v-slot:selection="data">
-              <v-chip :key="JSON.stringify(data.item)" size="small" @click:close="data.parent.selectItem(data.item)">
-                <template v-slot:prepend>
-                  <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
-                </template>
-                {{ data.item.title }}
-              </v-chip>
-            </template>
-          </v-combobox>
-        </v-col>
+            <v-combobox v-model="select" :items="nonLanguages" label="" multiple>
+              <template v-slot:selection="data">
+                <v-chip :key="JSON.stringify(data.item)" size="small">
+                  <template v-slot:prepend>
+                    <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
+                  </template>
+                  {{ data.item.title }}
+                </v-chip>
+              </template>
+            </v-combobox>
+          </v-col>
+        </div>
+        <div class="filter-option">
+          <h4>
+            Year published
+            <v-tooltip text="Select the range of years of publication of the original work">
+              <template v-slot:activator="{ props }">
+                <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+              </template>
+            </v-tooltip>
+          </h4>
+          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1800" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
+          <p style="text-align: center; margin-top: -0.8rem">
+            From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
+          </p>
+        </div>
       </div>
-      <div class="filter-option">
-        <h4>
-          Year published
-          <v-tooltip text="Select the range of years of publication of the original work">
-            <template v-slot:activator="{ props }">
-              <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
-            </template>
-          </v-tooltip>
-        </h4>
-        <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1800" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
-        <p style="text-align: center; margin-top: -0.8rem">
-          From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
-        </p>
-      </div>
-    </div>
-    <div class="filter-type">
-      <h2>Translation filters</h2>
-      <div class="filter-option">
-        <h4>Language</h4>
-        <div v-for="(translation, ix) in translations" :key="ix">
-          <div class="single-translation">
-            From
-            <v-combobox label="original" class="language-selector" v-model="translation.from" :hide-details="true" :items="languages"></v-combobox>
-            to
-            <v-combobox label="target" class="language-selector" v-model="translation.to" :hide-details="true" :items="languages"></v-combobox>
+      <div class="filter-type">
+        <h2>Translation filters</h2>
+        <div class="filter-option">
+          <h4>Language</h4>
+          <div v-for="(translation, ix) in translations" :key="ix">
+            <div class="single-translation">
+              From
+              <v-combobox label="original" class="language-selector" v-model="translation.from" :hide-details="true" :items="languages"></v-combobox>
+              to
+              <v-combobox label="target" class="language-selector" v-model="translation.to" :hide-details="true" :items="languages"></v-combobox>
+            </div>
+          </div>
+          <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
+        </div>
+        <div class="filter-option">
+          <h4>Translation status</h4>
+          <div>
+            <v-checkbox label="Completely translated" density="compact" :hide-details="true" v-model="completelyTranslated"></v-checkbox>
+            <v-checkbox label="Untranslated" density="compact" :hide-details="true" v-model="untranslated"></v-checkbox>
           </div>
         </div>
-        <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
       </div>
-      <div class="filter-option">
-        <h4>Translation status</h4>
-        <div>
-          <v-checkbox label="Completely translated" density="compact" :hide-details="true" v-model="completelyTranslated"></v-checkbox>
-          <v-checkbox label="Untranslated" density="compact" :hide-details="true" v-model="untranslated"></v-checkbox>
-        </div>
+      <div class="filter-type">
+        <v-col cols="12">
+          <v-btn block rounded="lg" size="large" @click="submitFilters()">APPLY FILTERS</v-btn>
+        </v-col>
       </div>
-    </div>
-    <div class="filter-type">
-      <v-col cols="12">
-        <v-btn block rounded="lg" size="large" @click="submitFilters()">APPLY FILTERS</v-btn>
-      </v-col>
     </div>
   </section>
 </template>
@@ -139,6 +189,10 @@ const submitFilters = () => {
 .language-selector {
   padding: 0 1rem;
 }
+
+.filter-button {
+  text-decoration: underline;
+}
 .filter-option {
   margin: 0.5rem 0;
   display: flex;
@@ -151,14 +205,13 @@ h2 {
 }
 section {
   width: 100%;
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   justify-content: left;
-  background-color: var(--tertiary-30);
-  margin-bottom: 10rem;
   box-sizing: border-box;
+  margin-bottom: 3rem;
+  padding: 0 2rem;
 }
 
 .filter-type {
@@ -167,11 +220,24 @@ section {
   border-bottom: 1px solid var(--tertiary);
 }
 
+.filter-type:last-child {
+  border-bottom: none;
+}
+
 .clear-all-filters {
   color: rgb(81, 117, 183);
   text-decoration: underline;
   margin-bottom: -1rem;
   font-weight: bold;
   text-align: right;
+}
+
+@media (min-width: 700px) {
+  section {
+    padding: 2rem;
+    margin-bottom: 10rem;
+    background-color: var(--tertiary-30);
+    text-decoration: none;
+  }
 }
 </style>

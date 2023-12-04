@@ -57,6 +57,11 @@ export default class TagConcept {
     await this.attachments.createOne({ tag, attachedTo });
     return { msg: "Attached tag!" };
   }
+
+  async getAttachments(filter: Filter<AttachmentDoc>) {
+    return await this.attachments.readMany(filter);
+  }
+
   async getObjectTags(attachedTo: ObjectId) {
     return await this.attachments.readMany({ attachedTo });
   }

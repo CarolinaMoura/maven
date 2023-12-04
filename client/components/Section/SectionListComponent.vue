@@ -26,7 +26,6 @@ async function getSections() {
 }
 
 function logSection(section: string) {
-  console.log("Clicked Section:", section);
   activeSection.value = section == activeSection.value ? "" : section;
 }
 

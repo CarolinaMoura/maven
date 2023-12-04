@@ -1,10 +1,12 @@
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, WebSession } from "./app";
-import { Author } from "./concepts/document";
+import { Author, DocumentDoc } from "./concepts/document";
+import { TranslationRequestDoc } from "./concepts/translationRequest";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
 import Responses from "./responses";
+
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -123,17 +125,12 @@ class Routes {
   }
   @Router.get("/document")
   async getDocuments() {
-    return await Responses.documents(await Document.getDocuments());
+    return await Responses.documents(await Document.filterDocuments({}));
   }
   @Router.get("/document/:id")
   async getDocument(id: string) {
     return await Responses.document(await Document.getDocument(new ObjectId(id)));
   }
-
-  // @Router.get("/document/filter")
-  // async filterDocuments(languageFromTo: ){
-
-  // }
 
   @Router.delete("/document/:id")
   async deleteDocument(session: WebSessionDoc, id: string) {
@@ -217,9 +214,9 @@ class Routes {
     return await SectionTranslation.deleteSectionTranslation(new ObjectId(id));
   }
 
-  ////////////////////////
-  // TranslationRequest //
-  ///////////////////////
+  ////////////////////////////
+  //   TranslationRequest   //
+  ////////////////////////////
   @Router.post("/translationRequest")
   async createTranslationRequest(session: WebSessionDoc, document: string, languageTo: string) {
     const user = WebSession.getUser(session);
@@ -257,6 +254,79 @@ class Routes {
   async getTranslationRequest(id: string) {
     return await Responses.translationRequest(await TranslationRequest.getTranslationRequest(new ObjectId(id)));
   }
+
+  ////////////////
+  //   Filter   //
+  ////////////////
+  @Router.put("/filter")
+  async filterDocuments(filter: IFilter) {
+    const infYear = 10000000000;
+
+    if (filter.yearFrom === undefined) {
+      filter.yearFrom = -infYear;
+    }
+    if (filter.yearTo === undefined) {
+      filter.yearTo = infYear;
+    }
+
+    let docIds: ObjectId[];
+    // filter by tags
+    if (filter.tags !== undefined && filter.tags.length > 0) {
+      const objectTags = filter.tags.map((tag) => new ObjectId(tag));
+      const attachments = await Tag.getAttachments({ tag: { $in: objectTags } });
+      docIds = attachments.map(({ attachedTo }) => attachedTo);
+    } else {
+      docIds = (await Document.filterDocuments({})).map((doc) => doc._id);
+    }
+
+    // filter by document
+    const queryDocs: Filter<DocumentDoc> = {
+      _id: { $in: docIds },
+      year: { $gte: filter.yearFrom, $lte: filter.yearTo },
+    };
+    if (filter.translations !== undefined && filter.translations.length) {
+      const from = filter.translations.map(({ from }) => new ObjectId(from));
+      queryDocs.originalLanguage = { $in: from };
+    }
+    const docs = await Document.filterDocuments(queryDocs);
+
+    if (filter.translations === undefined || filter.translations.length === 0) {
+      return await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } });
+    }
+
+    const fromTo: Map<ObjectId, ObjectId[]> = new Map();
+
+    for (const { from, to } of filter.translations) {
+      const fromId = new ObjectId(from);
+      const toId = new ObjectId(to);
+      if (fromTo.has(fromId)) {
+        fromTo.get(fromId)?.push(toId);
+      } else {
+        fromTo.set(fromId, [toId]);
+      }
+    }
+
+    // filter by translation request
+    const toReturn: Array<TranslationRequestDoc> = [];
+    for (const doc of docs) {
+      const possibleToLanguage = fromTo.get(doc.originalLanguage) ?? [];
+      const queryTranslationRequest = {
+        document: doc._id,
+        languageTo: { $in: possibleToLanguage },
+      };
+      toReturn.concat(await TranslationRequest.getTranslationRequests(queryTranslationRequest));
+    }
+
+    return toReturn;
+  }
+}
+interface IFilter {
+  translations?: { from: string; to: string }[];
+  yearFrom?: number;
+  yearTo?: number;
+  completelyTranslated?: boolean;
+  untranslated?: boolean;
+  tags?: string[];
 }
 
 export default getExpressRouter(new Routes());
