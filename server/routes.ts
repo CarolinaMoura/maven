@@ -293,26 +293,25 @@ class Routes {
       return await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } });
     }
 
-    const fromTo: Map<string, string[]> = new Map();
+    const fromTo: Map<string, ObjectId[]> = new Map();
 
     for (const { from, to } of filter.translations) {
       if (fromTo.has(from)) {
-        fromTo.get(from)?.push(to);
+        fromTo.get(from)?.push(new ObjectId(to));
       } else {
-        fromTo.set(from, [to]);
+        fromTo.set(from, [new ObjectId(to)]);
       }
     }
-    console.log(fromTo);
     // filter by translation request
     const toReturn: Array<TranslationRequestDoc> = [];
     for (const doc of docs) {
-      console.log(doc.originalLanguage);
       const possibleToLanguage = fromTo.get(doc.originalLanguage.toString()) ?? [];
       const queryTranslationRequest = {
         document: doc._id,
-        languageTo: { $in: possibleToLanguage.map((p) => new ObjectId(p)) },
+        languageTo: { $in: possibleToLanguage.map((id) => new ObjectId(id)) },
       };
-      toReturn.concat(await TranslationRequest.getTranslationRequests(queryTranslationRequest));
+      const result = await TranslationRequest.getTranslationRequests(queryTranslationRequest);
+      toReturn.push(...result);
     }
 
     return toReturn;
