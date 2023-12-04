@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
@@ -62,17 +62,18 @@ const closeDialogAndRemoveTranslation = async () => {
 
 const getVotes = async () => {
   try {
-    console.log("sectionid", props.sectionTranslation._id)
     const votes = await fetchy("/api/votes", "GET", {
       query: { section: props.sectionTranslation._id },
     });
     totalVotes.value = votes; // set updated votes value here
-    console.log("total votes:", totalVotes.value);
   } catch {
     return;
   }
 };
 
+onBeforeMount(async () => {
+  await getVotes();
+});
 </script>
 
 <template>
@@ -83,11 +84,10 @@ const getVotes = async () => {
           <b>Translator: </b>
           <u>{{ translatorName }}</u>
         </div>
-        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto"
-          @click="enterEditMode">
+        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto" @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @click="getVotes" />
+        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
@@ -115,8 +115,7 @@ const getVotes = async () => {
           </v-btn>
         </div>
       </v-card-title>
-      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation"
-        v-model="edition"></v-textarea>
+      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation" v-model="edition"></v-textarea>
     </div>
   </v-card>
 </template>
