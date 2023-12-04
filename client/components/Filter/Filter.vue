@@ -111,7 +111,7 @@ onMounted(() => {
         <div class="filter-option">
           <h4>
             Tags
-            <v-tooltip text="A document with any of the selected tags will match your search">
+            <v-tooltip text="A document with at least one of the selected tags will match your search">
               <template v-slot:activator="{ props }">
                 <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
               </template>
