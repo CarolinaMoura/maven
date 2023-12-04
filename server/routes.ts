@@ -159,7 +159,7 @@ class Routes {
   @Router.get("/sectionTranslation/:section")
   async getAllSectionTranslations(section: string) {
     const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
-    return await Promise.all(
+    const translationsWithVotes = await Promise.all(
       sectionTranslations.map(async (translation) => {
         let name = "";
         try {
@@ -168,12 +168,16 @@ class Routes {
         } catch (e) {
           name = "Deleted user";
         }
+        const upvotes = await Vote.countUpvotes(translation._id);
         return {
           translatorName: name,
+          upvotes,
           ...translation,
         };
       }),
     );
+    const sortedTranslations = translationsWithVotes.sort((a, b) => b.upvotes - a.upvotes);
+    return sortedTranslations;
   }
 
   @Router.post("/sectionTranslation")

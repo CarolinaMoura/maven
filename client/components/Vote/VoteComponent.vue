@@ -5,7 +5,7 @@ import { defineEmits, defineProps, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["section", "votes"]);
-const emit = defineEmits(["refreshVotes"]);
+const emit = defineEmits(["refreshVotes", "refreshSectionTranslations"]);
 
 let totalVotes = ref(props.votes);
 const { isLoggedIn } = storeToRefs(useUserStore());
@@ -16,6 +16,8 @@ const vote = async (upvote: boolean) => {
       body: { section: props.section._id, upvote: upvote },
     });
     emit("refreshVotes");
+    emit("refreshSectionTranslations");
+
   } catch {
     return new Error("Error voting");
   }
