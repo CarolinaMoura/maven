@@ -66,7 +66,7 @@ const getVotes = async () => {
     const votes = await fetchy("/api/votes", "GET", {
       query: { section: props.sectionTranslation._id },
     });
-    totalVotes.value = votes;
+    totalVotes.value = votes; // set updated votes value here
     console.log("total votes:", totalVotes.value);
   } catch {
     return;
@@ -92,7 +92,7 @@ onBeforeMount(async () => {
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
         <!-- VOTE -->
-        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
+        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @click="getVotes" />
         <!-- VOTE -->
       </v-card-title>
       <v-card-title>Translation:</v-card-title>

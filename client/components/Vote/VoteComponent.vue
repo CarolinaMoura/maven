@@ -16,9 +16,11 @@ const vote = async (upvote: boolean) => {
         await fetchy("/api/votes/vote", "POST", {
             body: { section: props.section._id, upvote: upvote },
         });
+        // not reaching this
         console.log("need to refresh votes!");
         emit("refreshVotes");
-    } catch {
+    }
+    catch {
         return new Error("Error voting");
     }
 };
