@@ -9,9 +9,11 @@
   --secondary-20: rgba(149, 174, 179, 0.2);
 
   --tertiary: #D9D9D9;
+  --tertiary-20: rgba(217, 217, 217, 0.2);
   --quaternary: #B2CED4;
   --primary-text: #474747;
 }
+
 
 .btn-primary {
   background-color: var(--primary);

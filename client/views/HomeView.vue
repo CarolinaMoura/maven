@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Filter from "@/components/Filter/Filter.vue";
 import TranslationRequestList from "@/components/Translation/TranslationRequestList.vue";
 import TranslationRequestForm from "@/components/TranslationRequest/TranslationRequestForm.vue";
 import { useUserStore } from "@/stores/user";
@@ -30,12 +31,16 @@ onBeforeMount(async () => {
       <h1 v-if="isLoggedIn"></h1>
       <h1 v-else>Please login!</h1>
     </section>
+
     <TranslationRequestForm @refresh-documents="getDocuments" />
     <TranslationRequestList />
 
-    <div>
-      UPLOADED DOCUMENTS (FOR ALPHA)
-      <TranslationRequestPreview v-for="document in documents" :document="document" v-bind:key="document._id"></TranslationRequestPreview>
+    <div class="documents-display">
+      <Filter />
+      <div>
+        UPLOADED DOCUMENTS (FOR ALPHA)
+        <TranslationRequestPreview v-for="document in documents" :document="document" v-bind:key="document._id"></TranslationRequestPreview>
+      </div>
     </div>
   </main>
 </template>
@@ -43,5 +48,27 @@ onBeforeMount(async () => {
 <style scoped>
 h1 {
   text-align: center;
+}
+
+.documents-display {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+@media (min-width: 700px) {
+  .documents-display {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .documents-display {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+  }
 }
 </style>

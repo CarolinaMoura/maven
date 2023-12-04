@@ -7,6 +7,7 @@ export const useTagStore = defineStore(
   "tag",
   () => {
     const languageTags = ref([]);
+    // const nonLanguageTags = ref([]);
 
     const getLanguageTags = async () => {
       const languageTagDocs = await fetchy(`/api/tag/language`, "GET");

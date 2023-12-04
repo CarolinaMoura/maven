@@ -36,8 +36,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <section v-if="isLoggedIn">
-  </section>
+  <section v-if="isLoggedIn"></section>
   <div class="row">
     <h2 v-if="!searchAuthor"></h2>
     <h2 v-else>Posts by {{ searchAuthor }}:</h2>
@@ -48,8 +47,8 @@ onBeforeMount(async () => {
       <TranslationPreviewComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
     </article>
   </section>
-  <p v-else-if="loaded">No posts found</p>
-  <p v-else>Loading...</p>
+  <!-- <p v-else-if="loaded">No posts found</p>
+  <p v-else>Loading...</p> -->
 </template>
 
 <style scoped>
