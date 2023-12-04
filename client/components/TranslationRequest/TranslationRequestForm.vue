@@ -6,7 +6,7 @@ import { Tag } from "../../types";
 import { fetchy } from "../../utils/fetchy";
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 
-const TAGS = otherTags;
+const TAGS = computed(() => otherTags.value.map((t: Tag) => t.name));
 const LANGUAGES = computed(() => languageTags.value.map((t: Tag) => t.name));
 
 // keeps track of if form is open or not

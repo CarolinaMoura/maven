@@ -129,6 +129,12 @@ class Routes {
   async getDocument(id: string) {
     return await Responses.document(await Document.getDocument(new ObjectId(id)));
   }
+
+  // @Router.get("/document/filter")
+  // async filterDocuments(languageFromTo: ){
+
+  // }
+
   @Router.delete("/document/:id")
   async deleteDocument(session: WebSessionDoc, id: string) {
     const user = WebSession.getUser(session);

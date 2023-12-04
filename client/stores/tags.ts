@@ -7,7 +7,7 @@ export const useTagStore = defineStore(
   "tag",
   () => {
     const languageTags = ref<Tag[]>([]);
-    const otherTags = ref([]);
+    const otherTags = ref<Tag[]>([]);
 
     const getLanguageTags = async () => {
       const languageTagDocs = await fetchy(`/api/tag/language`, "GET");
@@ -22,7 +22,13 @@ export const useTagStore = defineStore(
 
     const getOtherTags = async () => {
       const otherTagDocs = await fetchy(`/api/tag/other`, "GET");
-      otherTags.value = otherTagDocs.map((t: Tag) => t.name);
+      otherTags.value = otherTagDocs.map((t: Tag) => {
+        return {
+          isLanguage: t.isLanguage,
+          name: t.name,
+          _id: t._id,
+        };
+      });
     };
 
     return { languageTags, getLanguageTags, getOtherTags, otherTags };

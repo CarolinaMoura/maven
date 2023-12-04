@@ -11,6 +11,9 @@ const { languageTags, otherTags } = storeToRefs(useTagStore());
 // TODO
 // ADD 'X' TO REMOVE A LINE
 
+// TODO
+// REMOVE CHIP BY CLICKING ON IT
+
 function getTodaysYear(): number {
   const today = new Date();
   const year = today.getFullYear();
@@ -34,9 +37,9 @@ const emptyTag: IExtendedTag = {
 };
 
 const languages = computed(() => languageTags.value.map((t: Tag) => ({ ...t, title: t.name })));
+const nonLanguages = computed(() => otherTags.value.map((t: Tag) => ({ ...t, title: t.name })));
 
 const select = ref([]);
-const items = ref(["Programming", "Design", "Vue", "Vuetify", "abc", "def", "ghi"]);
 const value = ref([1800, getTodaysYear()]);
 const translations = ref<ITranslation[]>([{ from: { ...emptyTag }, to: { ...emptyTag } }]);
 const completelyTranslated = ref(false);
@@ -68,9 +71,9 @@ const submitFilters = () => {
         <v-col cols="12">
           <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
 
-          <v-combobox v-model="select" :items="otherTags" label="" multiple>
+          <v-combobox v-model="select" :items="nonLanguages" label="" multiple>
             <template v-slot:selection="data">
-              <v-chip :key="JSON.stringify(data.item)" v-bind="data.attrs" :model-value="data.selected" :disabled="data.disabled" size="small" @click:close="data.parent.selectItem(data.item)">
+              <v-chip :key="JSON.stringify(data.item)" size="small" @click:close="data.parent.selectItem(data.item)">
                 <template v-slot:prepend>
                   <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
                 </template>
@@ -89,7 +92,7 @@ const submitFilters = () => {
             </template>
           </v-tooltip>
         </h4>
-        <v-range-slider v-model="value" step="1" thumb-label="true" elevation="2" min="1800" max="2023" hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
+        <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1800" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
         <p style="text-align: center; margin-top: -0.8rem">
           From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
         </p>
@@ -102,9 +105,9 @@ const submitFilters = () => {
         <div v-for="(translation, ix) in translations" :key="ix">
           <div class="single-translation">
             From
-            <v-combobox label="original" class="language-selector" v-model="translation.from" hide-details="true" :items="languages"></v-combobox>
+            <v-combobox label="original" class="language-selector" v-model="translation.from" :hide-details="true" :items="languages"></v-combobox>
             to
-            <v-combobox label="target" class="language-selector" v-model="translation.to" hide-details="true" :items="languages"></v-combobox>
+            <v-combobox label="target" class="language-selector" v-model="translation.to" :hide-details="true" :items="languages"></v-combobox>
           </div>
         </div>
         <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
@@ -112,8 +115,8 @@ const submitFilters = () => {
       <div class="filter-option">
         <h4>Translation status</h4>
         <div>
-          <v-checkbox label="Completely translated" density="compact" hide-details="true" v-model="completelyTranslated"></v-checkbox>
-          <v-checkbox label="Untranslated" density="compact" hide-details="true" v-model="untranslated"></v-checkbox>
+          <v-checkbox label="Completely translated" density="compact" :hide-details="true" v-model="completelyTranslated"></v-checkbox>
+          <v-checkbox label="Untranslated" density="compact" :hide-details="true" v-model="untranslated"></v-checkbox>
         </div>
       </div>
     </div>

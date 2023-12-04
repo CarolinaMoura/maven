@@ -6,6 +6,10 @@ export const useDocumentStore = defineStore(
   () => {
     // Documents that match the filters
     const documents = ref([]);
+
+    // const getDocuments = async (filter:) => {
+
+    // }
   },
   { persist: true },
 );
