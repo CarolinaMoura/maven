@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { watch } from "vue";
-import { mdiInformationVariantCircleOutline } from "@mdi/js";
 import Tag from "@/types/Tag";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
+import { useTagStore } from "../../stores/tags";
+const { languageTags } = storeToRefs(useTagStore());
 
 // TODO
 // CHECK IF LANGUAGES ARE VALID
@@ -22,6 +23,8 @@ const emptyTag: Tag = {
   name: "",
   isLanguage: true,
 };
+
+const tags = languageTags;
 
 const select = ref([]);
 const items = ref(["Programming", "Design", "Vue", "Vuetify", "abc", "def", "ghi"]);
@@ -46,6 +49,8 @@ const submitFilters = () => {};
       <div class="filter-option">
         <h4>Tags</h4>
         <v-col cols="12">
+          <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox>
+
           <v-combobox v-model="select" :items="items" label="" multiple>
             <template v-slot:selection="data">
               <v-chip :key="JSON.stringify(data.item)" v-bind="data.attrs" :model-value="data.selected" :disabled="data.disabled" size="small" @click:close="data.parent.selectItem(data.item)">
