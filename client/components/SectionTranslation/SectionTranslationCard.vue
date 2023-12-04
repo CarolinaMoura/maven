@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
@@ -11,13 +11,12 @@ interface SectionTranslationProps {
 }
 const props = defineProps<SectionTranslationProps>();
 
-let upvotes = ref(0);
-
 const translatorName = props.sectionTranslation.translatorName;
 const emit = defineEmits(["refreshSectionTranslations"]);
 const isEdit = ref(false);
 const edition = ref("");
 const dialog = ref(false);
+const totalVotes = ref(0);
 
 const userStore = useUserStore();
 const { isLoggedIn, currentUsername } = storeToRefs(userStore);
@@ -63,14 +62,20 @@ const closeDialogAndRemoveTranslation = async () => {
 
 const getVotes = async () => {
   try {
+    console.log("sectionid", props.sectionTranslation._id)
     const votes = await fetchy("/api/votes", "GET", {
-      query: { content: props.sectionTranslation._id },
+      query: { section: props.sectionTranslation._id },
     });
-    upvotes.value = votes;
+    totalVotes.value = votes;
+    console.log("total votes:", totalVotes.value);
   } catch {
     return;
   }
 };
+
+onBeforeMount(async () => {
+  await getVotes();
+});
 
 </script>
 
@@ -87,7 +92,7 @@ const getVotes = async () => {
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
         <!-- VOTE -->
-        <VoteComponent :section="props.sectionTranslation" :votes="upvotes" @refreshVotes="getVotes" />
+        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
         <!-- VOTE -->
       </v-card-title>
       <v-card-title>Translation:</v-card-title>

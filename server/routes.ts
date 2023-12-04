@@ -253,19 +253,19 @@ class Routes {
     @Router.get("/votes")
     async getVotes(section: ObjectId) 
     {
-      return await Vote.countUpvotes(section);
+      return await Vote.countUpvotes(new ObjectId(section));
     }
   
     @Router.post("/votes/vote")
     async vote(session: WebSessionDoc, section: ObjectId, upvote: boolean){
       const user = WebSession.getUser(session);
-      return await Vote.vote(section, user, upvote);
+      return await Vote.vote(new ObjectId(section), user, upvote);
     }
   
     @Router.patch("/votes/removeVote")
     async removeVote(session: WebSessionDoc, section: ObjectId, upvote: boolean){
       const user = WebSession.getUser(session);
-      return await Vote.removeVote(section, user, upvote);
+      return await Vote.removeVote(new ObjectId(section), user, upvote);
     }
 }
 

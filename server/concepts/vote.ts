@@ -3,34 +3,38 @@ import DocCollection, { BaseDoc } from "../framework/doc";
 
 export interface VoteDoc extends BaseDoc {
   upvote: boolean;
-  content: ObjectId;
+  section: ObjectId;
   user: ObjectId;
 }
 
 export default class VoteConcept {
   private readonly votes = new DocCollection<VoteDoc>("votes");
 
-  async vote(content: ObjectId, user: ObjectId, upvote: boolean) {
-    const existingVote = await this.votes.readOne({ content, user, upvote });
+  async vote(section: ObjectId, user: ObjectId, upvote: boolean) {
+    const existingVote = await this.votes.readOne({ section, user, upvote });
 
     if (existingVote) {
-      await this.removeVote(content, user, upvote);
+      await this.removeVote(section, user, upvote);
     } 
     else {
-      await this.votes.createOne({ content, user, upvote });
+      await this.votes.createOne({ section, user, upvote });
     }
   }
 
-  async removeVote(content: ObjectId, user: ObjectId, upvote: boolean) {
-    await this.votes.deleteOne({ content, user, upvote });
+  async removeVote(section: ObjectId, user: ObjectId, upvote: boolean) {
+    await this.votes.deleteOne({ section, user, upvote });
   }
 
-  async countUpvotes(content: ObjectId) {
-     const votes = await this.votes.readMany( {content} );
+  async countUpvotes(section: ObjectId) {
+     const votes = await this.votes.readMany( {section} );
      let total = 0;
      for (const vote of votes){
-        if (vote.upvote) total++;
-        else total--;
+      if (vote.upvote){
+        total++;
+      }
+      else{
+        total--;
+      }
      }
      return total;
   }
