@@ -23,7 +23,7 @@ const emptyTag: Tag = {
   isLanguage: true,
 };
 
-const select = ref(["Vuetify", "Programming"]);
+const select = ref([]);
 const items = ref(["Programming", "Design", "Vue", "Vuetify", "abc", "def", "ghi"]);
 const value = ref([1800, getTodaysYear()]);
 const translations = ref<ITranslation[]>([{ from: { ...emptyTag }, to: { ...emptyTag } }]);
@@ -131,6 +131,7 @@ const submitFilters = () => {};
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  font-size: 0.9rem;
 }
 h2 {
   text-align: center;
@@ -142,13 +143,15 @@ section {
   flex-direction: column;
   gap: 1rem;
   justify-content: left;
-  background-color: var(--tertiary-20);
+  background-color: var(--tertiary-30);
   margin-bottom: 10rem;
   box-sizing: border-box;
 }
 
 .filter-type {
-  margin: 1rem 0;
+  /* margin: 0.8rem 0; */
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--tertiary);
 }
 
 .clear-all-filters {
