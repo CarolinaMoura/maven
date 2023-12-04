@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, WebSession, Vote } from "./app";
+import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, Vote, WebSession } from "./app";
 import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";

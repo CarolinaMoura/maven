@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
-// import VoteComponent from "./components/Vote/VoteComponent.vue";
 
 interface SectionTranslationProps {
   sectionTranslation: PayloadSectionTranslation;
 }
 const props = defineProps<SectionTranslationProps>();
+
+let upvotes = ref(0);
+
 const translatorName = props.sectionTranslation.translatorName;
 const emit = defineEmits(["refreshSectionTranslations"]);
 const isEdit = ref(false);
@@ -57,6 +60,18 @@ const closeDialogAndRemoveTranslation = async () => {
   dialog.value = false;
   await removeSectionTranslation();
 };
+
+const getVotes = async () => {
+  try {
+    const votes = await fetchy("/api/votes", "GET", {
+      query: { content: props.sectionTranslation._id },
+    });
+    upvotes.value = votes;
+  } catch {
+    return;
+  }
+};
+
 </script>
 
 <template>
@@ -71,7 +86,9 @@ const closeDialogAndRemoveTranslation = async () => {
           @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <!-- <span v-else>Upvote button</span> -->
+        <!-- VOTE -->
+        <VoteComponent :section="props.sectionTranslation" :votes="upvotes" @refreshVotes="getVotes" />
+        <!-- VOTE -->
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
