@@ -289,30 +289,28 @@ class Routes {
       queryDocs.originalLanguage = { $in: from };
     }
     const docs = await Document.filterDocuments(queryDocs);
-
     if (filter.translations === undefined || filter.translations.length === 0) {
       return await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } });
     }
 
-    const fromTo: Map<ObjectId, ObjectId[]> = new Map();
+    const fromTo: Map<string, string[]> = new Map();
 
     for (const { from, to } of filter.translations) {
-      const fromId = new ObjectId(from);
-      const toId = new ObjectId(to);
-      if (fromTo.has(fromId)) {
-        fromTo.get(fromId)?.push(toId);
+      if (fromTo.has(from)) {
+        fromTo.get(from)?.push(to);
       } else {
-        fromTo.set(fromId, [toId]);
+        fromTo.set(from, [to]);
       }
     }
-
+    console.log(fromTo);
     // filter by translation request
     const toReturn: Array<TranslationRequestDoc> = [];
     for (const doc of docs) {
-      const possibleToLanguage = fromTo.get(doc.originalLanguage) ?? [];
+      console.log(doc.originalLanguage);
+      const possibleToLanguage = fromTo.get(doc.originalLanguage.toString()) ?? [];
       const queryTranslationRequest = {
         document: doc._id,
-        languageTo: { $in: possibleToLanguage },
+        languageTo: { $in: possibleToLanguage.map((p) => new ObjectId(p)) },
       };
       toReturn.concat(await TranslationRequest.getTranslationRequests(queryTranslationRequest));
     }

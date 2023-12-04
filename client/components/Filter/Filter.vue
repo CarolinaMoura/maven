@@ -17,6 +17,9 @@ const translationRequestsStore = useTranslationRequestsStore();
 // TODO
 // REMOVE CHIP BY CLICKING ON IT
 
+// TODO
+// JUST ONE FIELD IN LANGUAGE
+
 function getTodaysYear(): number {
   const today = new Date();
   const year = today.getFullYear();
