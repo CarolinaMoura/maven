@@ -32,10 +32,11 @@ onBeforeMount(async () => {
       <h1 v-else>Please login!</h1>
     </section>
 
+    <TranslationRequestForm @refresh-requests="getRequests" />
+    <TranslationRequestList />
+
     <div class="documents-display">
       <Filter />
-      <TranslationRequestForm @refresh-requests="getRequests" />
-      <TranslationRequestList />
 
       <div>
         TRANSLATION REQUESTS

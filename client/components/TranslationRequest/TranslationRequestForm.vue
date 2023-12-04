@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
+import { Tag } from "../../types";
 import { fetchy } from "../../utils/fetchy";
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 
 const TAGS = otherTags;
-const LANGUAGES = languageTags;
+const LANGUAGES = computed(() => languageTags.value.map((t: Tag) => t.name));
 
 // keeps track of if form is open or not
 const formOpen = ref(false);

@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import Tag from "@/types/Tag";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
-const { languageTags } = storeToRefs(useTagStore());
+import { Tag } from "../../types";
+const { languageTags, otherTags } = storeToRefs(useTagStore());
 
 // TODO
 // CHECK IF LANGUAGES ARE VALID
+
+// TODO
+// ADD 'X' TO REMOVE A LINE
 
 function getTodaysYear(): number {
   const today = new Date();
@@ -14,17 +17,23 @@ function getTodaysYear(): number {
   return year;
 }
 
-interface ITranslation {
-  from: Tag;
-  to: Tag;
+interface IExtendedTag extends Tag {
+  title: string;
 }
 
-const emptyTag: Tag = {
+interface ITranslation {
+  from: IExtendedTag;
+  to: IExtendedTag;
+}
+
+const emptyTag: IExtendedTag = {
+  title: "",
   name: "",
   isLanguage: true,
+  _id: "0",
 };
 
-const tags = languageTags;
+const languages = computed(() => languageTags.value.map((t: Tag) => ({ ...t, title: t.name })));
 
 const select = ref([]);
 const items = ref(["Programming", "Design", "Vue", "Vuetify", "abc", "def", "ghi"]);
@@ -38,7 +47,15 @@ const addNewTranslationField = () => {
   translations.value.push(translation);
 };
 
-const submitFilters = () => {};
+const submitFilters = () => {
+  const filters = {
+    tags: select.value,
+    year: value.value,
+    translations: translations.value,
+    completelyTranslated: completelyTranslated.value,
+    untranslated: untranslated.value,
+  };
+};
 </script>
 
 <template>
@@ -49,9 +66,9 @@ const submitFilters = () => {};
       <div class="filter-option">
         <h4>Tags</h4>
         <v-col cols="12">
-          <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox>
+          <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
 
-          <v-combobox v-model="select" :items="items" label="" multiple>
+          <v-combobox v-model="select" :items="otherTags" label="" multiple>
             <template v-slot:selection="data">
               <v-chip :key="JSON.stringify(data.item)" v-bind="data.attrs" :model-value="data.selected" :disabled="data.disabled" size="small" @click:close="data.parent.selectItem(data.item)">
                 <template v-slot:prepend>
@@ -85,21 +102,9 @@ const submitFilters = () => {};
         <div v-for="(translation, ix) in translations" :key="ix">
           <div class="single-translation">
             From
-            <v-combobox
-              label="original"
-              class="language-selector"
-              v-model="translation.from.name"
-              hide-details="true"
-              :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-            ></v-combobox>
+            <v-combobox label="original" class="language-selector" v-model="translation.from" hide-details="true" :items="languages"></v-combobox>
             to
-            <v-combobox
-              label="target"
-              class="language-selector"
-              v-model="translation.to.name"
-              hide-details="true"
-              :items="['California', 'Colorado', 'Florida', 'Georgia', 'Texas', 'Wyoming']"
-            ></v-combobox>
+            <v-combobox label="target" class="language-selector" v-model="translation.to" hide-details="true" :items="languages"></v-combobox>
           </div>
         </div>
         <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>

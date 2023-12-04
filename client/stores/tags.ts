@@ -6,12 +6,18 @@ import { fetchy } from "../utils/fetchy";
 export const useTagStore = defineStore(
   "tag",
   () => {
-    const languageTags = ref([]);
+    const languageTags = ref<Tag[]>([]);
     const otherTags = ref([]);
 
     const getLanguageTags = async () => {
       const languageTagDocs = await fetchy(`/api/tag/language`, "GET");
-      languageTags.value = languageTagDocs.map((t: Tag) => t.name);
+      languageTags.value = languageTagDocs.map((t: Tag) => {
+        return {
+          isLanguage: t.isLanguage,
+          name: t.name,
+          _id: t._id,
+        };
+      });
     };
 
     const getOtherTags = async () => {
