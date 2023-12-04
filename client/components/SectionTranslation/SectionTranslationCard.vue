@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
@@ -73,10 +73,6 @@ const getVotes = async () => {
   }
 };
 
-onBeforeMount(async () => {
-  await getVotes();
-});
-
 </script>
 
 <template>
@@ -91,9 +87,7 @@ onBeforeMount(async () => {
           @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <!-- VOTE -->
         <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @click="getVotes" />
-        <!-- VOTE -->
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>

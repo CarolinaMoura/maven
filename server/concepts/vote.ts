@@ -27,15 +27,7 @@ export default class VoteConcept {
 
   async countUpvotes(section: ObjectId) {
      const votes = await this.votes.readMany( {section} );
-     let total = 0;
-     for (const vote of votes){
-      if (vote.upvote){
-        total++;
-      }
-      else{
-        total--;
-      }
-     }
+     const total = votes.reduce((acc, vote) => acc + (vote.upvote ? 1 : -1), 0);
      return total;
   }
 }

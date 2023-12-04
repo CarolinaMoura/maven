@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { defineEmits, defineProps, onBeforeMount, onUpdated, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["section", "votes"]);
@@ -16,14 +16,34 @@ const vote = async (upvote: boolean) => {
         await fetchy("/api/votes/vote", "POST", {
             body: { section: props.section._id, upvote: upvote },
         });
-        // not reaching this
-        console.log("need to refresh votes!");
         emit("refreshVotes");
     }
     catch {
         return new Error("Error voting");
     }
 };
+
+const getVotes = async () => {
+    try {
+        console.log("sectionid", props.section._id)
+        const votes = await fetchy("/api/votes", "GET", {
+            query: { section: props.section._id },
+        });
+        totalVotes.value = votes; // set updated votes value here
+        console.log("total votes:", totalVotes.value);
+        emit("refreshVotes");
+    } catch {
+        return;
+    }
+};
+
+onBeforeMount(async () => {
+    await getVotes();
+});
+
+onUpdated(async () => {
+    await getVotes();
+});
 
 </script>
  
@@ -34,7 +54,7 @@ const vote = async (upvote: boolean) => {
                 <v-icon size="20">{{ 'mdi-chevron-up' }}</v-icon>
             </v-btn>
             <div class="vote-count">
-                <span>{{ votes }}</span>
+                <span>{{ totalVotes }}</span>
             </div>
             <v-btn size="x-small" @click="vote(false)" color="success" icon>
                 <v-icon size="20">{{ 'mdi-chevron-down' }}</v-icon>
