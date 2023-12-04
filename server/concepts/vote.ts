@@ -16,7 +16,9 @@ export default class VoteConcept {
     if (existingVote) {
       await this.removeVote(section, user);
     }
-    await this.votes.createOne({ section, user, upvote });
+    if (!existingVote || existingVote.upvote !== upvote) {
+      await this.votes.createOne({ section, user, upvote });
+    }
 
     return { msg: "Vote updated successfully!" };
   }
