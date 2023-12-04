@@ -18,4 +18,16 @@ export default class TranslationRequestConcept {
     await this.translationRequests.deleteOne({ _id: id });
     return { msg: "Deleted translation request!" };
   }
+
+  async getTranslationRequests() {
+    return await this.translationRequests.readMany({});
+  }
+
+  async getTranslationRequest(_id: ObjectId) {
+    const document = await this.translationRequests.readOne({ _id });
+    if (document === null) {
+      throw new Error("Document not found!");
+    }
+    return document;
+  }
 }

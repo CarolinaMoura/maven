@@ -10,17 +10,17 @@ import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const loaded = ref(false);
-const documents = ref();
+const requests = ref();
 
-async function getDocuments() {
+async function getRequests() {
   loaded.value = false;
-  const fetchedDocuments = await fetchy("/api/document", "GET");
-  documents.value = fetchedDocuments;
+  const fetchedRequests = await fetchy("/api/translationRequest", "GET");
+  requests.value = fetchedRequests;
   loaded.value = true;
 }
 
 onBeforeMount(async () => {
-  await getDocuments();
+  await getRequests();
 });
 </script>
 
@@ -32,14 +32,14 @@ onBeforeMount(async () => {
       <h1 v-else>Please login!</h1>
     </section>
 
-    <TranslationRequestForm @refresh-documents="getDocuments" />
-    <TranslationRequestList />
-
     <div class="documents-display">
       <Filter />
+      <TranslationRequestForm @refresh-requests="getRequests" />
+      <TranslationRequestList />
+
       <div>
-        UPLOADED DOCUMENTS (FOR ALPHA)
-        <TranslationRequestPreview v-for="document in documents" :document="document" v-bind:key="document._id"></TranslationRequestPreview>
+        TRANSLATION REQUESTS
+        <TranslationRequestPreview v-for="request in requests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
       </div>
     </div>
   </main>

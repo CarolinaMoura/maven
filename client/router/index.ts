@@ -36,10 +36,16 @@ const router = createRouter({
       },
     },
     {
-      path: "/translation_test",
+      path: "/translationRequest/:id",
       name: "Translation",
+      props: true,
       component: TranslationView,
     },
+    // {
+    //   path: "/translation_test",
+    //   name: "Translation",
+    //   component: TranslationView,
+    // },
     {
       path: "/tag",
       name: "Tag",
