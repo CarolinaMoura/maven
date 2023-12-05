@@ -33,10 +33,12 @@ onBeforeMount(async () => {
     <TranslationRequestForm @refresh-requests="getRequests" />
     <TranslationRequestList />
 
-    <div>
-      TRANSLATION REQUESTS
-      <TranslationRequestPreview v-for="request in requests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
-    </div>
+    <v-row>
+      <v-col :sm="4"> </v-col>
+      <v-col :sm="8">
+        <TranslationRequestPreview v-for="request in requests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
+      </v-col>
+    </v-row>
   </main>
 </template>
 

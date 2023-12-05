@@ -116,6 +116,7 @@ const closeForm = () => {
       }
     "
   >
+    <v-icon>mdi-file-document-alert</v-icon>
     Request a translation
   </button>
 
@@ -134,7 +135,6 @@ const closeForm = () => {
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
               <v-col :sm="4"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips></v-select></v-col>
-              <v-col :sm="4"><v-select label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
             </v-row>
 
             <v-row>
@@ -143,7 +143,7 @@ const closeForm = () => {
                   <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first"></v-text-field>
                   <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last"></v-text-field>
 
-                  <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)"><v-icon>mdi-close</v-icon></v-btn>
+                  <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
 
                 <button class="btn-primary" @click="addAuthor()" type="button">Add author</button>
@@ -158,8 +158,10 @@ const closeForm = () => {
 
           <div class="form-section">
             Translation Request Details
-            <v-row>
-              <v-col :sm="4"><v-select label="Language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+            <v-row v-bind:style="{ 'align-items': 'center' }">
+              <v-col :sm="4"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+              to
+              <v-col :sm="4"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
             </v-row>
             <v-row>
               <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with`"></v-textarea> </v-col>
