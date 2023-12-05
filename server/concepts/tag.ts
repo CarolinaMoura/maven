@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 
 export interface TagDoc extends BaseDoc {
@@ -28,8 +28,8 @@ export default class TagConcept {
     return await this.tags.readOne({ _id });
   }
 
-  async getTags() {
-    return await this.tags.readMany({});
+  async getTags(filter: Filter<TagDoc> = {}) {
+    return await this.tags.readMany(filter);
   }
   async getLanguageTags() {
     return await this.tags.readMany({ isLanguage: true });
@@ -57,6 +57,11 @@ export default class TagConcept {
     await this.attachments.createOne({ tag, attachedTo });
     return { msg: "Attached tag!" };
   }
+
+  async getAttachments(filter: Filter<AttachmentDoc>) {
+    return await this.attachments.readMany(filter);
+  }
+
   async getObjectTags(attachedTo: ObjectId) {
     return await this.attachments.readMany({ attachedTo });
   }

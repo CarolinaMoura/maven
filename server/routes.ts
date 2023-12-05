@@ -1,10 +1,12 @@
-import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, WebSession } from "./app";
-import { Author } from "./concepts/document";
+import { Filter, ObjectId } from "mongodb";
+import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, Vote, WebSession } from "./app";
+import { Author, DocumentDoc } from "./concepts/document";
+import { TranslationRequestDoc } from "./concepts/translationRequest";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
 import Responses from "./responses";
+
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -74,6 +76,11 @@ class Routes {
     return await Tag.getLanguageTags();
   }
 
+  @Router.get("/tag/nonlanguage")
+  async getNonLanguageTags() {
+    return await Tag.getTags({ isLanguage: false });
+  }
+
   @Router.get("/tag/other")
   async getOtherTags() {
     return await Tag.getOtherTags();
@@ -118,12 +125,13 @@ class Routes {
   }
   @Router.get("/document")
   async getDocuments() {
-    return await Responses.documents(await Document.getDocuments());
+    return await Responses.documents(await Document.filterDocuments({}));
   }
   @Router.get("/document/:id")
   async getDocument(id: string) {
     return await Responses.document(await Document.getDocument(new ObjectId(id)));
   }
+
   @Router.delete("/document/:id")
   async deleteDocument(session: WebSessionDoc, id: string) {
     const user = WebSession.getUser(session);
@@ -159,7 +167,7 @@ class Routes {
   @Router.get("/sectionTranslation/:section")
   async getAllSectionTranslations(section: string) {
     const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
-    return await Promise.all(
+    const translationsWithVotes = await Promise.all(
       sectionTranslations.map(async (translation) => {
         let name = "";
         try {
@@ -168,12 +176,16 @@ class Routes {
         } catch (e) {
           name = "Deleted user";
         }
+        const upvotes = await Vote.countUpvotes(translation._id);
         return {
           translatorName: name,
+          upvotes,
           ...translation,
         };
       }),
     );
+    const sortedTranslations = translationsWithVotes.sort((a, b) => b.upvotes - a.upvotes);
+    return sortedTranslations;
   }
 
   @Router.post("/sectionTranslation")
@@ -206,9 +218,9 @@ class Routes {
     return await SectionTranslation.deleteSectionTranslation(new ObjectId(id));
   }
 
-  ////////////////////////
-  // TranslationRequest //
-  ///////////////////////
+  ////////////////////////////
+  //   TranslationRequest   //
+  ////////////////////////////
   @Router.post("/translationRequest")
   async createTranslationRequest(session: WebSessionDoc, document: string, languageTo: string, description: string) {
     const user = WebSession.getUser(session);
@@ -246,6 +258,139 @@ class Routes {
   async getTranslationRequest(id: string) {
     return await Responses.translationRequest(await TranslationRequest.getTranslationRequest(new ObjectId(id)));
   }
+
+  ///////////////////
+  //    Upvote    //
+  //////////////////
+  @Router.get("/votes")
+  async getVotes(section: string) {
+    return await Vote.countUpvotes(new ObjectId(section));
+  }
+
+  @Router.get("/votes/myVote")
+  async getMyVote(session: WebSessionDoc, section: string) {
+    const user = WebSession.getUser(session);
+    return await Vote.getMyVote(new ObjectId(section), user);
+  }
+  @Router.post("/votes/vote")
+  async vote(session: WebSessionDoc, section: string, upvote: boolean) {
+    const user = WebSession.getUser(session);
+    return await Vote.vote(new ObjectId(section), user, upvote);
+  }
+
+  @Router.delete("/votes/removeVote")
+  async removeVote(session: WebSessionDoc, section: string) {
+    const user = WebSession.getUser(session);
+    await Vote.removeVote(new ObjectId(section), user);
+    return { msg: "Vote removed!" };
+  }
+
+  // Exporting the translation
+  @Router.get("/export/:id")
+  async export(id: string, chosenTranslations: Array<ObjectId | undefined>) {
+    const translationRequest = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+    const sections = translationRequest.sections;
+    const translations = await Promise.all(
+      sections.map(async (section, i) => {
+        const curChosenTranslation = chosenTranslations[i];
+        if (curChosenTranslation !== undefined) {
+          return SectionTranslation.getSectionTranslation(curChosenTranslation);
+        }
+        const translations = await Promise.all((await SectionTranslation.getTranslationsForSection(section)).map((t) => t._id));
+        const mostUpvotedTranslation = await Vote.getMostUpvoted(translations);
+        return SectionTranslation.getSectionTranslation(mostUpvotedTranslation);
+      }),
+    );
+    return translations.reduce((acc, cur) => acc + cur.translation + " ", "");
+  }
+
+  ////////////////
+  //   Filter   //
+  ////////////////
+  @Router.put("/filter")
+  async filterDocuments(filter: IFilter) {
+    const infYear = 10000000000;
+
+    if (filter.yearFrom === undefined) {
+      filter.yearFrom = -infYear;
+    }
+    if (filter.yearTo === undefined) {
+      filter.yearTo = infYear;
+    }
+
+    let docIds: ObjectId[];
+    // filter by tags
+    if (filter.tags !== undefined && filter.tags.length > 0) {
+      const objectTags = filter.tags.map((tag) => new ObjectId(tag));
+      const attachments = await Tag.getAttachments({ tag: { $in: objectTags } });
+      docIds = attachments.map(({ attachedTo }) => attachedTo);
+    } else {
+      docIds = (await Document.filterDocuments({})).map((doc) => doc._id);
+    }
+
+    // filter by document
+    const queryDocs: Filter<DocumentDoc> = {
+      _id: { $in: docIds },
+      year: { $gte: filter.yearFrom, $lte: filter.yearTo },
+    };
+
+    let ok = false;
+
+    for (const t of filter.translations ?? []) {
+      ok ||= t.from === "0";
+    }
+
+    if (filter.translations !== undefined && filter.translations.length && !ok) {
+      const from = filter.translations.map(({ from }) => new ObjectId(from));
+      queryDocs.originalLanguage = { $in: from };
+    }
+    const docs = await Document.filterDocuments(queryDocs);
+    if (filter.translations === undefined || filter.translations.length === 0) {
+      return await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } });
+    }
+
+    const fromTo: Map<string, Set<string>> = new Map([["0", new Set<string>()]]);
+
+    for (const { from, to } of filter.translations) {
+      fromTo.get("0")?.add(to);
+      if (fromTo.has(from)) {
+        fromTo.get(from)?.add(to);
+      } else {
+        fromTo.set(from, new Set([to]));
+      }
+    }
+
+    const setLanguagesEveryone = fromTo.get("0") ?? [];
+
+    // filter by translation request
+    const toReturn: Array<TranslationRequestDoc> = [];
+    for (const doc of docs) {
+      // get the specifics of the document
+      const setLanguagesDocument = fromTo.get(doc.originalLanguage.toString()) ?? [];
+      const possibleToLanguage = [...setLanguagesDocument, ...setLanguagesEveryone];
+
+      if (possibleToLanguage.includes("0")) {
+        toReturn.push(...(await TranslationRequest.getTranslationRequests({ document: doc._id })));
+      } else {
+        const queryTranslationRequest = {
+          document: doc._id,
+          languageTo: { $in: possibleToLanguage.map((id) => new ObjectId(id)) },
+        };
+        const result = await TranslationRequest.getTranslationRequests(queryTranslationRequest);
+        toReturn.push(...result);
+      }
+    }
+
+    return toReturn;
+  }
+}
+interface IFilter {
+  translations?: { from: string; to: string }[];
+  yearFrom?: number;
+  yearTo?: number;
+  completelyTranslated?: boolean;
+  untranslated?: boolean;
+  tags?: string[];
 }
 
 export default getExpressRouter(new Routes());
