@@ -3,6 +3,7 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import SectionListComponent from "../components/Section/SectionListComponent.vue";
+import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
 import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
@@ -32,6 +33,7 @@ onBeforeMount(async () => {
     </section>
 
     <div v-if="loaded">
+      <TranslationRequestPreview :request="translationRequest"></TranslationRequestPreview>
       <SectionListComponent :sectionsIds="translationRequest.sections" />
     </div>
   </main>

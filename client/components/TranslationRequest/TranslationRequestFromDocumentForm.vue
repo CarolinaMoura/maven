@@ -26,7 +26,7 @@ const selectRule = [
 
 async function submitRequest() {
   try {
-    await fetchy("/api/translationRequest/", "POST", { body: { document: props.document._id, languageTo: targetLanguage.value, description: description } });
+    await fetchy("/api/translationRequest/", "POST", { body: { document: props.document._id, languageTo: targetLanguage.value, description: description.value } });
     emit("refreshRequests");
     menu.value = false;
   } catch (e) {
