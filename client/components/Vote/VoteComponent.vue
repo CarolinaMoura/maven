@@ -1,35 +1,51 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { defineEmits, defineProps, ref } from "vue";
+import { computed, defineEmits, defineProps, onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["section", "votes"]);
 const emit = defineEmits(["refreshVotes", "refreshSectionTranslations"]);
 
-let downSelected = ref(false);
-let upSelected = ref(false);
 const { isLoggedIn } = storeToRefs(useUserStore());
+const curVote = ref<"UPVOTE" | "DOWNVOTE" | "NONE">("NONE");
+const sectionId = computed(() => props.section._id);
+
+async function removeVote() {
+  await fetchy("/api/votes/removeVote", "DELETE", {
+    query: { section: sectionId.value },
+  });
+  curVote.value = "NONE";
+}
+async function sendVote(upvote: boolean) {
+  await fetchy("/api/votes/vote", "POST", {
+    body: { section: sectionId.value, upvote },
+  });
+  curVote.value = upvote ? "UPVOTE" : "DOWNVOTE";
+}
 
 const vote = async (upvote: boolean) => {
-  try {
-    if (upvote) upSelected.value = !upSelected.value;
-    if (!upvote) downSelected.value = !downSelected.value;
-    await fetchy("/api/votes/vote", "POST", {
-      body: { section: props.section._id, upvote: upvote },
-    });
-    emit("refreshVotes");
-    emit("refreshSectionTranslations");
-  } catch {
-    return new Error("Error voting");
+  if ((upvote && curVote.value == "UPVOTE") || (!upvote && curVote.value == "DOWNVOTE")) {
+    await removeVote();
+  } else {
+    await sendVote(upvote);
   }
+  emit("refreshVotes");
 };
 
 const getButtonColor = (upvote: boolean) => {
-  if (upvote && upSelected.value) return "success";
-  else if (!upvote && downSelected.value) return "success";
-  return "white"
+  if (upvote && curVote.value == "UPVOTE") return "success";
+  else if (!upvote && curVote.value == "DOWNVOTE") return "success";
+};
+
+async function getVoteType() {
+  const res = await fetchy("/api/votes/myVote", "GET", { query: { section: sectionId.value } });
+  curVote.value = res;
 }
+
+onBeforeMount(async () => {
+  await getVoteType();
+});
 </script>
 
 <template>
