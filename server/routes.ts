@@ -259,16 +259,42 @@ class Routes {
     return await Vote.countUpvotes(new ObjectId(section));
   }
 
+  @Router.get("/votes/myVote")
+  async getMyVote(session: WebSessionDoc, section: string) {
+    const user = WebSession.getUser(session);
+    return await Vote.getMyVote(new ObjectId(section), user);
+  }
   @Router.post("/votes/vote")
   async vote(session: WebSessionDoc, section: string, upvote: boolean) {
     const user = WebSession.getUser(session);
     return await Vote.vote(new ObjectId(section), user, upvote);
   }
 
-  @Router.patch("/votes/removeVote")
-  async removeVote(session: WebSessionDoc, section: string, upvote: boolean) {
+  @Router.delete("/votes/removeVote")
+  async removeVote(session: WebSessionDoc, section: string) {
     const user = WebSession.getUser(session);
-    return await Vote.removeVote(new ObjectId(section), user);
+    await Vote.removeVote(new ObjectId(section), user);
+    return { msg: "Vote removed!" };
+  }
+
+  // Exporting the translation
+  @Router.get("/export/:id")
+  async export(id: string, chosenTranslations: Array<ObjectId | undefined>) {
+    const translationRequest = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+    const sections = translationRequest.sections;
+    const translations = await Promise.all(
+      sections.map(async (section, i) => {
+        const curChosenTranslation = chosenTranslations[i];
+        if (curChosenTranslation !== undefined) {
+          return SectionTranslation.getSectionTranslation(curChosenTranslation);
+        }
+
+        const translations = await Promise.all((await SectionTranslation.getTranslationsForSection(section)).map((t) => t._id));
+        const mostUpvotedTranslation = await Vote.getMostUpvoted(translations);
+        return SectionTranslation.getSectionTranslation(mostUpvotedTranslation);
+      }),
+    );
+    return translations.reduce((acc, cur) => acc + cur.translation + " ", "");
   }
 }
 

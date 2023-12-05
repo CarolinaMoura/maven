@@ -17,6 +17,9 @@ export default class SectionTranslationConcept {
   async getSectionTranslations(filter: Filter<SectionTranslationDoc>) {
     return await this.sectionTranslations.readMany(filter);
   }
+  async getTranslationsForSection(section: ObjectId) {
+    return await this.sectionTranslations.readMany({ section });
+  }
 
   async checkSectionTranslationExists(id: ObjectId) {
     return (await this.sectionTranslations.readOne({ _id: id })) !== null;
