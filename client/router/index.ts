@@ -2,6 +2,7 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import ExportView from "../views/ExportView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
@@ -41,11 +42,12 @@ const router = createRouter({
       props: true,
       component: TranslationView,
     },
-    // {
-    //   path: "/translation_test",
-    //   name: "Translation",
-    //   component: TranslationView,
-    // },
+    {
+      path: "/exportTranslation/:id",
+      name: "Export Translation",
+      props: true,
+      component: ExportView,
+    },
     {
       path: "/tag",
       name: "Tag",

@@ -188,6 +188,10 @@ class Routes {
     return sortedTranslations;
   }
 
+  @Router.get("/sectionTranslation/byId/:id")
+  async getSectionTranslation(id: string) {
+    return await SectionTranslation.getSectionTranslation(new ObjectId(id));
+  }
   @Router.post("/sectionTranslation")
   async createSectionTranslation(session: WebSessionDoc, translation: string, section: string) {
     const user = WebSession.getUser(session);
@@ -287,21 +291,21 @@ class Routes {
 
   // Exporting the translation
   @Router.get("/export/:id")
-  async export(id: string, chosenTranslations: Array<ObjectId | undefined>) {
-    const translationRequest = await TranslationRequest.getTranslationRequest(new ObjectId(id));
-    const sections = translationRequest.sections;
-    const translations = await Promise.all(
-      sections.map(async (section, i) => {
-        const curChosenTranslation = chosenTranslations[i];
-        if (curChosenTranslation !== undefined) {
-          return SectionTranslation.getSectionTranslation(curChosenTranslation);
-        }
-        const translations = await Promise.all((await SectionTranslation.getTranslationsForSection(section)).map((t) => t._id));
-        const mostUpvotedTranslation = await Vote.getMostUpvoted(translations);
-        return SectionTranslation.getSectionTranslation(mostUpvotedTranslation);
-      }),
-    );
+  async export(chosenTranslations: Array<ObjectId>) {
+    const translations = await Promise.all(chosenTranslations.map(async (chosenTranslation) => SectionTranslation.getSectionTranslation(chosenTranslation)));
     return translations.reduce((acc, cur) => acc + cur.translation + " ", "");
+  }
+
+  @Router.get("/getTranslation/byUpvotes/:id")
+  async getTranslationByUpvotes(id: string) {
+    const sectionId = new ObjectId(id);
+    const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: sectionId });
+    if (sectionTranslations.length === 0) {
+      return { msg: "No translations found!" };
+    } else {
+      const popularTranslation = await Vote.getMostUpvoted(sectionTranslations.map((t) => t._id));
+      return { msg: "Translation found!", translation: popularTranslation };
+    }
   }
 
   ////////////////
@@ -311,9 +315,6 @@ class Routes {
   async filterDocuments(filter: IFilter) {
     const infYear = 10000000000;
 
-    if (filter.yearFrom === undefined) {
-      filter.yearFrom = -infYear;
-    }
     if (filter.yearTo === undefined) {
       filter.yearTo = infYear;
     }

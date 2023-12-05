@@ -36,6 +36,7 @@ const vote = async (upvote: boolean) => {
 const getButtonColor = (upvote: boolean) => {
   if (upvote && curVote.value == "UPVOTE") return "success";
   else if (!upvote && curVote.value == "DOWNVOTE") return "success";
+  return "white";
 };
 
 async function getVoteType() {
