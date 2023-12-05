@@ -39,7 +39,7 @@ async function toTranslations() {
 </script>
 
 <template>
-  <v-card v-if="loaded" class="preview-card card" hover>
+  <v-card v-if="loaded" class="preview-card card" hover @click="toTranslations">
     <div class="card-container">
       <div class="card-content">
         <div>
