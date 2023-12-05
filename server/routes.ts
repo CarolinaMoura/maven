@@ -284,7 +284,14 @@ class Routes {
       _id: { $in: docIds },
       year: { $gte: filter.yearFrom, $lte: filter.yearTo },
     };
-    if (filter.translations !== undefined && filter.translations.length) {
+
+    let ok = false;
+
+    for (const t of filter.translations ?? []) {
+      ok ||= t.from === "0";
+    }
+
+    if (filter.translations !== undefined && filter.translations.length && !ok) {
       const from = filter.translations.map(({ from }) => new ObjectId(from));
       queryDocs.originalLanguage = { $in: from };
     }
@@ -293,25 +300,36 @@ class Routes {
       return await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } });
     }
 
-    const fromTo: Map<string, ObjectId[]> = new Map();
+    const fromTo: Map<string, Set<string>> = new Map([["0", new Set<string>()]]);
 
     for (const { from, to } of filter.translations) {
+      fromTo.get("0")?.add(to);
       if (fromTo.has(from)) {
-        fromTo.get(from)?.push(new ObjectId(to));
+        fromTo.get(from)?.add(to);
       } else {
-        fromTo.set(from, [new ObjectId(to)]);
+        fromTo.set(from, new Set([to]));
       }
     }
+
+    const setLanguagesEveryone = fromTo.get("0") ?? [];
+
     // filter by translation request
     const toReturn: Array<TranslationRequestDoc> = [];
     for (const doc of docs) {
-      const possibleToLanguage = fromTo.get(doc.originalLanguage.toString()) ?? [];
-      const queryTranslationRequest = {
-        document: doc._id,
-        languageTo: { $in: possibleToLanguage.map((id) => new ObjectId(id)) },
-      };
-      const result = await TranslationRequest.getTranslationRequests(queryTranslationRequest);
-      toReturn.push(...result);
+      // get the specifics of the document
+      const setLanguagesDocument = fromTo.get(doc.originalLanguage.toString()) ?? [];
+      const possibleToLanguage = [...setLanguagesDocument, ...setLanguagesEveryone];
+
+      if (possibleToLanguage.includes("0")) {
+        toReturn.push(...(await TranslationRequest.getTranslationRequests({ document: doc._id })));
+      } else {
+        const queryTranslationRequest = {
+          document: doc._id,
+          languageTo: { $in: possibleToLanguage.map((id) => new ObjectId(id)) },
+        };
+        const result = await TranslationRequest.getTranslationRequests(queryTranslationRequest);
+        toReturn.push(...result);
+      }
     }
 
     return toReturn;

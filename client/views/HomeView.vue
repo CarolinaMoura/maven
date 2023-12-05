@@ -57,7 +57,6 @@ h1 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   padding: 0 1.5rem;
   width: 100%;
 }

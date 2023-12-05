@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { useTranslationRequestsStore } from "../../stores/translationRequests";
 import { Tag } from "../../types";
@@ -60,15 +60,11 @@ const addNewTranslationField = () => {
 };
 
 const submitFilters = async () => {
-  // remove unused translation lines
-  const languageIds = languages.value.map((lang) => lang._id);
-  const filteredTranslations = translations.value.filter((t) => languageIds.includes(t.from._id) && languageIds.includes(t.to._id));
-
   const filters = {
     tags: select.value.map((t: Tag) => t._id ?? ""),
     yearFrom: value.value[0],
     yearTo: value.value[1],
-    translations: filteredTranslations.map(({ from, to }) => ({
+    translations: translations.value.map(({ from, to }) => ({
       from: from._id ?? "",
       to: to._id ?? "",
     })),
@@ -77,6 +73,12 @@ const submitFilters = async () => {
   };
 
   await translationRequestsStore.getTranslationRequests(filters);
+};
+
+watchEffect(submitFilters);
+
+const removeTranslationLine = (ix: number) => {
+  translations.value.splice(ix, 1);
 };
 
 const clearAllFilters = async () => {
@@ -99,6 +101,10 @@ onMounted(() => {
     window.removeEventListener("resize", updateWindowSize);
   });
 });
+
+const myFunc = () => {
+  console.log("entrei");
+};
 </script>
 
 <template>
@@ -110,7 +116,7 @@ onMounted(() => {
     <div v-if="canAppear || windowSize >= 700">
       <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button>
       <div class="filter-type">
-        <h2>Work filters</h2>
+        <h2>Document filters</h2>
         <div class="filter-option">
           <h4>
             Tags
@@ -138,7 +144,7 @@ onMounted(() => {
         <div class="filter-option">
           <h4>
             Year published
-            <v-tooltip text="Select the range of years of publication of the original work">
+            <v-tooltip text="Select the range of years of publication of the original document">
               <template v-slot:activator="{ props }">
                 <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
               </template>
@@ -157,20 +163,22 @@ onMounted(() => {
           <div v-for="(translation, ix) in translations" :key="ix">
             <div class="single-translation">
               From
+              <!-- <v-select :return-object="true" @update:modelValue="(e) => (translation = e)" :items="languages" label="original"></v-select> -->
               <v-combobox label="original" class="language-selector" v-model="translation.from" :hide-details="true" :items="languages"></v-combobox>
               to
               <v-combobox label="target" class="language-selector" v-model="translation.to" :hide-details="true" :items="languages"></v-combobox>
+              <v-icon color="var(--primary-text-60)" size="x-small" @click="removeTranslationLine(ix)">mdi-close</v-icon>
             </div>
           </div>
           <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
         </div>
-        <div class="filter-option">
+        <!-- <div class="filter-option">
           <h4>Translation status</h4>
           <div>
             <v-checkbox label="Completely translated" density="compact" :hide-details="true" v-model="completelyTranslated"></v-checkbox>
             <v-checkbox label="Untranslated" density="compact" :hide-details="true" v-model="untranslated"></v-checkbox>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="filter-type">
         <v-col cols="12">
@@ -187,10 +195,12 @@ onMounted(() => {
 }
 .single-translation {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
+  width: 100%;
 }
 .language-selector {
   padding: 0 1rem;
+  width: 10%;
 }
 
 .filter-button {
