@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 
 export interface Author {
@@ -21,8 +21,8 @@ export default class DocumentConcept {
     return await this.documents.createOne({ title, authors, content, year, uploader, originalLanguage });
   }
 
-  async getDocuments() {
-    return await this.documents.readMany({});
+  async filterDocuments(filter: Filter<DocumentDoc>): Promise<DocumentDoc[]> {
+    return await this.documents.readMany(filter);
   }
 
   async getDocument(id: ObjectId) {

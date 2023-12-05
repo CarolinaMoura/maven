@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 
 export interface TranslationRequestDoc extends BaseDoc {
@@ -19,8 +19,8 @@ export default class TranslationRequestConcept {
     return { msg: "Deleted translation request!" };
   }
 
-  async getTranslationRequests() {
-    return await this.translationRequests.readMany({});
+  async getTranslationRequests(filter: Filter<TranslationRequestDoc> = {}) {
+    return await this.translationRequests.readMany(filter);
   }
 
   async getTranslationRequest(_id: ObjectId) {
