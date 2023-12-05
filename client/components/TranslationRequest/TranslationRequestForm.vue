@@ -63,7 +63,7 @@ async function submitRequest() {
       });
 
       // then use returned id to create request
-      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value } });
+      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value, description: description.value } });
       emit("refreshRequests");
       closeForm();
     } catch (e) {
@@ -117,6 +117,7 @@ const closeForm = () => {
       }
     "
   >
+    <v-icon>mdi-file-document-alert</v-icon>
     Request a translation
   </button>
 
@@ -125,17 +126,19 @@ const closeForm = () => {
       <v-form v-model="isFormValid" @submit.prevent="submitRequest()">
         <v-container class="form-container">
           <div class="row between">
-            Translation Request Form
+            <v-card-title>Translation Request Form</v-card-title>
             <v-btn variant="plain" @click="closeForm"><v-icon>mdi-close</v-icon></v-btn>
           </div>
 
+          <v-divider></v-divider>
+
           <div class="form-section">
-            Document Details
+            <v-card-subtitle>Translation Request Form</v-card-subtitle>
+
             <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
               <v-col :sm="4"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips></v-select></v-col>
-              <v-col :sm="4"><v-select label="Language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
             </v-row>
 
             <v-row>
@@ -144,10 +147,10 @@ const closeForm = () => {
                   <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first"></v-text-field>
                   <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last"></v-text-field>
 
-                  <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)"><v-icon>mdi-close</v-icon></v-btn>
+                  <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
 
-                <button class="btn-primary" @click="addAuthor()" type="button">Add author</button>
+                <button class="btn-secondary" @click="addAuthor()" type="button">Add author</button>
               </v-col>
             </v-row>
           </div>
@@ -159,8 +162,10 @@ const closeForm = () => {
 
           <div class="form-section">
             Translation Request Details
-            <v-row>
-              <v-col :sm="4"><v-select label="Language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+            <v-row v-bind:style="{ 'align-items': 'center' }">
+              <v-col :sm="4"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+              to
+              <v-col :sm="4"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
             </v-row>
             <v-row>
               <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with`"></v-textarea> </v-col>

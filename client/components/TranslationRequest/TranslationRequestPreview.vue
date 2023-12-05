@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import Tag from "@/components/Tag/Tag.vue";
+import TranslationRequestFromDocumentForm from "@/components/TranslationRequest/TranslationRequestFromDocumentForm.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Author } from "../../types";
 import { fetchy } from "../../utils/fetchy";
+import LanguageTag from "../Tag/LanguageTag.vue";
 const { currentUsername } = storeToRefs(useUserStore());
+
+const router = useRouter();
+const route = useRoute();
 
 const loaded = ref(false);
 const document = ref();
@@ -26,41 +32,107 @@ async function deleteRequest() {
   await fetchy(`/api/translationRequest/${props.request._id}`, "DELETE");
   emit("refreshRequests");
 }
+
+async function toTranslations() {
+  await router.push({ path: `/translationRequest/${props.request._id}` });
+}
 </script>
 
 <template>
-  <v-card v-if="loaded" class="preview-card card" hover>
-    <v-btn v-if="currentUsername === request.requester" variant="plain" @click="deleteRequest"><v-icon>mdi-trash-can</v-icon></v-btn>
-    <h3>{{ document.title }}</h3>
-    <p>
-      {{
-        document.authors
-          .map((a: Author) => {
-            return `${a.first} ${a.last}`;
-          })
-          .join(", ")
-      }}
-    </p>
+  <v-card v-if="loaded" class="preview-card card" hover @click="toTranslations">
+    <div class="card-container">
+      <div class="card-content">
+        <div>
+          <h3>{{ document.title }}</h3>
+          <p>
+            {{
+              document.authors
+                .map((a: Author) => {
+                  return `${a.first} ${a.last}`;
+                })
+                .join(", ")
+            }}
+          </p>
 
-    <p>{{ `Published ${document.year}` }}</p>
-    <p>{{ `${document.originalLanguage} ==> ${request.languageTo}` }}</p>
+          <p>{{ `Published ${document.year}` }}</p>
+          <p>{{ request.description }}</p>
+        </div>
 
-    <div class="row">
-      <Tag v-for="tag in tags" :key="tag">{{ tag }}</Tag>
+        <div class="row small">
+          <LanguageTag :langauge="document.originalLanguage"></LanguageTag>
+          <v-icon>mdi-arrow-right</v-icon>
+          <LanguageTag :langauge="request.languageTo"></LanguageTag>
+        </div>
+
+        <div class="row">
+          <Tag v-for="tag in tags" :key="tag">{{ tag }}</Tag>
+        </div>
+      </div>
+
+      <div class="card-actions">
+        <v-tooltip text="See translations">
+          <template v-slot:activator="{ props }">
+            <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click="toTranslations"></v-btn>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Request translation in a different language">
+          <template v-slot:activator="{ props }">
+            <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
+          </template>
+        </v-tooltip>
+        <v-tooltip text="Delete request">
+          <template v-slot:activator="{ props }">
+            <v-btn v-if="currentUsername === request.requester" v-bind="props" variant="plain" @click="deleteRequest" icon="mdi-trash-can"></v-btn>
+          </template>
+        </v-tooltip>
+      </div>
     </div>
-    <RouterLink :to="{ name: 'Translation', params: { id: props.request._id } }">View Translations</RouterLink>
-    <v-btn>request translation in a different language</v-btn>
   </v-card>
 
   <div v-else class="preview-container column">Loading...</div>
 </template>
 
-<style>
+<style scoped>
+h3 {
+  font-size: 24px;
+  font-weight: normal;
+}
+
+.card-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0em;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+}
+.heading {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  width: 100%;
+}
+
+.small {
+  row-gap: 0em;
+  column-gap: 0em;
+}
 .preview-card.card {
+  color: var(--primary-text);
   align-items: start;
   background-color: var(--secondary-20);
   border-radius: 10px;
   padding: 1.5em;
-  margin-bottom: 1em;
 }
 </style>
