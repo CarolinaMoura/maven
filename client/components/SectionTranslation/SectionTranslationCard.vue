@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import VoteComponent from "@/components/Vote/VoteComponent.vue";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
@@ -9,11 +10,13 @@ interface SectionTranslationProps {
   sectionTranslation: PayloadSectionTranslation;
 }
 const props = defineProps<SectionTranslationProps>();
+
 const translatorName = props.sectionTranslation.translatorName;
 const emit = defineEmits(["refreshSectionTranslations"]);
 const isEdit = ref(false);
 const edition = ref("");
 const dialog = ref(false);
+const totalVotes = ref(0);
 
 const userStore = useUserStore();
 const { isLoggedIn, currentUsername } = storeToRefs(userStore);
@@ -56,6 +59,21 @@ const closeDialogAndRemoveTranslation = async () => {
   dialog.value = false;
   await removeSectionTranslation();
 };
+
+const getVotes = async () => {
+  try {
+    const votes = await fetchy("/api/votes", "GET", {
+      query: { section: props.sectionTranslation._id },
+    });
+    totalVotes.value = votes; // set updated votes value here
+  } catch {
+    return;
+  }
+};
+
+onBeforeMount(async () => {
+  await getVotes();
+});
 </script>
 
 <template>
@@ -69,7 +87,7 @@ const closeDialogAndRemoveTranslation = async () => {
         <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto" @click="enterEditMode">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <span v-else>Upvote button</span>
+        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
       </v-card-title>
       <v-card-title>Translation:</v-card-title>
       <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
@@ -97,7 +115,6 @@ const closeDialogAndRemoveTranslation = async () => {
           </v-btn>
         </div>
       </v-card-title>
-      <!-- <v-card-title>Translation:</v-card-title> -->
       <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation" v-model="edition"></v-textarea>
     </div>
   </v-card>

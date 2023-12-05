@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, WebSession } from "./app";
+import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, Vote, WebSession } from "./app";
 import { Author } from "./concepts/document";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -159,7 +159,7 @@ class Routes {
   @Router.get("/sectionTranslation/:section")
   async getAllSectionTranslations(section: string) {
     const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: new ObjectId(section) });
-    return await Promise.all(
+    const translationsWithVotes = await Promise.all(
       sectionTranslations.map(async (translation) => {
         let name = "";
         try {
@@ -168,12 +168,16 @@ class Routes {
         } catch (e) {
           name = "Deleted user";
         }
+        const upvotes = await Vote.countUpvotes(translation._id);
         return {
           translatorName: name,
+          upvotes,
           ...translation,
         };
       }),
     );
+    const sortedTranslations = translationsWithVotes.sort((a, b) => b.upvotes - a.upvotes);
+    return sortedTranslations;
   }
 
   @Router.post("/sectionTranslation")
@@ -245,6 +249,26 @@ class Routes {
   @Router.get("/translationRequest/:id")
   async getTranslationRequest(id: string) {
     return await Responses.translationRequest(await TranslationRequest.getTranslationRequest(new ObjectId(id)));
+  }
+
+  ///////////////////
+  //    Upvote    //
+  //////////////////
+  @Router.get("/votes")
+  async getVotes(section: string) {
+    return await Vote.countUpvotes(new ObjectId(section));
+  }
+
+  @Router.post("/votes/vote")
+  async vote(session: WebSessionDoc, section: string, upvote: boolean) {
+    const user = WebSession.getUser(session);
+    return await Vote.vote(new ObjectId(section), user, upvote);
+  }
+
+  @Router.patch("/votes/removeVote")
+  async removeVote(session: WebSessionDoc, section: string, upvote: boolean) {
+    const user = WebSession.getUser(session);
+    return await Vote.removeVote(new ObjectId(section), user);
   }
 }
 
