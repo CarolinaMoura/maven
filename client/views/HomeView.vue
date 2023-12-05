@@ -37,14 +37,12 @@ onBeforeMount(async () => {
     <TranslationRequestForm @refresh-requests="getRequests" />
     <TranslationRequestList />
 
-    <div class="documents-display">
-      <Filter />
-
-      <div>
-        TRANSLATION REQUESTS
-        <TranslationRequestPreview v-for="request in translationRequests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
-      </div>
-    </div>
+    <v-row>
+      <v-col :sm="4"> <Filter /></v-col>
+      <v-col :sm="8">
+        <TranslationRequestPreview v-for="request in requests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
+      </v-col>
+    </v-row>
   </main>
 </template>
 
