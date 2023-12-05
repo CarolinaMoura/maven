@@ -5,7 +5,7 @@ const data = LANGUAGE_MAP.get(props.langauge);
 </script>
 
 <template>
-  <div class="language-tag" v-bind:style="{ 'background-color': data?.color }">
+  <div class="language-tag" :style="{ 'background-color': `${data?.color}` }">
     <p>{{ data?.abbreviation }}</p>
   </div>
 </template>
