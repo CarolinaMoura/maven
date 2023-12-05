@@ -36,20 +36,25 @@ interface ITranslation {
 }
 
 const emptyTag: IExtendedTag = {
-  title: "",
+  title: "Any",
   name: "",
   isLanguage: true,
   _id: "0",
 };
 
-const languages = computed(() => languageTags.value.map((t: Tag) => ({ ...t, title: t.name })));
+const languages = computed(() => {
+  const sortedCopy = languageTags.value.sort((a, b) => a.name.localeCompare(b.name));
+  return [{ ...emptyTag }, ...sortedCopy.map((t: Tag) => ({ ...t, title: t.name }))];
+});
 const nonLanguages = computed(() => otherTags.value.map((t: Tag) => ({ ...t, title: t.name })));
+
+nonLanguages.value.sort((a, b) => a.name.localeCompare(b.name));
 
 const canAppear = ref(false);
 const windowSize = ref(window.innerWidth);
 
 const select = ref([]);
-const value = ref([1800, getTodaysYear()]);
+const value = ref([1900, getTodaysYear()]);
 const translations = ref<ITranslation[]>([{ from: { ...emptyTag }, to: { ...emptyTag } }]);
 const completelyTranslated = ref(false);
 const untranslated = ref(false);
@@ -60,11 +65,13 @@ const addNewTranslationField = () => {
 };
 
 const submitFilters = async () => {
+  let filteredTranslations = translations.value.filter(({ from, to }) => from._id !== "0" || to._id !== "0");
+
   const filters = {
     tags: select.value.map((t: Tag) => t._id ?? ""),
     yearFrom: value.value[0],
     yearTo: value.value[1],
-    translations: translations.value.map(({ from, to }) => ({
+    translations: filteredTranslations.map(({ from, to }) => ({
       from: from._id ?? "",
       to: to._id ?? "",
     })),
@@ -83,7 +90,7 @@ const removeTranslationLine = (ix: number) => {
 
 const clearAllFilters = async () => {
   select.value = [];
-  value.value = [1800, getTodaysYear()];
+  value.value = [1900, getTodaysYear()];
   translations.value = [{ from: { ...emptyTag }, to: { ...emptyTag } }];
   completelyTranslated.value = false;
   untranslated.value = false;
@@ -94,6 +101,17 @@ const updateWindowSize = () => {
   windowSize.value = window.innerWidth;
 };
 
+const updateLanguageFrom = (e: IExtendedTag | null, ix: number) => {
+  if (!e) return;
+  translations.value[ix].from = e;
+  console.log("entrei");
+};
+
+const updateLanguageTo = (e: IExtendedTag | null, ix: number) => {
+  if (!e) return;
+  translations.value[ix].to = e;
+};
+
 onMounted(() => {
   window.addEventListener("resize", updateWindowSize);
 
@@ -101,10 +119,6 @@ onMounted(() => {
     window.removeEventListener("resize", updateWindowSize);
   });
 });
-
-const myFunc = () => {
-  console.log("entrei");
-};
 </script>
 
 <template>
@@ -129,16 +143,16 @@ const myFunc = () => {
           <v-col cols="12">
             <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
 
-            <v-combobox v-model="select" :items="nonLanguages" label="" multiple>
+            <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
               <template v-slot:selection="data">
-                <v-chip :key="JSON.stringify(data.item)" size="small">
+                <v-chip closable :key="JSON.stringify(data.item)" size="small">
                   <template v-slot:prepend>
                     <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
                   </template>
                   {{ data.item.title }}
                 </v-chip>
               </template>
-            </v-combobox>
+            </v-select>
           </v-col>
         </div>
         <div class="filter-option">
@@ -150,7 +164,7 @@ const myFunc = () => {
               </template>
             </v-tooltip>
           </h4>
-          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1800" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
+          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
           <p style="text-align: center; margin-top: -0.8rem">
             From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
           </p>
@@ -161,24 +175,37 @@ const myFunc = () => {
         <div class="filter-option">
           <h4>Language</h4>
           <div v-for="(translation, ix) in translations" :key="ix">
-            <div class="single-translation">
-              From
-              <!-- <v-select :return-object="true" @update:modelValue="(e) => (translation = e)" :items="languages" label="original"></v-select> -->
-              <v-combobox label="original" class="language-selector" v-model="translation.from" :hide-details="true" :items="languages"></v-combobox>
-              to
-              <v-combobox label="target" class="language-selector" v-model="translation.to" :hide-details="true" :items="languages"></v-combobox>
+            <div class="translation-line">
               <v-icon color="var(--primary-text-60)" size="x-small" @click="removeTranslationLine(ix)">mdi-close</v-icon>
+              <div class="single-translation">
+                From
+                <v-select
+                  clearable
+                  :hide-details="true"
+                  class="language-selector"
+                  @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)"
+                  :return-object="true"
+                  @update:modelValue="(e) => updateLanguageFrom(e, ix)"
+                  :items="languages"
+                  label="original"
+                ></v-select>
+
+                to
+                <v-select
+                  :hide-details="true"
+                  @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)"
+                  clearable
+                  class="language-selector"
+                  :return-object="true"
+                  @update:modelValue="(e) => updateLanguageTo(e, ix)"
+                  :items="languages"
+                  label="target"
+                ></v-select>
+              </div>
             </div>
           </div>
           <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
         </div>
-        <!-- <div class="filter-option">
-          <h4>Translation status</h4>
-          <div>
-            <v-checkbox label="Completely translated" density="compact" :hide-details="true" v-model="completelyTranslated"></v-checkbox>
-            <v-checkbox label="Untranslated" density="compact" :hide-details="true" v-model="untranslated"></v-checkbox>
-          </div>
-        </div> -->
       </div>
       <div class="filter-type">
         <v-col cols="12">
@@ -193,14 +220,21 @@ const myFunc = () => {
 * {
   color: var(--primary-text);
 }
+
+.translation-line {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
 .single-translation {
   display: flex;
+  flex-direction: column;
   /* align-items: center; */
   width: 100%;
 }
 .language-selector {
-  padding: 0 1rem;
-  width: 10%;
+  padding: 1rem 0;
 }
 
 .filter-button {
@@ -210,7 +244,7 @@ const myFunc = () => {
   margin: 0.5rem 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
   font-size: 0.9rem;
 }
 h2 {
@@ -251,6 +285,17 @@ section {
     margin-bottom: 10rem;
     background-color: var(--tertiary-30);
     text-decoration: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .single-translation {
+    flex-direction: row;
+  }
+
+  .language-selector {
+    width: 10%;
+    padding: 0 1rem;
   }
 }
 </style>
