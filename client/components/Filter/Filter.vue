@@ -145,7 +145,7 @@ onMounted(() => {
 
             <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
               <template v-slot:selection="data">
-                <v-chip closable :key="JSON.stringify(data.item)" size="small">
+                <v-chip :key="JSON.stringify(data.item)" size="small">
                   <template v-slot:prepend>
                     <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
                   </template>
