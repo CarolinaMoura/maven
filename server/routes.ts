@@ -210,7 +210,7 @@ class Routes {
   // TranslationRequest //
   ///////////////////////
   @Router.post("/translationRequest")
-  async createTranslationRequest(session: WebSessionDoc, document: string, languageTo: string) {
+  async createTranslationRequest(session: WebSessionDoc, document: string, languageTo: string, description: string) {
     const user = WebSession.getUser(session);
     const documentId = new ObjectId(document);
 
@@ -221,7 +221,7 @@ class Routes {
 
     const documentDoc = await Document.getDocument(documentId);
     const sections = await Section.splitIntoSections(documentDoc.content);
-    const translationRequest = await TranslationRequest.createTranslationRequest(documentId, sections, languageId, user);
+    const translationRequest = await TranslationRequest.createTranslationRequest(documentId, sections, languageId, user, description);
     await Tag.attachTag(languageId, translationRequest);
     return { msg: "Created translation request!" };
   }

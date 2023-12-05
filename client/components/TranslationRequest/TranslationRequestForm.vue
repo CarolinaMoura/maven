@@ -62,7 +62,7 @@ async function submitRequest() {
       });
 
       // then use returned id to create request
-      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value } });
+      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value, description: description.value } });
       emit("refreshRequests");
       closeForm();
     } catch (e) {
@@ -125,12 +125,15 @@ const closeForm = () => {
       <v-form v-model="isFormValid" @submit.prevent="submitRequest()">
         <v-container class="form-container">
           <div class="row between">
-            Translation Request Form
+            <v-card-title>Translation Request Form</v-card-title>
             <v-btn variant="plain" @click="closeForm"><v-icon>mdi-close</v-icon></v-btn>
           </div>
 
+          <v-divider></v-divider>
+
           <div class="form-section">
-            Document Details
+            <v-card-subtitle>Translation Request Form</v-card-subtitle>
+
             <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
             <v-row>
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
@@ -146,7 +149,7 @@ const closeForm = () => {
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
 
-                <button class="btn-primary" @click="addAuthor()" type="button">Add author</button>
+                <button class="btn-secondary" @click="addAuthor()" type="button">Add author</button>
               </v-col>
             </v-row>
           </div>

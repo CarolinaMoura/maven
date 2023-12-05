@@ -5,9 +5,13 @@ const data = LANGUAGE_MAP.get(props.langauge);
 </script>
 
 <template>
-  <div class="language-tag" :style="{ 'background-color': `${data?.color}` }">
-    <p>{{ data?.abbreviation }}</p>
-  </div>
+  <v-tooltip :text="props.langauge">
+    <template v-slot:activator="{ props }">
+      <div class="language-tag" v-bind="props" :style="{ 'background-color': `${data?.color}` }">
+        <p>{{ data?.abbreviation }}</p>
+      </div>
+    </template></v-tooltip
+  >
 </template>
 
 <style scoped>

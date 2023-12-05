@@ -55,6 +55,7 @@ async function toTranslations() {
           </p>
 
           <p>{{ `Published ${document.year}` }}</p>
+          <p>{{ request.description }}</p>
         </div>
 
         <div class="row small">
