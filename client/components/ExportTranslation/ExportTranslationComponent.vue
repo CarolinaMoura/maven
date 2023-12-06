@@ -5,7 +5,6 @@ import SectionComponent from "../Section/SectionComponent.vue";
 import TranslationComponent from "./TranslationComponent.vue";
 import ChooseTranslationComponent from "./ChooseTranslationComponent.vue";
 import { useToastStore } from "@/stores/toast";
-
 const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
@@ -36,7 +35,6 @@ async function getSections() {
       }
     }),
   );
-  console.log("chosenTranslations.value ", chosenTranslations.value);
 }
 
 function logSection(section: string) {
@@ -55,7 +53,6 @@ async function exportTranslation() {
   }
 
   const exportedTranslation = await fetchy("/api/export", "POST", { body: { chosenTranslations: chosenTranslations.value } });
-  console.log("exportedTranslation ", exportedTranslation);
   displayTranslation.value = exportedTranslation;
 }
 
@@ -63,6 +60,11 @@ onBeforeMount(async () => {
   await getSections();
   loaded.value = true;
 });
+
+async function copyToClipboard(text: string) {
+  console.log(text);
+  await navigator.clipboard.writeText(text);
+}
 </script>
 
 <template>
@@ -81,14 +83,38 @@ onBeforeMount(async () => {
         <TranslationComponent :translation-id="chosenTranslations[idx]" />
       </div>
     </div>
-    <button @click="exportTranslation">EXPORT TRANSLATION</button>
-    <div>{{ displayTranslation }}</div>
+
+    <v-dialog width="1000">
+      <template v-slot:activator="{ props }">
+        <v-btn v-bind="props" text="Export" @click="exportTranslation" class="export-button"> </v-btn>
+      </template>
+      <template v-slot:default="{ isActive }">
+        <v-card title="Translation">
+          <v-card-text> {{ displayTranslation }} </v-card-text>
+
+          <v-card-actions>
+            <v-btn @click="copyToClipboard(displayTranslation)" class="copy-button">
+              <v-icon>mdi-content-copy</v-icon>
+            </v-btn>
+            <v-spacer></v-spacer>
+
+            <v-btn text="Close" @click="isActive.value = false"></v-btn>
+          </v-card-actions>
+        </v-card>
+      </template>
+    </v-dialog>
   </section>
   <p v-else-if="loaded">No sections found</p>
   <p v-else>Loading...</p>
 </template>
 
 <style scoped>
+.export-button {
+  text-align: center;
+  font-size: 2em;
+  width: 20%;
+  margin-left: 40%;
+}
 h2 {
   margin-bottom: 0px;
 }
