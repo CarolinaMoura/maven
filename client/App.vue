@@ -21,7 +21,6 @@ onBeforeMount(async () => {
     await userStore.updateSession();
     await tagStore.getLanguageTags();
     await tagStore.getOtherTags();
-    await translationRequestsStore.getTranslationRequests({});
   } catch {
     // User is not logged in
   }

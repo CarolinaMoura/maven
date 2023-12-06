@@ -36,7 +36,9 @@ onBeforeMount(async () => {
       </v-col>
       <v-col :md="8">
         <div class="requests-container">
-          <TranslationRequestPreview v-for="request in translationRequests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
+          <div v-for="request in translationRequests" v-bind:key="request._id">
+            <TranslationRequestPreview :request="request" @refresh-requests="getRequests"></TranslationRequestPreview>
+          </div>
         </div>
       </v-col>
     </v-row>
