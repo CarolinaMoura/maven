@@ -3,7 +3,7 @@ import Filter from "@/components/Filter/Filter.vue";
 import TranslationRequestForm from "@/components/TranslationRequest/TranslationRequestForm.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref } from "vue";
+import { ref } from "vue";
 import LoginWarning from "../components/Login/LoginWarning.vue";
 import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
 import { useTranslationRequestsStore } from "../stores/translationRequests";
@@ -20,10 +20,6 @@ async function getRequests() {
   void getTranslationRequests();
   loaded.value = true;
 }
-
-onBeforeMount(async () => {
-  // await getRequests();
-});
 </script>
 
 <template>
@@ -31,11 +27,11 @@ onBeforeMount(async () => {
     <LoginWarning v-if="!isLoggedIn"></LoginWarning>
 
     <v-row>
-      <v-col :md="4" class="controls-container">
+      <v-col :md="4" class="controls-container" :sm="0">
         <TranslationRequestForm @refresh-requests="getRequests" />
         <Filter />
       </v-col>
-      <v-col :md="8">
+      <v-col :md="8" :sm="12">
         <div class="requests-container">
           <div v-for="request in translationRequests" v-bind:key="request._id">
             <TranslationRequestPreview :request="request" @refresh-requests="getRequests"></TranslationRequestPreview>
