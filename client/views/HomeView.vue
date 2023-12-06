@@ -6,11 +6,9 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
-import { useTranslationRequestsStore } from "../stores/translationRequests";
 import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
-const { translationRequests } = storeToRefs(useTranslationRequestsStore());
 const loaded = ref(false);
 const requests = ref();
 
@@ -40,7 +38,9 @@ onBeforeMount(async () => {
     <v-row>
       <v-col :sm="4"> <Filter /></v-col>
       <v-col :sm="8">
-        <TranslationRequestPreview v-for="request in translationRequests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
+        <div v-for="request in requests" :key="request._id">
+          <TranslationRequestPreview :request="request" @refresh-requests="getRequests"></TranslationRequestPreview>
+        </div>
       </v-col>
     </v-row>
   </main>
