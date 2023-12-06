@@ -7,6 +7,7 @@ import { Author } from "../../types";
 import { fetchy } from "../../utils/fetchy";
 import LanguageTag from "../Tag/LanguageTag.vue";
 import Tag from "../Tag/Tag.vue";
+import DeleteTranslationRequestForm from "./DeleteTranslationRequestForm.vue";
 import TranslationRequestFromDocumentForm from "./TranslationRequestFromDocumentForm.vue";
 const { currentUsername } = storeToRefs(useUserStore());
 
@@ -27,11 +28,6 @@ onBeforeMount(async () => {
 
 const props = defineProps(["request"]);
 const emit = defineEmits(["refreshRequests"]);
-
-async function deleteRequest() {
-  await fetchy(`/api/translationRequest/${props.request._id}`, "DELETE");
-  emit("refreshRequests");
-}
 
 async function toTranslations() {
   await router.push({ path: `/translationRequest/${props.request._id}` });
@@ -81,9 +77,9 @@ async function toTranslations() {
             <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
           </template>
         </v-tooltip>
-        <v-tooltip text="Delete request">
+        <v-tooltip text="Delete request" v-if="currentUsername === request.requester">
           <template v-slot:activator="{ props }">
-            <v-btn v-if="currentUsername === request.requester" v-bind="props" variant="plain" @click="deleteRequest" icon="mdi-trash-can"></v-btn>
+            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')"></DeleteTranslationRequestForm>
           </template>
         </v-tooltip>
       </div>
