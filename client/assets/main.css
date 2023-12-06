@@ -7,6 +7,7 @@
   --primary: #A1BB9D;
   --secondary: #95AEB3;
   --secondary-20: rgba(149, 174, 179, 0.2);
+  --secondary-50: rgba(149, 174, 179, 0.5);
 
   --tertiary: #D9D9D9;
   --tertiary-30: rgba(217, 217, 217, 0.3);
@@ -16,35 +17,58 @@
 }
 
 .view-container {
-  padding: 2em
+  padding: 2em;
 }
 
+
+button:disabled,
+button[disabled]{
+  background-color: #cccccc;
+  pointer-events: none;
+}
 
 
 .btn-primary {
-  background-color: var(--primary);
+  background-color: var(--secondary);
   color: white !important;
   padding: 12px 16px;
-  transition: all 0.25s ease-in
+  transition: all 0.25s ease-in;
+  outline: 0px solid var(--secondary)
 }
 
 .btn-primary:hover {
-  /* TODO: define hover styles */
-  background-color: var(--secondary);
+  outline: 2px solid var(--secondary);
+  background-color: transparent;
+  color: var(--secondary) !important;
 }
 
 .btn-secondary {
-  outline: 2px solid var(--primary);
-  border-radius: 50px;
-  color: var(--primary) !important;
+
   padding: 12px 16px;
-  transition: all 0.25s ease-in
+
+  background-color: transparent;
+  color: var(--primary)!important;
+  outline: 2px solid var(--secondary);
+  
+  border-radius: 50px;
+  padding: 8px 12px;
+  transition: all 0.25s ease-in;
+  font-size: 12px;
+
+  width: fit-content;
 }
 
 .btn-secondary:hover {
   /* TODO: define hover styles */
-  outline:  2px solid var(--secondary);
-  color: var(--secondary) !important;
+
+  background-color: var(--secondary);
+  color: white !important;
+  outline: 2px solid var(--secondary);
+  
+
+  
+ 
+
 }
 
 

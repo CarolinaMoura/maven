@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { Tag } from "../../types";
 import { fetchy } from "../../utils/fetchy";
 const { languageTags, otherTags } = storeToRefs(useTagStore());
+const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 const TAGS = computed(() => otherTags.value.map((t: Tag) => t.name));
 const LANGUAGES = computed(() => languageTags.value.map((t: Tag) => t.name));
@@ -45,6 +47,8 @@ function clearForm() {
   tags.value = [];
   content.value = "";
   originalLanguage.value = "";
+  targetLanguage.value = "";
+  description.value = "";
 }
 
 async function submitRequest() {
@@ -109,66 +113,74 @@ const closeForm = () => {
 };
 </script>
 <template>
-  <button
-    class="btn-primary"
-    @click="
-      () => {
-        formOpen = !formOpen;
-      }
-    "
-  >
-    <v-icon>mdi-file-document-alert</v-icon>
-    Request a translation
-  </button>
+  <div :class="!isLoggedIn && `disabled`">
+    <button
+      :disabled="!isLoggedIn"
+      class="btn-primary"
+      @click="
+        () => {
+          formOpen = !formOpen;
+        }
+      "
+    >
+      <v-icon>mdi-file-document-alert</v-icon>
+      Request a translation
+    </button>
+  </div>
 
   <v-dialog v-model="formOpen" width="90%">
     <v-card>
       <v-form v-model="isFormValid" @submit.prevent="submitRequest()">
         <v-container class="form-container">
           <div class="row between">
-            <v-card-title>Translation Request Form</v-card-title>
-            <v-btn variant="plain" @click="closeForm"><v-icon>mdi-close</v-icon></v-btn>
+            <div><h2>Translation Request Form</h2></div>
+            <v-btn variant="plain" @click="closeForm" :icon="`mdi-close`"></v-btn>
           </div>
 
           <v-divider></v-divider>
 
           <div class="form-section">
-            <v-card-subtitle>Translation Request Form</v-card-subtitle>
-
-            <v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"></v-text-field>
+            <h3 class="form-subheading">Tell us more about the document</h3>
+            <v-row
+              ><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule" color="#95AEB3"></v-text-field></v-col
+            ></v-row>
             <v-row>
-              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"></v-text-field></v-col>
-              <v-col :sm="4"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips></v-select></v-col>
+              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules" color="#95AEB3"></v-text-field></v-col>
+              <v-col :sm="8"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select></v-col>
             </v-row>
 
             <v-row>
-              <v-col>
+              <v-col class="col">
                 <div v-for="(author, idx) in authors" v-bind:key="`author-${idx}`" class="row">
-                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first"></v-text-field>
-                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last"></v-text-field>
+                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first" color="#95AEB3"></v-text-field>
+                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last" color="#95AEB3"></v-text-field>
 
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
 
-                <button class="btn-secondary" @click="addAuthor()" type="button">Add author</button>
+                <button class="btn-secondary add-author-btn" @click="addAuthor()" type="button">Add author</button>
               </v-col>
             </v-row>
           </div>
+          <v-divider></v-divider>
 
           <div class="form-section">
-            Document Upload
-            <v-textarea label="Document Content" v-model="content" :rules="nonEmptyRule"></v-textarea>
+            <h3 class="form-subheading">Document upload</h3>
+
+            <v-textarea label="Document Content" :placeholder="`Submit text content of the document here.`" v-model="content" :rules="nonEmptyRule" color="#95AEB3"></v-textarea>
           </div>
+          <v-divider></v-divider>
 
           <div class="form-section">
-            Translation Request Details
+            <h3 class="form-subheading">Translation Request Details</h3>
+
             <v-row v-bind:style="{ 'align-items': 'center' }">
-              <v-col :sm="4"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+              <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
               to
-              <v-col :sm="4"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule"></v-select></v-col>
+              <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
             </v-row>
             <v-row>
-              <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with`"></v-textarea> </v-col>
+              <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with.`" color="#95AEB3"></v-textarea> </v-col>
             </v-row>
           </div>
 
@@ -179,6 +191,21 @@ const closeForm = () => {
   </v-dialog>
 </template>
 <style scoped>
+.disabled {
+  cursor: not-allowed;
+}
+h3,
+h2 {
+  font-weight: normal;
+}
+
+h3 {
+  padding: 1em 0 1.5em 0;
+}
+
+h2 {
+  padding-bottom: 0.5em;
+}
 .col {
   display: flex;
   flex-direction: column;
@@ -188,14 +215,19 @@ const closeForm = () => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1em;
+  column-gap: 1em;
+  row-gap: 1em;
+}
+
+.add-author-btn {
+  align-self: end;
 }
 
 .row.between {
   justify-content: space-between;
 }
 
-.form-container > div {
+.form-section {
   padding-bottom: 1.5em;
 }
 </style>
