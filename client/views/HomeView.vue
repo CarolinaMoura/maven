@@ -3,7 +3,7 @@ import Filter from "@/components/Filter/Filter.vue";
 import TranslationRequestForm from "@/components/TranslationRequest/TranslationRequestForm.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import LoginWarning from "../components/Login/LoginWarning.vue";
 import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
 import { useTranslationRequestsStore } from "../stores/translationRequests";
@@ -19,6 +19,10 @@ async function getRequests() {
   await translationRequestsStore.getTranslationRequests();
   loaded.value = true;
 }
+
+onBeforeMount(async () => {
+  await getRequests();
+});
 </script>
 
 <template>
