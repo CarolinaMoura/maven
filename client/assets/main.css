@@ -15,6 +15,10 @@
   --primary-text-60: rgba(71, 71, 71, 0.6);
 }
 
+.view-container {
+  padding: 2em
+}
+
 
 
 .btn-primary {

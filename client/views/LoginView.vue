@@ -4,7 +4,7 @@ import RegisterForm from "@/components/Login/RegisterForm.vue";
 </script>
 
 <template>
-  <main class="column">
+  <main class="column view-container">
     <h1>Please login or register!</h1>
     <v-row class="gap">
       <v-col> <LoginForm /> </v-col>

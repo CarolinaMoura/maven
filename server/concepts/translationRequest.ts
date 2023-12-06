@@ -20,7 +20,7 @@ export default class TranslationRequestConcept {
     return { msg: "Deleted translation request!" };
   }
 
-  async getTranslationRequests(filter: Filter<TranslationRequestDoc> = {}) {
+  async getTranslationRequests(filter: Filter<TranslationRequestDoc>) {
     return await this.translationRequests.readMany(filter);
   }
 

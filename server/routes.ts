@@ -311,6 +311,12 @@ class Routes {
   }
 
   ////////////////
+  //   User   //
+  ////////////////
+  @Router.get("/user/requests")
+  async getUserRequests(username: string) {}
+
+  ////////////////
   //   Filter   //
   ////////////////
   @Router.put("/filter")
@@ -387,6 +393,7 @@ class Routes {
     return toReturn;
   }
 }
+
 interface IFilter {
   translations?: { from: string; to: string }[];
   yearFrom?: number;
