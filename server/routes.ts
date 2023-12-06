@@ -290,9 +290,11 @@ class Routes {
   }
 
   // Exporting the translation
-  @Router.get("/export/:id")
+  @Router.post("/export")
   async export(chosenTranslations: Array<ObjectId>) {
+    console.log(chosenTranslations);
     const translations = await Promise.all(chosenTranslations.map(async (chosenTranslation) => SectionTranslation.getSectionTranslation(chosenTranslation)));
+    console.log(translations);
     return translations.reduce((acc, cur) => acc + cur.translation + " ", "");
   }
 
@@ -301,10 +303,10 @@ class Routes {
     const sectionId = new ObjectId(id);
     const sectionTranslations = await SectionTranslation.getSectionTranslations({ section: sectionId });
     if (sectionTranslations.length === 0) {
-      return { msg: "No translations found!" };
+      return { found: false };
     } else {
       const popularTranslation = await Vote.getMostUpvoted(sectionTranslations.map((t) => t._id));
-      return { msg: "Translation found!", translation: popularTranslation };
+      return { found: true, translation: popularTranslation };
     }
   }
 

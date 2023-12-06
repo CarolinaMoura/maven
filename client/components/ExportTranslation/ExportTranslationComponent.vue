@@ -3,14 +3,16 @@ import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import SectionComponent from "../Section/SectionComponent.vue";
 import TranslationComponent from "./TranslationComponent.vue";
+import ChooseTranslationComponent from "./ChooseTranslationComponent.vue";
+import { useToastStore } from "@/stores/toast";
 
 const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
 const chosenTranslations = ref(Array<string | undefined>());
+const { showToast } = useToastStore();
 
 // let sections = ref<Array<Record<string, any>>>([]);
-let editing = ref("");
 const activeSection = ref<string>("");
 
 async function getSections() {
@@ -27,17 +29,34 @@ async function getSections() {
   chosenTranslations.value = await Promise.all(
     sectionResults.map(async (section): Promise<any> => {
       const chosenTranslation = await fetchy(`/api/getTranslation/byUpvotes/${section._id}`, "GET");
-      if (chosenTranslation.msg === "Translation found!") {
+      if (chosenTranslation.found) {
         return chosenTranslation.translation;
       } else {
         return undefined;
       }
     }),
   );
+  console.log("chosenTranslations.value ", chosenTranslations.value);
 }
 
 function logSection(section: string) {
   activeSection.value = section == activeSection.value ? "" : section;
+}
+
+function updateChosen(sectionIdx: Number, translationId: string) {
+  chosenTranslations.value[sectionIdx] = translationId;
+}
+
+const displayTranslation = ref("");
+async function exportTranslation() {
+  if (chosenTranslations.value.includes(undefined)) {
+    showToast({ message: "Exporting cannot be done without valid translations for each section", style: "error" });
+    return;
+  }
+
+  const exportedTranslation = await fetchy("/api/export", "POST", { body: { chosenTranslations: chosenTranslations.value } });
+  console.log("exportedTranslation ", exportedTranslation);
+  displayTranslation.value = exportedTranslation;
 }
 
 onBeforeMount(async () => {
@@ -55,9 +74,15 @@ onBeforeMount(async () => {
       <article @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }">
         <SectionComponent :section="section" />
       </article>
-      <TranslationComponent :translation-id="chosenTranslations[idx]" />
-      <!-- <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" /> -->
+      <div v-if="activeSection == section._id">
+        <ChooseTranslationComponent v-bind:section="section" v-bind:chosenTranslation="chosenTranslations[idx]" @refresh-chosen="(id) => updateChosen(idx, id)" />
+      </div>
+      <div v-else>
+        <TranslationComponent :translation-id="chosenTranslations[idx]" />
+      </div>
     </div>
+    <button @click="exportTranslation">EXPORT TRANSLATION</button>
+    <div>{{ displayTranslation }}</div>
   </section>
   <p v-else-if="loaded">No sections found</p>
   <p v-else>Loading...</p>

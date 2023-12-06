@@ -7,6 +7,11 @@ const translationId = ref<string>(props.translationId);
 const translation = ref();
 
 async function loadTranslation() {
+  console.log("translationId.value ", translationId.value);
+  if (!translationId.value) {
+    translation.value = "No translation found";
+    return;
+  }
   const translationResult = await fetchy(`/api/sectionTranslation/byId/${translationId.value}`, "GET");
   translation.value = translationResult.translation;
 }
