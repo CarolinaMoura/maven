@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Tag from "@/components/Tag/Tag.vue";
-import TranslationRequestFromDocumentForm from "@/components/TranslationRequest/TranslationRequestFromDocumentForm.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
@@ -8,6 +6,8 @@ import { useRoute, useRouter } from "vue-router";
 import { Author } from "../../types";
 import { fetchy } from "../../utils/fetchy";
 import LanguageTag from "../Tag/LanguageTag.vue";
+import Tag from "../Tag/Tag.vue";
+import TranslationRequestFromDocumentForm from "./TranslationRequestFromDocumentForm.vue";
 const { currentUsername } = storeToRefs(useUserStore());
 
 const router = useRouter();
@@ -90,7 +90,9 @@ async function toTranslations() {
     </div>
   </v-card>
 
-  <div v-else class="preview-container column">Loading...</div>
+  <v-card v-else class="preview-card card" hover>
+    <div class="loading-state"><v-progress-circular indeterminate></v-progress-circular></div>
+  </v-card>
 </template>
 
 <style scoped>
@@ -134,5 +136,12 @@ h3 {
   background-color: var(--secondary-20);
   border-radius: 10px;
   padding: 1.5em;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>

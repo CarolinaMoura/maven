@@ -1,7 +1,6 @@
 import { Filter, ObjectId } from "mongodb";
 import { Document, Section, SectionTranslation, Tag, TranslationRequest, User, Vote, WebSession } from "./app";
 import { Author, DocumentDoc } from "./concepts/document";
-import { TranslationRequestDoc } from "./concepts/translationRequest";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
@@ -363,20 +362,20 @@ class Routes {
     const setLanguagesEveryone = fromTo.get("0") ?? [];
 
     // filter by translation request
-    const toReturn: Array<TranslationRequestDoc> = [];
+    const toReturn = [];
     for (const doc of docs) {
       // get the specifics of the document
       const setLanguagesDocument = fromTo.get(doc.originalLanguage.toString()) ?? [];
       const possibleToLanguage = [...setLanguagesDocument, ...setLanguagesEveryone];
 
       if (possibleToLanguage.includes("0")) {
-        toReturn.push(...(await TranslationRequest.getTranslationRequests({ document: doc._id })));
+        toReturn.push(...(await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ document: doc._id }))));
       } else {
         const queryTranslationRequest = {
           document: doc._id,
           languageTo: { $in: possibleToLanguage.map((id) => new ObjectId(id)) },
         };
-        const result = await TranslationRequest.getTranslationRequests(queryTranslationRequest);
+        const result = await Responses.translationRequests(await TranslationRequest.getTranslationRequests(queryTranslationRequest));
         toReturn.push(...result);
       }
     }
