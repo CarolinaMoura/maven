@@ -11,17 +11,18 @@ import { useTranslationRequestsStore } from "../stores/translationRequests";
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const translationRequestsStore = useTranslationRequestsStore();
 const { translationRequests } = storeToRefs(useTranslationRequestsStore());
+const { getTranslationRequests } = useTranslationRequestsStore();
 
 const loaded = ref(false);
 
 async function getRequests() {
   loaded.value = false;
-  await translationRequestsStore.getTranslationRequests();
+  void getTranslationRequests();
   loaded.value = true;
 }
 
 onBeforeMount(async () => {
-  await getRequests();
+  // await getRequests();
 });
 </script>
 
