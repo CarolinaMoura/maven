@@ -38,8 +38,8 @@ const refreshChosen = (id) => {
   <div class="wrapper">
     <div class="section-translation-container">
       <header>
-        <h2>Translated Text</h2>
-        <i>Showing all translations for section</i>
+        <v-card-title>Translated Text</v-card-title>
+        <v-card-subtitle><i>Showing all translations for section</i></v-card-subtitle>
       </header>
       <div class="grid-1em">
         <div class="section-translation-list grid-1em">

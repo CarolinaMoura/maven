@@ -25,8 +25,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <main>
-    <h1>Translation Page</h1>
+  <main class="view-container">
     <section>
       <h1 v-if="isLoggedIn"></h1>
       <h1 v-else>Please login!</h1>

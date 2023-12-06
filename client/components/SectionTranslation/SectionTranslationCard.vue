@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
+import DeleteSectionTranslation from "../Section/DeleteSectionTranslation.vue";
 import { PayloadSectionTranslation } from "./PayloadSectionTranslation";
 
 interface SectionTranslationProps {
@@ -11,7 +12,7 @@ interface SectionTranslationProps {
 }
 const props = defineProps<SectionTranslationProps>();
 
-const translatorName = props.sectionTranslation.translatorName;
+const translatorName = props.sectionTranslation.translator;
 const emit = defineEmits(["refreshSectionTranslations"]);
 const isEdit = ref(false);
 const edition = ref("");
@@ -46,20 +47,6 @@ const editCard = () => {
   edition.value = props.sectionTranslation.translation;
 };
 
-const removeSectionTranslation = async () => {
-  try {
-    await fetchy(`/api/sectionTranslation/${props.sectionTranslation._id}`, "DELETE", {});
-    emit("refreshSectionTranslations");
-  } catch (_) {
-    return Error("Failed to delete translation");
-  }
-};
-
-const closeDialogAndRemoveTranslation = async () => {
-  dialog.value = false;
-  await removeSectionTranslation();
-};
-
 const getVotes = async () => {
   try {
     const votes = await fetchy("/api/votes", "GET", {
@@ -77,50 +64,77 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <v-card hover class="section-translation-card">
-    <div v-if="!isEdit">
-      <v-card-title class="title">
-        <div style="display: inline-block">
-          <b>Translator: </b>
-          <u>{{ translatorName }}</u>
+  <div v-if="!isEdit">
+    <v-card hover class="section-translation-card">
+      <div class="display">
+        <div class="column">
+          <p>
+            <b>Translator: </b><RouterLink :to="{ name: 'Profile', params: { username: props.sectionTranslation.translator } }"> {{ props.sectionTranslation.translator }} </RouterLink>
+          </p>
+          <p><b>Translation: </b>{{ props.sectionTranslation.translation }}</p>
         </div>
-        <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon size="x-small" class="ml-auto" @click="enterEditMode">
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-        <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
-      </v-card-title>
-      <v-card-title>Translation:</v-card-title>
-      <v-card-text>{{ props.sectionTranslation.translation }}</v-card-text>
-    </div>
-    <div v-else>
-      <v-card-title class="title">
-        <div style="display: inline-block">
-          <b>Edit translation</b>
+        <div class="button-col">
+          <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
+
+          <v-tooltip text="Edit translation">
+            <template v-slot:activator="{ props }">
+              <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon="mdi-pencil" v-bind="props" variant="plain" size="x-small" @click="enterEditMode"></v-btn>
+            </template>
+          </v-tooltip>
+
+          <DeleteSectionTranslation
+            v-if="isLoggedIn && currentUsername === translatorName"
+            :section-translation="props.sectionTranslation"
+            @refresh-section-translations="emit('refreshSectionTranslations')"
+          ></DeleteSectionTranslation>
         </div>
-        <div class="buttons-bar">
-          <v-btn icon size="x-small" class="ml-auto" @click="enterViewMode">
-            <v-icon>mdi-content-save</v-icon>
-          </v-btn>
-          <v-btn icon size="x-small" class="ml-auto">
-            <v-icon>mdi-trash-can-outline</v-icon>
-            <v-dialog v-model="dialog" activator="parent" width="auto">
-              <v-card>
-                <v-card-text> Are you sure you want to delete this translation? </v-card-text>
-                <v-card-actions class="v-card-actions">
-                  <v-btn color="primary" block @click="closeDialogAndRemoveTranslation">YES</v-btn>
-                  <v-btn color="primary" style="padding: 0; margin: 0" block @click="dialog = false">NO</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-btn>
-        </div>
-      </v-card-title>
+      </div>
+    </v-card>
+  </div>
+  <div v-else>
+    <v-card hover class="section-translation-card">
+      <v-card-title>Edit Translation</v-card-title>
+
       <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation" v-model="edition"></v-textarea>
-    </div>
-  </v-card>
+      <div class="button-row">
+        <v-tooltip text="Save translation">
+          <template v-slot:activator="{ props }">
+            <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon="mdi-content-save" v-bind="props" variant="plain" size="x-small" @click="enterViewMode"></v-btn>
+          </template>
+        </v-tooltip>
+      </div>
+    </v-card>
+  </div>
 </template>
 
 <style scoped>
+a {
+  color: var(--primary-text);
+}
+
+.button-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+.display {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+}
 .v-card-actions {
   display: flex;
   flex-direction: column;
@@ -130,13 +144,7 @@ onBeforeMount(async () => {
   background-color: var(--secondary-20);
   box-sizing: border-box;
   word-wrap: break-word;
-  width: 100%;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 1em;
 }
 
 .edit-translation {

@@ -15,27 +15,36 @@ async function login() {
 </script>
 
 <template>
-  <form class="pure-form pure-form-aligned" @submit.prevent="login">
-    <h3>Login</h3>
-    <fieldset>
-      <div class="pure-control-group">
-        <label for="aligned-name">Username</label>
-        <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
-      </div>
-      <div class="pure-control-group">
-        <label for="aligned-password">Password</label>
-        <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
-      </div>
-      <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Submit</button>
-      </div>
-    </fieldset>
-  </form>
+  <v-card class="card">
+    <form class="pure-form pure-form-aligned" @submit.prevent="login">
+      <v-card-title>Login</v-card-title>
+      <fieldset>
+        <div class="pure-control-group">
+          <label for="aligned-name">Username</label>
+          <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
+        </div>
+        <div class="pure-control-group">
+          <label for="aligned-password">Password</label>
+          <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
+        </div>
+        <div class="pure-controls">
+          <button type="submit" class="btn-primary">Submit</button>
+        </div>
+      </fieldset>
+    </form>
+  </v-card>
 </template>
 
 <style scoped>
 h3 {
   display: flex;
   justify-content: center;
+}
+.card {
+  color: var(--primary-text);
+  align-items: start;
+  background-color: var(--secondary-20);
+  border-radius: 10px;
+  padding: 1.5em;
 }
 </style>

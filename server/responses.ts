@@ -1,5 +1,6 @@
 import { Tag, User } from "./app";
 import { DocumentDoc } from "./concepts/document";
+import { SectionTranslationDoc } from "./concepts/sectionTranslation";
 import { AttachmentDoc } from "./concepts/tag";
 import { TranslationRequestDoc } from "./concepts/translationRequest";
 
@@ -40,6 +41,18 @@ export default class Responses {
   static async attachments(attachments: AttachmentDoc[]) {
     const promises = attachments.map(async (a) => {
       return (await Tag.getTag(a.tag))?.name;
+    });
+    return await Promise.all(promises);
+  }
+
+  static async sectionTranslation(sectionTranslation: SectionTranslationDoc) {
+    const translator = await User.getUserById(sectionTranslation.translator);
+    return { ...sectionTranslation, translator: translator.username };
+  }
+
+  static async sectionTranslations(sectionTranslation: SectionTranslationDoc[]) {
+    const promises = sectionTranslation.map(async (a) => {
+      return await this.sectionTranslation(a);
     });
     return await Promise.all(promises);
   }

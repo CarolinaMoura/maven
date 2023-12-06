@@ -20,14 +20,23 @@ export default class TranslationRequestConcept {
     return { msg: "Deleted translation request!" };
   }
 
-  async getTranslationRequests(filter: Filter<TranslationRequestDoc> = {}) {
+  async getTranslationRequests(filter: Filter<TranslationRequestDoc>) {
     return await this.translationRequests.readMany(filter);
   }
 
   async getTranslationRequest(_id: ObjectId) {
     const document = await this.translationRequests.readOne({ _id });
     if (document === null) {
-      throw new Error("Document not found!");
+      throw new Error("Request not found!");
+    }
+    return document;
+  }
+
+  async getTranslationRequestBySection(_id: ObjectId) {
+    console.log("ID ", _id);
+    const document = await this.translationRequests.readOne({ sections: _id });
+    if (document === null) {
+      throw new Error("Request not found!");
     }
     return document;
   }

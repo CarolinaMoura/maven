@@ -1,33 +1,20 @@
 <script setup lang="ts">
-
 const props = defineProps(["section"]);
 // const emit = defineEmits([""]);
-
 </script>
 
 <template>
-  <div class="base">
+  <!-- <div class="base">
     <p class="text">{{ props.section.text }}</p>
-  </div>
+  </div> -->
+
+  <v-card class="section">
+    <v-card-text>{{ props.section.text }}</v-card-text>
+  </v-card>
 </template>
 
 <style scoped>
-p {
-  margin: 0em;
-}
-
-.text {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-.base {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.base article:only-child {
-  margin-left: auto;
+.section {
+  background-color: var(--base-bg);
 }
 </style>

@@ -12,7 +12,7 @@ const currentRouteName = computed(() => currentRoute.name);
 const userStore = useUserStore();
 const tagStore = useTagStore();
 const translationRequestsStore = useTranslationRequestsStore();
-const { isLoggedIn } = storeToRefs(userStore);
+const { isLoggedIn, currentUsername } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
 
 // Make sure to update the session before mounting the app in case the user is already logged in
@@ -39,7 +39,9 @@ onBeforeMount(async () => {
         <li>
           <RouterLink :to="{ name: 'Home' }"> <v-icon :class="`${currentRouteName == 'Home' && 'selected'}`">mdi-home</v-icon> </RouterLink>
         </li>
-
+        <li v-if="isLoggedIn">
+          <RouterLink :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
+        </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }"> <v-icon :class="`${currentRouteName == 'Settings' && 'selected'}`">mdi-cog</v-icon> </RouterLink>
         </li>

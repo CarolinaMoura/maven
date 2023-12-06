@@ -41,4 +41,13 @@ export default class SectionTranslationConcept {
     }
     return sectionTranslation;
   }
+
+  async getSectionTranslationsByTranslator(translator: ObjectId) {
+    return await this.sectionTranslations.readMany(
+      { translator },
+      {
+        sort: { dateUpdated: -1 },
+      },
+    );
+  }
 }
