@@ -21,7 +21,6 @@ onBeforeMount(async () => {
     await userStore.updateSession();
     await tagStore.getLanguageTags();
     await tagStore.getOtherTags();
-    await translationRequestsStore.getTranslationRequests({});
   } catch {
     // User is not logged in
   }
@@ -38,16 +37,14 @@ onBeforeMount(async () => {
       </div>
       <ul>
         <li>
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
+          <RouterLink :to="{ name: 'Home' }"> <v-icon :class="`${currentRouteName == 'Home' && 'selected'}`">mdi-home</v-icon> </RouterLink>
         </li>
-        <!-- <li>
-          <RouterLink :to="{ name: 'Translation' }" :class="{ underline: currentRouteName == 'Translation' }"> TranslationTest </RouterLink>
-        </li> -->
+
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
+          <RouterLink :to="{ name: 'Settings' }"> <v-icon :class="`${currentRouteName == 'Settings' && 'selected'}`">mdi-cog</v-icon> </RouterLink>
         </li>
         <li v-else>
-          <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
+          <RouterLink :to="{ name: 'Login' }"> <v-icon :class="`${currentRouteName == 'Login' && 'selected'}`">mdi-login</v-icon> </RouterLink>
         </li>
       </ul>
     </nav>
@@ -85,8 +82,14 @@ img {
 
 a {
   font-size: large;
-  color: black;
+  color: white;
   text-decoration: none;
+  transition: all 0.25s ease-in;
+}
+
+a:hover,
+.selected {
+  color: var(--primary-text);
 }
 
 ul {
