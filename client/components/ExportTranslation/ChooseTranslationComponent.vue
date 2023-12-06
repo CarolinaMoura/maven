@@ -29,7 +29,7 @@ onBeforeMount(async () => {
   await getAllSectionTranslations();
 });
 
-const refreshChosen = (id) => {
+const refreshChosen = (id: any) => {
   emits("refresh-chosen", id);
 };
 </script>

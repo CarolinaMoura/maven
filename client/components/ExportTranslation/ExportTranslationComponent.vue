@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { useToastStore } from "@/stores/toast";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import SectionComponent from "../Section/SectionComponent.vue";
-import TranslationComponent from "./TranslationComponent.vue";
 import ChooseTranslationComponent from "./ChooseTranslationComponent.vue";
-import { useToastStore } from "@/stores/toast";
+import TranslationComponent from "./TranslationComponent.vue";
 const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
@@ -41,7 +41,7 @@ function logSection(section: string) {
   activeSection.value = section == activeSection.value ? "" : section;
 }
 
-function updateChosen(sectionIdx: Number, translationId: string) {
+function updateChosen(sectionIdx: number, translationId: string) {
   chosenTranslations.value[sectionIdx] = translationId;
 }
 
@@ -52,7 +52,10 @@ async function exportTranslation() {
     return;
   }
 
-  const exportedTranslation = await fetchy("/api/export", "POST", { body: { chosenTranslations: chosenTranslations.value } });
+  const chosenTranslationsIds: string[] = chosenTranslations.value.map((id) => id ?? "");
+  const exportedTranslation = await fetchy("/api/export", "POST", {
+    body: { chosenTranslations: chosenTranslationsIds },
+  });
   displayTranslation.value = exportedTranslation;
 }
 
