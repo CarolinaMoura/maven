@@ -9,7 +9,7 @@ export const LANGUAGE_MAP = new Map<String, { abbreviation: String; color: Strin
   ["Portuguese", { abbreviation: "POR", color: "#EC1074" }],
   ["Bengali", { abbreviation: "BEN", color: "#69B7AE" }],
   ["Russian", { abbreviation: "RUS", color: "#DF2A57" }],
-  ["Japanese", { abbreviation: "JAP", color: "#D711F9" }],
+  ["Japanese", { abbreviation: "JPN", color: "#D711F9" }],
   ["Punjabi", { abbreviation: "PUN", color: "#224CB4" }],
   ["French", { abbreviation: "FRE", color: "#33E56B" }],
   ["German", { abbreviation: "GER", color: "#DDE784" }],
