@@ -33,7 +33,7 @@ onBeforeMount(async () => {
 
     <div v-if="loaded">
       <TranslationRequestPreview :request="translationRequest"></TranslationRequestPreview>
-      <SectionListComponent :sectionsIds="translationRequest.sections" />
+      <SectionListComponent :sectionsIds="translationRequest.sections" :requestId="props.id" />
     </div>
   </main>
 </template>

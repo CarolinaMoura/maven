@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import Filter from "@/components/Filter/Filter.vue";
 import TranslationRequestList from "@/components/Translation/TranslationRequestList.vue";
 import TranslationRequestForm from "@/components/TranslationRequest/TranslationRequestForm.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
+import Filter from "../components/Filter/Filter.vue";
 import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
+import { useTranslationRequestsStore } from "../stores/translationRequests";
+
 import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { translationRequests } = storeToRefs(useTranslationRequestsStore());
+
 const loaded = ref(false);
 const requests = ref();
 
