@@ -346,7 +346,7 @@ class Routes {
     }
     const docs = await Document.filterDocuments(queryDocs);
     if (filter.translations === undefined || filter.translations.length === 0) {
-      return await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } });
+      return await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ document: { $in: docs.map(({ _id }) => _id) } }));
     }
 
     const fromTo: Map<string, Set<string>> = new Map([["0", new Set<string>()]]);

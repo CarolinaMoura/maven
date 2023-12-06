@@ -40,7 +40,7 @@ onBeforeMount(async () => {
     <v-row>
       <v-col :sm="4"> <Filter /></v-col>
       <v-col :sm="8">
-        <TranslationRequestPreview v-for="request in requests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
+        <TranslationRequestPreview v-for="request in translationRequests" :request="request" v-bind:key="request._id" @refresh-requests="getRequests"></TranslationRequestPreview>
       </v-col>
     </v-row>
   </main>
