@@ -185,12 +185,12 @@ class Routes {
       }),
     );
     const sortedTranslations = translationsWithVotes.sort((a, b) => b.upvotes - a.upvotes);
-    return sortedTranslations;
+    return await Responses.sectionTranslations(sortedTranslations);
   }
 
   @Router.get("/sectionTranslation/byId/:id")
   async getSectionTranslation(id: string) {
-    return await SectionTranslation.getSectionTranslation(new ObjectId(id));
+    return await Responses.sectionTranslation(await SectionTranslation.getSectionTranslation(new ObjectId(id)));
   }
   @Router.post("/sectionTranslation")
   async createSectionTranslation(session: WebSessionDoc, translation: string, section: string) {
@@ -255,7 +255,7 @@ class Routes {
 
   @Router.get("/translationRequest")
   async getTranslationRequests() {
-    return await Responses.translationRequests(await TranslationRequest.getTranslationRequests());
+    return await Responses.translationRequests(await TranslationRequest.getTranslationRequests({}));
   }
 
   @Router.get("/translationRequest/:id")
@@ -313,8 +313,31 @@ class Routes {
   ////////////////
   //   User   //
   ////////////////
-  @Router.get("/user/requests")
-  async getUserRequests(username: string) {}
+  @Router.get("/user/requests/:username")
+  async getUserRequests(username: string) {
+    const user = await User.getUserByUsername(username);
+    return await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ requester: new ObjectId(user._id) }));
+  }
+
+  @Router.get("/user/contributions/:username")
+  async getUserTranslations(username: string) {
+    const user = await User.getUserByUsername(username);
+    const translations = await Responses.sectionTranslations(await SectionTranslation.getSectionTranslationsByTranslator(user._id));
+
+    const sections = await Promise.all(
+      translations.map(async (t) => {
+        return await Section.getSection(t.section);
+      }),
+    );
+
+    const requests = await Promise.all(
+      sections.map(async (s) => {
+        return await TranslationRequest.getTranslationRequestBySection(s._id);
+      }),
+    );
+
+    return { requests, sections, translations };
+  }
 
   ////////////////
   //   Filter   //

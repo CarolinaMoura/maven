@@ -37,14 +37,14 @@ onBeforeMount(async () => {
 
 <template>
   <section class="sections" v-if="loaded && sections.length !== 0">
-    <div class="header-container">
-      <h2>Original Text</h2>
-      <h2 class="instruction" v-if="!activeSection">(select a section)</h2>
-    </div>
+    <v-row>
+      <v-col sm="6">
+        <v-card-title>Original Text</v-card-title>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section to view and rate all translations for that section)</v-card-subtitle>
+      </v-col>
+    </v-row>
     <div class="sections-container" v-for="section in sections" :key="section._id">
-      <article @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }">
-        <SectionComponent :section="section" />
-      </article>
+      <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
       <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
     </div>
   </section>
@@ -58,36 +58,25 @@ h2 {
 }
 
 .instruction {
-  margin-left: auto;
-  overflow-y: auto;
-  width: 90%;
+  font-style: italic;
 }
 
 .active-section {
-  border: 2px solid rgb(15, 133, 78);
+  border: 2px solid var(--secondary);
 }
 
 .header-container {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  flex-direction: column;
 }
 
 .sections {
+  padding: 2em 0;
+
   display: flex;
   flex-direction: column;
   gap: 1em;
   margin: 0 2rem;
-}
-
-article {
-  background-color: var(--base-bg);
-  border-radius: 20px;
-  padding: 20px;
-  margin: 1px 0;
-  width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
 }
 
 .sections-container {

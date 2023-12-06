@@ -35,16 +35,14 @@ onBeforeMount(async () => {
   <div class="wrapper">
     <div class="section-translation-container">
       <header>
-        <h2>Translated Text</h2>
-        <i>Showing all translations for section</i>
+        <v-card-title>Translated Text</v-card-title>
+        <v-card-subtitle><i>Showing all translations for section</i></v-card-subtitle>
       </header>
       <div class="grid-1em">
-        <SectionTranslationForm v-if="isLoggedIn" @refreshSectionTranslations="getAllSectionTranslations"
-          :section="props.section" />
+        <SectionTranslationForm v-if="isLoggedIn" @refreshSectionTranslations="getAllSectionTranslations" :section="props.section" />
         <div class="section-translation-list grid-1em">
           <div v-if="sectionTranslations.length" v-for="translation in sectionTranslations" :key="translation._id">
-            <SectionTranslationCard :sectionTranslation="translation"
-              @refreshSectionTranslations="getAllSectionTranslations" />
+            <SectionTranslationCard :sectionTranslation="translation" @refreshSectionTranslations="getAllSectionTranslations" />
           </div>
           <p v-else>Nothing to see here... Be the first to translate!</p>
         </div>

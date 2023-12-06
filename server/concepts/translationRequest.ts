@@ -27,7 +27,16 @@ export default class TranslationRequestConcept {
   async getTranslationRequest(_id: ObjectId) {
     const document = await this.translationRequests.readOne({ _id });
     if (document === null) {
-      throw new Error("Document not found!");
+      throw new Error("Request not found!");
+    }
+    return document;
+  }
+
+  async getTranslationRequestBySection(_id: ObjectId) {
+    console.log("ID ", _id);
+    const document = await this.translationRequests.readOne({ sections: _id });
+    if (document === null) {
+      throw new Error("Request not found!");
     }
     return document;
   }

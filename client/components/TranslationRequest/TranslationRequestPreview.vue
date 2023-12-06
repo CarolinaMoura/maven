@@ -35,7 +35,7 @@ async function toTranslations() {
 </script>
 
 <template>
-  <v-card v-if="loaded" class="preview-card card" hover @click="toTranslations">
+  <v-card v-if="loaded" class="preview-card card" hover>
     <div class="card-container">
       <div class="card-content">
         <div>
@@ -51,7 +51,10 @@ async function toTranslations() {
           </p>
 
           <p>{{ `Published ${document.year}` }}</p>
-          <p>{{ request.description }}</p>
+          <small>
+            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"> {{ request.requester }} </RouterLink> </small
+          ><br />
+          <small class="italics" v-if="request.description">"{{ request.description }}"</small>
         </div>
 
         <div class="row small">
@@ -90,6 +93,13 @@ async function toTranslations() {
 </template>
 
 <style scoped>
+a {
+  color: var(--primary-text);
+}
+.italics {
+  font-style: italic;
+  font-weight: lighter;
+}
 h3 {
   font-size: 24px;
   font-weight: normal;
@@ -99,6 +109,7 @@ h3 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  column-gap: 1em;
 }
 
 .card-actions {
