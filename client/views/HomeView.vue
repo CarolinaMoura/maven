@@ -28,8 +28,7 @@ onBeforeMount(async () => {
   <main>
     <h1>Home Page</h1>
     <section>
-      <h1 v-if="isLoggedIn"></h1>
-      <h1 v-else>Please login!</h1>
+      <h1 v-if="!isLoggedIn">Please login</h1>
     </section>
 
     <TranslationRequestForm @refresh-requests="getRequests" />
