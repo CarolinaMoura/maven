@@ -27,11 +27,11 @@ async function getRequests() {
     <LoginWarning v-if="!isLoggedIn"></LoginWarning>
 
     <v-row>
-      <v-col :md="4" class="controls-container" :sm="0">
+      <v-col :md="3" class="controls-container" :sm="0">
         <TranslationRequestForm @refresh-requests="getRequests" />
         <Filter />
       </v-col>
-      <v-col :md="8" :sm="12">
+      <v-col :md="9" :sm="12">
         <div class="requests-container">
           <div v-for="request in translationRequests" v-bind:key="request._id">
             <TranslationRequestPreview :request="request" @refresh-requests="getRequests"></TranslationRequestPreview>
