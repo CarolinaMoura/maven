@@ -2,7 +2,6 @@
 import TranslationRequestPreview from "@/components/TranslationRequest/TranslationRequestPreview.vue";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../utils/fetchy";
-import { LANGUAGE_MAP } from "../utils/languages";
 
 import PieChart from "../components/Profile/PieChart.vue";
 import SectionComponent from "../components/Section/SectionComponent.vue";
@@ -51,8 +50,7 @@ async function getuserData() {
     const formattedData = [];
 
     for (let [key, value] of languageFrequency.entries()) {
-      const color = LANGUAGE_MAP.get(key)?.color;
-      formattedData.push({ language: key, value, color });
+      formattedData.push({ language: key, value });
     }
 
     languageDistribution.value = formattedData;

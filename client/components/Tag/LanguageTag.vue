@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { iso6392 } from "iso-639-2";
-import { LANGUAGE_MAP } from "../../utils/languages";
+import { stringToColour } from "../../utils/languages";
 
 const props = defineProps(["language"]);
-const data = LANGUAGE_MAP.get(props.language);
 
 function getLanguageCode(name: string): string | undefined {
   const language = iso6392.find((entry) => {
@@ -19,7 +18,7 @@ const code = getLanguageCode(props.language);
 <template>
   <v-tooltip :text="props.language">
     <template v-slot:activator="{ props }">
-      <div :class="`language-tag ${data?.color ? '' : 'outline'}`" v-bind="props" :style="{ 'background-color': `${data?.color || 'transparent'}` }">
+      <div :class="`language-tag`" v-bind="props" :style="{ 'background-color': stringToColour(language) }">
         <p>{{ code }}</p>
       </div>
     </template></v-tooltip

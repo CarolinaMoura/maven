@@ -2,8 +2,9 @@
   <div ref="chartContainer" class="chartContainer"></div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { stringToColour } from "@/utils/languages";
 import * as d3 from "d3";
+import { onMounted, ref } from "vue";
 
 const chartContainer = ref(null);
 const props = defineProps(["data"]);
@@ -25,7 +26,7 @@ const createPieChart = (container, data) => {
     .attr("transform", `translate(${width / 2},${height / 2})`);
 
   const pie = d3.pie();
-  const colorScale = d3.scaleOrdinal().range(data.map((item) => item.color));
+  const colorScale = d3.scaleOrdinal().range(data.map((item) => stringToColour(item.language)));
 
   const arcs = pie(data.map((item) => item.value));
 
