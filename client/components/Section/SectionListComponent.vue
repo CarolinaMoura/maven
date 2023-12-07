@@ -4,7 +4,7 @@ import { fetchy } from "../../utils/fetchy";
 import SectionTranslationList from "../SectionTranslation/SectionTranslationList.vue";
 import SectionComponent from "./SectionComponent.vue";
 
-const props = defineProps(["sectionsIds", "requestId"]);
+const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
 
@@ -47,17 +47,12 @@ onBeforeMount(async () => {
       <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
       <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
     </div>
-    <RouterLink :to="`/exportTranslation/${props.requestId}`" class="export-button"> EXPORT TRANSLATION</RouterLink>
   </section>
   <p v-else-if="loaded">No sections found</p>
   <p v-else>Loading...</p>
 </template>
 
 <style scoped>
-.export-button {
-  text-align: center;
-  font-size: 2em;
-}
 h2 {
   margin-bottom: 0px;
 }

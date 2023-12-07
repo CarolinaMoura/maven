@@ -60,6 +60,7 @@ header {
 .wrapper {
   position: relative;
   box-sizing: border-box;
+
   display: flex;
   justify-content: center;
 }

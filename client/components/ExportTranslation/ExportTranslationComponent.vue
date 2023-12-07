@@ -45,7 +45,18 @@ function updateChosen(sectionIdx: number, translationId: string) {
   chosenTranslations.value[sectionIdx] = translationId;
 }
 
+onBeforeMount(async () => {
+  await getSections();
+  loaded.value = true;
+});
+
+async function copyToClipboard(text: string) {
+  console.log(text);
+  await navigator.clipboard.writeText(text);
+}
+
 const displayTranslation = ref("");
+const isActive = ref(false);
 async function exportTranslation() {
   if (chosenTranslations.value.includes(undefined)) {
     showToast({ message: "Exporting cannot be done without valid translations for each section", style: "error" });
@@ -57,55 +68,42 @@ async function exportTranslation() {
     body: { chosenTranslations: chosenTranslationsIds },
   });
   displayTranslation.value = exportedTranslation;
+  dialogVisible.value = true;
 }
 
-onBeforeMount(async () => {
-  await getSections();
-  loaded.value = true;
-});
-
-async function copyToClipboard(text: string) {
-  console.log(text);
-  await navigator.clipboard.writeText(text);
-}
+const dialogVisible = ref(false);
 </script>
 
 <template>
+  <v-btn @click="exportTranslation" class="export-button">Export</v-btn>
+  <v-dialog v-model="dialogVisible" width="1000">
+    <v-card title="Translation">
+      <v-card-text> {{ displayTranslation }} </v-card-text>
+
+      <v-card-actions>
+        <v-btn @click="copyToClipboard(displayTranslation)" class="copy-button">
+          <v-icon>mdi-content-copy</v-icon>
+        </v-btn>
+        <v-spacer></v-spacer>
+
+        <v-btn text="Close" @click="dialogVisible = false"></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <section class="sections" v-if="loaded && sections.length !== 0">
     <div class="header-container">
       <h2>Original Text</h2>
     </div>
     <div class="sections-container" v-for="(section, idx) in sections" :key="section._id">
-      <article @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }">
-        <SectionComponent :section="section" />
-      </article>
+      <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
       <div v-if="activeSection == section._id">
         <ChooseTranslationComponent v-bind:section="section" v-bind:chosenTranslation="chosenTranslations[idx]" @refresh-chosen="(id) => updateChosen(idx, id)" />
       </div>
-      <div v-else>
+      <div v-else-if="activeSection.length === 0">
         <TranslationComponent :translation-id="chosenTranslations[idx]" />
       </div>
     </div>
-
-    <v-dialog width="1000">
-      <template v-slot:activator="{ props }">
-        <v-btn v-bind="props" text="Export" @click="exportTranslation" class="export-button"> </v-btn>
-      </template>
-      <template v-slot:default="{ isActive }">
-        <v-card title="Translation">
-          <v-card-text> {{ displayTranslation }} </v-card-text>
-
-          <v-card-actions>
-            <v-btn @click="copyToClipboard(displayTranslation)" class="copy-button">
-              <v-icon>mdi-content-copy</v-icon>
-            </v-btn>
-            <v-spacer></v-spacer>
-
-            <v-btn text="Close" @click="isActive.value = false"></v-btn>
-          </v-card-actions>
-        </v-card>
-      </template>
-    </v-dialog>
   </section>
   <p v-else-if="loaded">No sections found</p>
   <p v-else>Loading...</p>

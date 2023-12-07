@@ -33,12 +33,21 @@ onBeforeMount(async () => {
 
     <div v-if="loaded">
       <TranslationRequestPreview :request="translationRequest"></TranslationRequestPreview>
+
+      <RouterLink :to="`/exportTranslation/${props.id}`" class="export-button">
+        <v-btn> Export Translation </v-btn>
+      </RouterLink>
+
       <SectionListComponent :sectionsIds="translationRequest.sections" :requestId="props.id" />
     </div>
   </main>
 </template>
 
 <style scoped>
+.export-button {
+  text-align: center;
+  font-size: 2em;
+}
 h1 {
   text-align: center;
 }

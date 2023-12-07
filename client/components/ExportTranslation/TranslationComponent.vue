@@ -32,15 +32,13 @@ p {
   margin: 0em;
 }
 
-.text {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
 .base {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1em;
+  margin: 1em;
+  background-color: var(--base-bg);
 }
 
 .base article:only-child {
