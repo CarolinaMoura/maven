@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { useTagStore } from "../../stores/tags";
 import { useTranslationRequestsStore } from "../../stores/translationRequests";
 import { Tag } from "../../types";
+import CreateTagForm from "../Tag/CreateTagForm.vue";
 
 
 const { languageTags, otherTags } = storeToRefs(useTagStore());
@@ -141,10 +142,12 @@ onMounted(() => {
         <h2>Document filters</h2>
         <div class="filter-option">
           <h4>
-            Tags
-            <v-tooltip text="Create a tag">
+            <v-tooltip>
               <template v-slot:activator="{ props }">
-                <v-icon v-on="props">mdi-plus-circle</v-icon>
+                <v-row>
+                  <div class="tag-text">Tags</div>
+                  <CreateTagForm :language=false v-bind="props"></CreateTagForm>
+                </v-row>
               </template>
             </v-tooltip>
           </h4>
@@ -181,7 +184,16 @@ onMounted(() => {
       <div class="filter-type">
         <h2>Translation filters</h2>
         <div class="filter-option">
-          <h4>Language</h4>
+          <h4>
+            <v-tooltip>
+              <template v-slot:activator="{ props }">
+                <v-row>
+                  <div class="tag-text">Language</div>
+                  <CreateTagForm :language="true" v-bind="props"></CreateTagForm>
+                </v-row>
+              </template>
+            </v-tooltip>
+          </h4>
           <div v-for="(translation, ix) in translations" :key="ix">
             <div class="translation-line">
               <v-icon color="var(--primary-text-60)" size="x-small" @click="removeTranslationLine(ix)">mdi-close</v-icon>
@@ -213,6 +225,12 @@ onMounted(() => {
 <style scoped>
 * {
   color: var(--primary-text);
+}
+
+.tag-text {
+  font-size: 18px;
+  margin-top: 10px;
+  margin-left: 18px;
 }
 
 .translation-line {

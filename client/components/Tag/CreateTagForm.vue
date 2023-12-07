@@ -2,8 +2,9 @@
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
+const props = defineProps(["language"]);
 const tagName = ref("");
-const isLanguage = ref(false);
+const isLanguage = ref(props.language);
 const menu = ref(false);
 
 const createTag = async (tagName: string, isLanguage: boolean) => {
@@ -25,19 +26,24 @@ const emptyForm = () => {
 </script>
 
 <template>
-  <form @submit.prevent="createTag(tagName, isLanguage)">
-    <label for="tagName">Tag</label>
-    <v-textarea id="tagName" v-model="tagName" placeholder="Type in Tag Name!" required> </v-textarea>
-    <v-switch v-model="isLanguage" :label="isLanguage ? 'This tag is a language' : 'This tag is not a language'"
-      :label-value="isLanguage" />
-    <v-btn type="submit" class="pure-button-primary pure-button">Create Tag</v-btn>
-  </form>
+  <v-menu v-model="menu" :close-on-content-click="false" location="end">
+    <template v-slot:activator="{ props }">
+      <v-btn variant="plain" v-bind="props" icon="mdi-plus-circle-outline"></v-btn>
+    </template>
+
+    <v-card min-width="400" max-width="500">
+      <form @submit.prevent="createTag(tagName, isLanguage)">
+        <label for="tagName">Tag</label>
+        <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the tag name!" required> </v-textarea>
+        <v-btn type="submit" class="pure-button-primary pure-button">Create Tag</v-btn>
+      </form>
+    </v-card>
+  </v-menu>
 </template>
 
 <style scoped>
 form {
   background-color: var(--base-bg);
-  border-radius: 1em;
   display: flex;
   flex-direction: column;
   gap: 0.5em;
