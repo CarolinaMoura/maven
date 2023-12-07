@@ -1,7 +1,7 @@
 /* Add some global styles here! */
 
 :root {
-  --red: rgb(208, 67, 12);
+  --red: #cf6262;
   --base-bg: #f1f3f5;
 
   --primary: #A1BB9D;
@@ -15,6 +15,7 @@
   --quaternary: #B2CED4;
   --primary-text: #474747;
   --primary-text-60: rgba(71, 71, 71, 0.6);
+
 }
 
 .view-container {
@@ -26,6 +27,20 @@ button:disabled,
 button[disabled] {
   background-color: #cccccc;
   pointer-events: none;
+}
+
+.btn-red {
+  background-color: var(--red);
+  color: white !important;
+  padding: 12px 16px;
+  transition: all 0.25s ease-in;
+  outline: 0px solid var(--secondary)
+}
+
+.btn-red:hover {
+  outline: 2px solid var(--red);
+  background-color: transparent;
+  color: var(--red) !important;
 }
 
 
