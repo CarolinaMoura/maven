@@ -381,6 +381,9 @@ class Routes {
   async filterDocuments(filter: IFilter) {
     const infYear = 10000000000;
 
+    if (filter.yearFrom === undefined) {
+      filter.yearFrom = -infYear;
+    }
     if (filter.yearTo === undefined) {
       filter.yearTo = infYear;
     }
