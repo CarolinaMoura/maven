@@ -1,5 +1,4 @@
 import random 
-import iso639
 
 random.seed(10)
 
@@ -13,11 +12,61 @@ def random_color_generator():
 
 
 
-for lang in iso639.ALL_LANGUAGES:
-    if lang.status == 'R':
-        continue
-    print(f'["{lang.name}", ', end="")
+for lang in [
+    "English",
+    "Chinese",
+    "Spanish",
+    "Hindi",
+    "Arabic",
+    "Portuguese",
+    "Bengali",
+    "Russian",
+    "Japanese",
+    "Punjabi",
+    "French",
+    "German",
+    "Italian",
+    "Dutch",
+    "Swedish",
+    "Polish",
+    "Greek",
+    "Romanian",
+    "Spanish",
+    "Portuguese",
+    "Chinese",
+    "Hindi",
+    "Bengali",
+    "Japanese",
+    "Punjabi",
+    "Telugu",
+    "Marathi",
+    "Tamil",
+    "Urdu",
+    "Turkish",
+    "Swahili",
+    "Hausa",
+    "Yoruba",
+    "Amharic",
+    "Zulu",
+    "Igbo",
+    "Shona",
+    "Somali",
+    "Fulfulde",
+    "Tigrinya",
+    "Arabic",
+    "Persian (Farsi)",
+    "Turkish",
+    "Hebrew",
+    "Kurdish",
+    "Quechua",
+    "Maori",
+    "Ainu",
+    "Navajo",
+  ]:
+    print(f"['{lang}', ", end="")
     print("{", end="")
+    str = lang[:3]
+    str = str.upper()
     color = random_color_generator()
-    print(f"abbreviation: '{lang.part3.upper()}', color: '{color}'", end="") 
+    print(f"abbreviation: '{str}', color: '{color}'", end="") 
     print("}],")
