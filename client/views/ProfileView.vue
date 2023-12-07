@@ -144,7 +144,7 @@ onBeforeMount(async () => {
         <div v-else>{{ props.username }} hasn't requested any translations yet!</div>
       </div>
       <div v-else-if="view === `TRANSLATION`" class="requests-container">
-        <div v-if="contributions && contributions.length > 0" class="list">
+        <div v-if="contributions && contributions.translations.length > 0" class="list">
           <v-row v-for="(translation, idx) in contributions.translations" v-bind:key="translation._id">
             <v-col><SectionComponent :section="contributions.sections[idx]"></SectionComponent></v-col>
             <v-col><SectionTranslationCard :section-translation="translation"></SectionTranslationCard></v-col>
