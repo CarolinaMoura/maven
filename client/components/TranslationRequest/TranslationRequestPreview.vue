@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import { Author } from "../../types";
 import { fetchy } from "../../utils/fetchy";
 import LanguageTag from "../Tag/LanguageTag.vue";
-import Tag from "../Tag/Tag.vue";
+import Tag from "../Tag/TagComponent.vue";
 import DeleteTranslationRequestForm from "./DeleteTranslationRequestForm.vue";
 import TranslationRequestFromDocumentForm from "./TranslationRequestFromDocumentForm.vue";
 const { currentUsername } = storeToRefs(useUserStore());
@@ -22,7 +22,12 @@ onBeforeMount(async () => {
   const fetchedDocument = await fetchy(`/api/document/${props.request.document}`, "GET");
   const fetchedTags = await fetchy(`/api/tag/object/${fetchedDocument._id}`, "GET");
   document.value = fetchedDocument;
-  tags.value = fetchedTags;
+  tags.value = fetchedTags.map((t: any) => {
+    if (t && !t.isLanguage) {
+      return t.name;
+    }
+  });
+  console.log(tags);
   loaded.value = true;
 });
 
@@ -63,13 +68,13 @@ async function toTranslations() {
           <LanguageTag :langauge="request.languageTo"></LanguageTag>
         </div>
 
-        <div class="row">
+        <div class="tags-row">
           <Tag v-for="tag in tags" :key="tag">{{ tag }}</Tag>
         </div>
       </div>
 
       <div class="card-actions">
-        <v-tooltip text="See translations">
+        <v-tooltip text="View translation">
           <template v-slot:activator="{ props }">
             <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click="toTranslations"></v-btn>
           </template>
@@ -105,6 +110,13 @@ a {
 h3 {
   font-size: 24px;
   font-weight: normal;
+}
+
+.tags-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  flex-wrap: wrap;
 }
 
 .card-container {

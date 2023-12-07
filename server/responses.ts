@@ -40,7 +40,7 @@ export default class Responses {
 
   static async attachments(attachments: AttachmentDoc[]) {
     const promises = attachments.map(async (a) => {
-      return (await Tag.getTag(a.tag))?.name;
+      return await Tag.getTag(a.tag);
     });
     return await Promise.all(promises);
   }
