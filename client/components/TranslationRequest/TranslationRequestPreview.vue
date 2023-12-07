@@ -32,6 +32,10 @@ const emit = defineEmits(["refreshRequests"]);
 async function toTranslations() {
   await router.push({ path: `/translationRequest/${props.request._id}` });
 }
+
+async function toExport() {
+  await router.push({ path: `/exportTranslation/${props.request._id}` });
+}
 </script>
 
 <template>
@@ -52,8 +56,8 @@ async function toTranslations() {
 
           <p>{{ `Published ${document.year}` }}</p>
           <small>
-            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"> {{ request.requester }} </RouterLink> </small
-          ><br />
+            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"> {{
+              request.requester }} </RouterLink> </small><br />
           <small class="italics" v-if="request.description">"{{ request.description }}"</small>
         </div>
 
@@ -77,12 +81,21 @@ async function toTranslations() {
 
         <v-tooltip text="Request translation in a different language">
           <template v-slot:activator="{ props }">
-            <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
+            <TranslationRequestFromDocumentForm v-bind="props" :document="document"
+              @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
           </template>
         </v-tooltip>
+
+        <v-tooltip text="Export translation">
+          <template v-slot:activator="{ props }">
+            <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click="toExport"></v-btn>
+          </template>
+        </v-tooltip>
+
         <v-tooltip text="Delete request" v-if="currentUsername === request.requester">
           <template v-slot:activator="{ props }">
-            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')"></DeleteTranslationRequestForm>
+            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')">
+            </DeleteTranslationRequestForm>
           </template>
         </v-tooltip>
       </div>
@@ -98,10 +111,12 @@ async function toTranslations() {
 a {
   color: var(--primary-text);
 }
+
 .italics {
   font-style: italic;
   font-weight: lighter;
 }
+
 h3 {
   font-size: 24px;
   font-weight: normal;
@@ -125,6 +140,7 @@ h3 {
   flex-direction: column;
   row-gap: 1em;
 }
+
 .heading {
   display: flex;
   flex-direction: row;
@@ -137,6 +153,7 @@ h3 {
   row-gap: 0em;
   column-gap: 0em;
 }
+
 .preview-card.card {
   color: var(--primary-text);
   align-items: start;
