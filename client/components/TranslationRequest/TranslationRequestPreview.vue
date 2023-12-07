@@ -86,13 +86,13 @@ async function toExport() {
           </template>
         </v-tooltip>
 
-        <v-tooltip text="Request translation in a different language">
+        <v-tooltip text="Request translation in a different language" v-if="isLoggedIn">
           <template v-slot:activator="{ props }">
             <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
           </template>
         </v-tooltip>
 
-        <v-tooltip text="Export translation" v-if="isLoggedIn">
+        <v-tooltip text="Export translation">
           <template v-slot:activator="{ props }">
             <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click.stop="toExport"></v-btn>
           </template>

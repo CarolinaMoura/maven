@@ -19,7 +19,7 @@ const code = getLanguageCode(props.language);
 <template>
   <v-tooltip :text="props.language">
     <template v-slot:activator="{ props }">
-      <div class="language-tag" v-bind="props" :style="{ 'background-color': `${data?.color}` }">
+      <div :class="`language-tag ${data?.color ? '' : 'outline'}`" v-bind="props" :style="{ 'background-color': `${data?.color || 'transparent'}` }">
         <p>{{ code }}</p>
       </div>
     </template></v-tooltip
@@ -33,5 +33,9 @@ const code = getLanguageCode(props.language);
   border-radius: 45px;
   font-size: 16px;
   width: fit-content;
+}
+
+.outline {
+  outline: 1px solid var(--primary-text);
 }
 </style>

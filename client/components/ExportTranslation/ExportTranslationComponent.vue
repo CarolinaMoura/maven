@@ -131,6 +131,7 @@ async function copyToClipboard(text: string) {
 }
 
 .export-button {
+  color: white;
   text-align: center;
   font-size: 1.5em;
   width: auto;

@@ -33,7 +33,7 @@ p {
 }
 
 .no-translation {
-  color: red;
+  color: var(--red);
   font-style: italic;
 }
 
