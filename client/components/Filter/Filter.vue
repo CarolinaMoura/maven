@@ -10,6 +10,7 @@ const tagStore = useTagStore();
 
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const translationRequestsStore = useTranslationRequestsStore();
+const { getLanguageTags, getOtherTags } = useTagStore();
 const router = useRouter();
 
 // TODO
@@ -23,6 +24,14 @@ const router = useRouter();
 
 // TODO
 // JUST ONE FIELD IN LANGUAGE
+
+async function getLanguages() {
+  void getLanguageTags();
+}
+
+async function getTags() {
+  void getOtherTags();
+}
 
 function getTodaysYear(): number {
   const today = new Date();
@@ -54,7 +63,10 @@ const languages = computed(() => {
   const sortedCopy = languageTags.value.sort((a, b) => a.name.localeCompare(b.name));
   return [{ ...emptyTag }, ...sortedCopy.map((t: Tag) => ({ ...t, title: t.name }))];
 });
-const nonLanguages = computed(() => otherTags.value.map((t: Tag) => ({ ...t, title: t.name })));
+const nonLanguages = computed(() => {
+  const sortedCopy = otherTags.value.sort((a, b) => a.name.localeCompare(b.name));
+  return [{ ...emptyTag }, ...sortedCopy.map((t: Tag) => ({ ...t, title: t.name }))];
+});
 
 nonLanguages.value.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -145,13 +157,12 @@ onMounted(() => {
               <template v-slot:activator="{ props }">
                 <v-row class="tags-row">
                   <div class="tag-text">Tags</div>
-                  <CreateTagForm :language="false" v-bind="props" @refresh-tags="tagStore.getOtherTags"></CreateTagForm>
+                  <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
                 </v-row>
               </template>
             </v-tooltip>
           </h4>
           <v-col cols="12">
-            <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
             <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
               <template v-slot:selection="data">
                 <v-chip :key="JSON.stringify(data.item)" size="small">
@@ -189,7 +200,7 @@ onMounted(() => {
               <template v-slot:activator="{ props }">
                 <v-row class="tags-row">
                   <div class="tag-text">Language</div>
-                  <CreateTagForm :language="true" v-bind="props" @refresh-tags="tagStore.getLanguageTags"></CreateTagForm>
+                  <CreateTagForm :language="true" v-bind="props" v-on:refresh-tags="getLanguages"></CreateTagForm>
                 </v-row>
               </template>
             </v-tooltip>

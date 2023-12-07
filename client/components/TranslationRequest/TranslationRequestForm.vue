@@ -97,10 +97,7 @@ const nonEmptyRule = [
 
 const yearRules = [
   (v: string) => {
-    if (v) return true;
-    return "Field cannot be empty.";
-  },
-  (v: string) => {
+    if (v.length === 0) return true;
     const validYear = new RegExp("^[0-9]{4}$");
     if (validYear.test(v)) return true;
     return "Must be a valid year";
@@ -133,7 +130,9 @@ const closeForm = () => {
       <v-form v-model="isFormValid" @submit.prevent="submitRequest()">
         <v-container class="form-container">
           <div class="row between">
-            <div><h2>Translation Request Form</h2></div>
+            <div>
+              <h2>Translation Request Form</h2>
+            </div>
             <v-btn variant="plain" @click="closeForm" :icon="`mdi-close`"></v-btn>
           </div>
 
@@ -152,8 +151,8 @@ const closeForm = () => {
             <v-row>
               <v-col class="col">
                 <div v-for="(author, idx) in authors" v-bind:key="`author-${idx}`" class="row">
-                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (First)`" v-model="author.first" color="#95AEB3"></v-text-field>
-                  <v-text-field :rules="nonEmptyRule" :label="`Author #${idx + 1} (Last)`" v-model="author.last" color="#95AEB3"></v-text-field>
+                  <v-text-field :label="`Author #${idx + 1} (First)`" v-model="author.first" color="#95AEB3"></v-text-field>
+                  <v-text-field :label="`Author #${idx + 1} (Last)`" v-model="author.last" color="#95AEB3"></v-text-field>
 
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
@@ -194,6 +193,7 @@ const closeForm = () => {
 .disabled {
   cursor: not-allowed;
 }
+
 h3,
 h2 {
   font-weight: normal;
@@ -206,11 +206,13 @@ h3 {
 h2 {
   padding-bottom: 0.5em;
 }
+
 .col {
   display: flex;
   flex-direction: column;
   gap: 1em;
 }
+
 .row {
   display: flex;
   flex-direction: row;

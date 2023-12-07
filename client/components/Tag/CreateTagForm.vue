@@ -3,10 +3,10 @@ import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["language"]);
+const emit = defineEmits(["refreshTags"]);
 const tagName = ref("");
 const isLanguage = ref(props.language);
 const menu = ref(false);
-const emit = defineEmits(["refreshTags"]);
 
 const createTag = async (tagName: string, isLanguage: boolean) => {
   try {
@@ -14,6 +14,7 @@ const createTag = async (tagName: string, isLanguage: boolean) => {
       body: { name: tagName, isLanguage },
     });
     menu.value = false;
+    emit("refreshTags");
   } catch (_) {
     return;
   }
@@ -33,12 +34,17 @@ const emptyForm = () => {
     <template v-slot:activator="{ props }">
       <v-btn variant="plain" v-bind="props" icon="mdi-plus-circle-outline"></v-btn>
     </template>
-
     <v-card min-width="400" max-width="500">
       <form @submit.prevent="createTag(tagName, isLanguage)">
-        <label for="tagName">Tag</label>
-        <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the tag name!" required> </v-textarea>
-        <v-btn type="submit" class="pure-button-primary pure-button">Create Tag</v-btn>
+        <template v-if="!isLanguage">
+          <label for="tagName">Tag</label>
+          <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the tag name" required> </v-textarea>
+        </template>
+        <template v-if="isLanguage">
+          <label for="tagName">Language</label>
+          <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the language" required> </v-textarea>
+        </template>
+        <v-btn type="submit" class="pure-button-primary pure-button">Create!</v-btn>
       </form>
     </v-card>
   </v-menu>

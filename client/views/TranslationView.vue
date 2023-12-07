@@ -39,9 +39,6 @@ onBeforeMount(async () => {
 
     <div v-if="loaded">
       <TranslationRequestPreview :request="translationRequest"></TranslationRequestPreview>
-      <RouterLink :to="`/exportTranslation/${props.id}`" class="export-button">
-        <v-btn> Export Translation </v-btn>
-      </RouterLink>
       <SectionListComponent :sectionsIds="translationRequest.sections" :requestId="props.id" />
     </div>
 
