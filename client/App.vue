@@ -40,7 +40,9 @@ onBeforeMount(async () => {
           <RouterLink :to="{ name: 'Home' }"> <v-icon :class="`${currentRouteName == 'Home' && 'selected'}`">mdi-home</v-icon> </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
+          <RouterLink :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }">
+            <v-icon :class="`${currentRouteName == 'Profile' && 'selected'}`">mdi-account</v-icon>
+          </RouterLink>
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }"> <v-icon :class="`${currentRouteName == 'Settings' && 'selected'}`">mdi-cog</v-icon> </RouterLink>
