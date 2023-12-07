@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import SectionComponent from "../Section/SectionComponent.vue";
 import ChooseTranslationComponent from "./ChooseTranslationComponent.vue";
 import TranslationComponent from "./TranslationComponent.vue";
@@ -128,7 +129,7 @@ async function copyToClipboard(text: string) {
     </v-dialog>
   </section>
   <p v-else-if="loaded">No sections found</p>
-  <p v-else>Loading...</p>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>
