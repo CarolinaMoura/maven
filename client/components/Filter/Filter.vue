@@ -6,7 +6,7 @@ import { useTagStore } from "../../stores/tags";
 import { useTranslationRequestsStore } from "../../stores/translationRequests";
 import { Tag } from "../../types";
 import CreateTagForm from "../Tag/CreateTagForm.vue";
-
+const tagStore = useTagStore();
 
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const translationRequestsStore = useTranslationRequestsStore();
@@ -33,7 +33,6 @@ async function getTags() {
   void getOtherTags();
 }
 
-
 function getTodaysYear(): number {
   const today = new Date();
   const year = today.getFullYear();
@@ -56,11 +55,18 @@ const emptyTag: IExtendedTag = {
   _id: "0",
 };
 
+// const navigateToTag = () => {
+//   router.push({ name: "Tag" });
+// };
+
 const languages = computed(() => {
   const sortedCopy = languageTags.value.sort((a, b) => a.name.localeCompare(b.name));
   return [{ ...emptyTag }, ...sortedCopy.map((t: Tag) => ({ ...t, title: t.name }))];
 });
-const nonLanguages = computed(() => otherTags.value.map((t: Tag) => ({ ...t, title: t.name })));
+const nonLanguages = computed(() => {
+  const sortedCopy = otherTags.value.sort((a, b) => a.name.localeCompare(b.name));
+  return [{ ...emptyTag }, ...sortedCopy.map((t: Tag) => ({ ...t, title: t.name }))];
+});
 
 nonLanguages.value.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -142,16 +148,16 @@ onMounted(() => {
       <v-icon v-if="canAppear" size="x-small">mdi-triangle-down</v-icon>
     </button>
     <div v-if="canAppear || windowSize >= 700">
-      <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button>
+      <!-- <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button> -->
       <div class="filter-type">
         <h2>Document filters</h2>
         <div class="filter-option">
           <h4>
             <v-tooltip>
               <template v-slot:activator="{ props }">
-                <v-row>
+                <v-row class="tags-row">
                   <div class="tag-text">Tags</div>
-                  <CreateTagForm :language=false v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
+                  <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
                 </v-row>
               </template>
             </v-tooltip>
@@ -171,15 +177,16 @@ onMounted(() => {
         </div>
         <div class="filter-option">
           <h4>
-            Year published
-            <v-tooltip text="Select the range of years of publication of the original document">
-              <template v-slot:activator="{ props }">
-                <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
-              </template>
-            </v-tooltip>
+            <v-row class="tags-row">
+              <div class="tag-text">Year Published</div>
+              <v-tooltip text="Select the range of years of publication of the original document">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+                </template>
+              </v-tooltip></v-row
+            >
           </h4>
-          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023"
-            :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
+          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
           <p style="text-align: center; margin-top: -0.8rem">
             From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
           </p>
@@ -191,7 +198,7 @@ onMounted(() => {
           <h4>
             <v-tooltip>
               <template v-slot:activator="{ props }">
-                <v-row>
+                <v-row class="tags-row">
                   <div class="tag-text">Language</div>
                   <CreateTagForm :language="true" v-bind="props" v-on:refresh-tags="getLanguages"></CreateTagForm>
                 </v-row>
@@ -203,14 +210,28 @@ onMounted(() => {
               <v-icon color="var(--primary-text-60)" size="x-small" @click="removeTranslationLine(ix)">mdi-close</v-icon>
               <div class="single-translation">
                 From
-                <v-select clearable :hide-details="true" class="language-selector"
-                  @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)" :return-object="true"
-                  @update:modelValue="(e) => updateLanguageFrom(e, ix)" :items="languages" label="original"></v-select>
+                <v-select
+                  clearable
+                  :hide-details="true"
+                  class="language-selector"
+                  @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)"
+                  :return-object="true"
+                  @update:modelValue="(e) => updateLanguageFrom(e, ix)"
+                  :items="languages"
+                  label="original"
+                ></v-select>
 
                 to
-                <v-select :hide-details="true" @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)" clearable
-                  class="language-selector" :return-object="true" @update:modelValue="(e) => updateLanguageTo(e, ix)"
-                  :items="languages" label="target"></v-select>
+                <v-select
+                  :hide-details="true"
+                  @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)"
+                  clearable
+                  class="language-selector"
+                  :return-object="true"
+                  @update:modelValue="(e) => updateLanguageTo(e, ix)"
+                  :items="languages"
+                  label="target"
+                ></v-select>
               </div>
             </div>
           </div>
@@ -219,7 +240,7 @@ onMounted(() => {
       </div>
       <div class="filter-type">
         <v-col cols="12">
-          <v-btn block rounded="lg" size="large" @click="submitFilters()">APPLY FILTERS</v-btn>
+          <v-btn block rounded="lg" size="large" @click="clearAllFilters()">CLEAR FILTERS</v-btn>
         </v-col>
       </div>
     </div>
@@ -229,12 +250,12 @@ onMounted(() => {
 <style scoped>
 * {
   color: var(--primary-text);
+  font-weight: normal;
 }
 
 .tag-text {
   font-size: 18px;
-  margin-top: 10px;
-  margin-left: 18px;
+  margin: 0;
 }
 
 .translation-line {
@@ -283,8 +304,16 @@ section {
 
 .filter-type {
   /* margin: 0.8rem 0; */
-  padding: 1rem 0;
+  padding: 2rem 0 2rem 0;
   border-bottom: 1px solid var(--tertiary);
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+}
+
+.tags-row {
+  align-items: center;
+  column-gap: 1em;
 }
 
 .filter-type:last-child {

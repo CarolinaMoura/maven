@@ -18,6 +18,8 @@ const createTag = async (tagName: string, isLanguage: boolean) => {
   } catch (_) {
     return;
   }
+
+  emit("refreshTags");
   emptyForm();
 };
 
@@ -34,11 +36,11 @@ const emptyForm = () => {
     </template>
     <v-card min-width="400" max-width="500">
       <form @submit.prevent="createTag(tagName, isLanguage)">
-        <template v-if=!isLanguage>
+        <template v-if="!isLanguage">
           <label for="tagName">Tag</label>
           <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the tag name" required> </v-textarea>
         </template>
-        <template v-if=isLanguage>
+        <template v-if="isLanguage">
           <label for="tagName">Language</label>
           <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the language" required> </v-textarea>
         </template>

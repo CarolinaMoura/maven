@@ -10,7 +10,8 @@ import LanguageTag from "../Tag/LanguageTag.vue";
 import Tag from "../Tag/TagComponent.vue";
 import DeleteTranslationRequestForm from "./DeleteTranslationRequestForm.vue";
 import TranslationRequestFromDocumentForm from "./TranslationRequestFromDocumentForm.vue";
-const { currentUsername } = storeToRefs(useUserStore());
+
+const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 const router = useRouter();
 const route = useRoute();
@@ -81,7 +82,7 @@ async function toExport() {
       <div class="card-actions">
         <v-tooltip text="View translation">
           <template v-slot:activator="{ props }">
-            <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click="toTranslations"></v-btn>
+            <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click.stop="toTranslations"></v-btn>
           </template>
         </v-tooltip>
 
@@ -91,9 +92,9 @@ async function toExport() {
           </template>
         </v-tooltip>
 
-        <v-tooltip text="Export translation">
+        <v-tooltip text="Export translation" v-if="isLoggedIn">
           <template v-slot:activator="{ props }">
-            <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click="toExport"></v-btn>
+            <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click.stop="toExport"></v-btn>
           </template>
         </v-tooltip>
 
