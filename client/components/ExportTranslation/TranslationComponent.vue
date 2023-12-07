@@ -22,14 +22,19 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="base">
-    <p class="text">{{ translation }}</p>
+  <div class="base" :class="{ 'no-translation': translation === 'No translation found' }">
+    <p class="text-body-1 font-weight-regular">{{ translation }}</p>
   </div>
 </template>
 
 <style scoped>
 p {
   margin: 0em;
+}
+
+.no-translation {
+  color: red;
+  font-style: italic;
 }
 
 .base {

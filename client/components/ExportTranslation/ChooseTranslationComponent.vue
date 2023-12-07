@@ -13,6 +13,7 @@ const emits = defineEmits(["refresh-chosen"]);
 const sectionTranslations = ref<Array<any>>([]);
 
 const section = computed(() => props.section);
+
 const chosenTranslation = computed(() => props.chosenTranslation);
 
 const getAllSectionTranslations = async () => {
@@ -38,13 +39,13 @@ const refreshChosen = (id: any) => {
   <div class="wrapper">
     <div class="section-translation-container">
       <header>
-        <v-card-title>Translated Text</v-card-title>
-        <v-card-subtitle><i>Showing all translations for section</i></v-card-subtitle>
+        <v-card-subtitle><i>(Choose a translation to export)</i></v-card-subtitle>
       </header>
       <div class="grid-1em">
         <div class="section-translation-list grid-1em">
           <div v-for="translation in sectionTranslations" :key="translation._id">
-            <SectionTranslationChooser v-bind:translation="translation" v-bind:is-chosen="translation._id == chosenTranslation" @refresh-chosen="refreshChosen(translation._id)" />
+            <SectionTranslationChooser v-bind:translation="translation"
+              v-bind:is-chosen="translation._id == chosenTranslation" @refresh-chosen="refreshChosen(translation._id)" />
           </div>
         </div>
       </div>

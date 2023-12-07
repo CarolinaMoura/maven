@@ -20,5 +20,6 @@ const data = LANGUAGE_MAP.get(props.langauge);
   padding: 0.5em 1em;
   border-radius: 45px;
   font-size: 16px;
+  width: fit-content;
 }
 </style>

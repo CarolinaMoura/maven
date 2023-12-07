@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useToastStore } from "@/stores/toast";
 import { onBeforeMount, ref } from "vue";
+import { useToastStore } from "../../stores/toast";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import SectionComponent from "../Section/SectionComponent.vue";
 import ChooseTranslationComponent from "./ChooseTranslationComponent.vue";
 import TranslationComponent from "./TranslationComponent.vue";
@@ -9,6 +10,7 @@ const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
 const chosenTranslations = ref(Array<string | undefined>());
+const sectionsWithoutTranslation = ref<Array<Record<string, any>>>([]);
 const { showToast } = useToastStore();
 
 // let sections = ref<Array<Record<string, any>>>([]);
@@ -31,6 +33,7 @@ async function getSections() {
       if (chosenTranslation.found) {
         return chosenTranslation.translation;
       } else {
+        sectionsWithoutTranslation.value.push(section);
         return undefined;
       }
     }),
@@ -45,18 +48,9 @@ function updateChosen(sectionIdx: number, translationId: string) {
   chosenTranslations.value[sectionIdx] = translationId;
 }
 
-onBeforeMount(async () => {
-  await getSections();
-  loaded.value = true;
-});
-
-async function copyToClipboard(text: string) {
-  console.log(text);
-  await navigator.clipboard.writeText(text);
-}
-
 const displayTranslation = ref("");
 const isActive = ref(false);
+const dialogVisible = ref(false);
 async function exportTranslation() {
   if (chosenTranslations.value.includes(undefined)) {
     showToast({ message: "Exporting cannot be done without valid translations for each section", style: "error" });
@@ -71,7 +65,15 @@ async function exportTranslation() {
   dialogVisible.value = true;
 }
 
-const dialogVisible = ref(false);
+onBeforeMount(async () => {
+  await getSections();
+  loaded.value = true;
+});
+
+async function copyToClipboard(text: string) {
+  console.log(text);
+  await navigator.clipboard.writeText(text);
+}
 </script>
 
 <template>
@@ -92,9 +94,16 @@ const dialogVisible = ref(false);
   </v-dialog>
 
   <section class="sections" v-if="loaded && sections.length !== 0">
-    <div class="header-container">
-      <h2>Original Text</h2>
-    </div>
+    <v-row>
+      <v-col sm="6">
+        <v-card-title>Original Text</v-card-title>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Select a section to see all possible translations!)</v-card-subtitle>
+      </v-col>
+      <v-col sm="6">
+        <v-card-title>Translated Text</v-card-title>
+      </v-col>
+    </v-row>
+
     <div class="sections-container" v-for="(section, idx) in sections" :key="section._id">
       <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
       <div v-if="activeSection == section._id">
@@ -103,37 +112,45 @@ const dialogVisible = ref(false);
       <div v-else-if="activeSection.length === 0">
         <TranslationComponent :translation-id="chosenTranslations[idx]" />
       </div>
+
+      <div v-if="idx === sections.length - 1" class="last-section-padding"></div>
     </div>
   </section>
   <p v-else-if="loaded">No sections found</p>
-  <p v-else>Loading...</p>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>
+.active-section {
+  border: 2px solid var(--secondary);
+}
+
+.text-right {
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
 .export-button {
   text-align: center;
-  font-size: 2em;
-  width: 20%;
-  margin-left: 40%;
+  font-size: 1.5em;
+  width: auto;
+  margin: 0;
+  position: fixed;
+  bottom: 10px;
+  right: 30px;
+  text-transform: none;
+  font-size: 1em;
+  background-color: rgb(179, 203, 183);
 }
+
 h2 {
   margin-bottom: 0px;
 }
 
 .instruction {
-  margin-left: auto;
+  font-style: italic;
   overflow-y: auto;
   width: 90%;
-}
-
-.active-section {
-  border: 2px solid rgb(15, 133, 78);
-}
-
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
 }
 
 .sections {
@@ -144,13 +161,14 @@ h2 {
 }
 
 article {
-  background-color: var(--base-bg);
-  border-radius: 20px;
-  padding: 20px;
-  margin: 1px 0;
-  width: 100%;
+  border-radius: 5px;
   box-sizing: border-box;
   cursor: pointer;
+}
+
+.last-section-padding {
+  margin-bottom: 30px;
+  min-height: 30px;
 }
 
 .sections-container {

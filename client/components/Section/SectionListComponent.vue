@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import SectionTranslationList from "../SectionTranslation/SectionTranslationList.vue";
 import SectionComponent from "./SectionComponent.vue";
 
@@ -40,7 +41,7 @@ onBeforeMount(async () => {
     <v-row>
       <v-col sm="6">
         <v-card-title>Original Text</v-card-title>
-        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section to view and rate all translations for that section)</v-card-subtitle>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section)</v-card-subtitle>
       </v-col>
     </v-row>
     <div class="sections-container" v-for="section in sections" :key="section._id">
@@ -49,10 +50,15 @@ onBeforeMount(async () => {
     </div>
   </section>
   <p v-else-if="loaded">No sections found</p>
-  <p v-else>Loading...</p>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>
+.export-button {
+  text-align: center;
+  font-size: 2em;
+}
+
 h2 {
   margin-bottom: 0px;
 }
