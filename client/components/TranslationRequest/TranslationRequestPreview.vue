@@ -34,10 +34,14 @@ const emit = defineEmits(["refreshRequests"]);
 async function toTranslations() {
   await router.push({ path: `/translationRequest/${props.request._id}` });
 }
+
+async function toProfile(username: string) {
+  await router.push({ path: `/profile/${username}` });
+}
 </script>
 
 <template>
-  <v-card v-if="loaded" class="preview-card card" hover>
+  <v-card v-if="loaded" class="preview-card card" hover @click="toTranslations">
     <div class="card-container">
       <div class="card-content">
         <div>
@@ -54,7 +58,7 @@ async function toTranslations() {
 
           <p>{{ `Published ${document.year}` }}</p>
           <small>
-            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"> {{ request.requester }} </RouterLink> </small
+            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }" @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small
           ><br />
           <small class="italics" v-if="request.description">"{{ request.description }}"</small>
         </div>
