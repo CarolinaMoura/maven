@@ -48,7 +48,10 @@ function updateChosen(sectionIdx: number, translationId: string) {
 
 const displayTranslation = ref("");
 async function exportTranslation() {
-  const exportedTranslation = await fetchy("/api/export", "POST", { body: { chosenTranslations: chosenTranslations.value } });
+  const chosenTranslationsIds: string[] = chosenTranslations.value.map((id) => id ?? "");
+  const exportedTranslation = await fetchy("/api/export", "POST", {
+    body: { chosenTranslations: chosenTranslationsIds },
+  });
   displayTranslation.value = exportedTranslation;
 }
 

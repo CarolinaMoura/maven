@@ -47,14 +47,14 @@ onBeforeMount(async () => {
   <section v-if="isLoggedIn">
     <div class="vote-container">
       <v-btn @click="vote(true)" variant="plain" icon color="#95AEB3">
-        <v-icon v-if="upvote && curVote.value == 'UPVOTE'" size=" 20">mdi-arrow-up-bold</v-icon>
+        <v-icon v-if="curVote == 'UPVOTE'" size=" 20">mdi-arrow-up-bold</v-icon>
         <v-icon v-else>mdi-arrow-up-bold-outline</v-icon>
       </v-btn>
       <div class="vote-count">
         <span>{{ props.votes }}</span>
       </div>
       <v-btn @click="vote(false)" variant="plain" icon color="#95AEB3">
-        <v-icon v-if="!upvote && curVote.value == 'DOWNVOTE'" size=" 20">mdi-arrow-down-bold</v-icon>
+        <v-icon v-if="curVote == 'DOWNVOTE'" size=" 20">mdi-arrow-down-bold</v-icon>
         <v-icon v-else>mdi-arrow-down-bold-outline</v-icon>
       </v-btn>
     </div>

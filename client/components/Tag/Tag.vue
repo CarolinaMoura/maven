@@ -1,9 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="tag">
+  <v-chip class="tag" variant="tonal">
     <slot></slot>
-  </div>
+  </v-chip>
 </template>
 
 <style>
