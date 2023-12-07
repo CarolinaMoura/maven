@@ -106,7 +106,7 @@ onBeforeMount(async () => {
                 <div class="tags-row">
                   <div v-for="language in languageDistribution" v-bind:key="`${language.language}-${language.value}`">
                     <div class="row">
-                      <LanguageTag :langauge="language.language"></LanguageTag>
+                      <LanguageTag :language="language.language"></LanguageTag>
                       <p>{{ language.value }}%</p>
                     </div>
                   </div>

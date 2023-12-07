@@ -1,4 +1,4 @@
-export const LANGUAGE_MAP = new Map<String, { abbreviation: String; color: String }>([
+export const LANGUAGE_MAP = new Map<string, { abbreviation: string; color: string }>([
   // TODO: ADD MORE LANGUAGES
   // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes#:~:text=ISO%20639%20is%20a%20standardized,later%20versions%20of%20the%20nomenclature.
   ["English", { abbreviation: "ENG", color: "#77ADFF" }],

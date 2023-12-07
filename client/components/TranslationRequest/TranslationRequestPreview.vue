@@ -69,9 +69,9 @@ async function toExport() {
         </div>
 
         <div class="row small">
-          <LanguageTag :langauge="document.originalLanguage"></LanguageTag>
+          <LanguageTag :language="document.originalLanguage"></LanguageTag>
           <v-icon>mdi-arrow-right</v-icon>
-          <LanguageTag :langauge="request.languageTo"></LanguageTag>
+          <LanguageTag :language="request.languageTo"></LanguageTag>
         </div>
 
         <div class="tags-row">
