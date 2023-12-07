@@ -22,12 +22,8 @@ onBeforeMount(async () => {
   const fetchedDocument = await fetchy(`/api/document/${props.request.document}`, "GET");
   const fetchedTags = await fetchy(`/api/tag/object/${fetchedDocument._id}`, "GET");
   document.value = fetchedDocument;
-  tags.value = fetchedTags.map((t: any) => {
-    if (t && !t.isLanguage) {
-      return t.name;
-    }
-  });
-  console.log(tags);
+
+  tags.value = fetchedTags.filter((t) => t && !t.isLanguage).map((t) => t.name);
   loaded.value = true;
 });
 
