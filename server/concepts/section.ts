@@ -22,6 +22,12 @@ export default class SectionConcept {
     }
     return section;
   }
+
+  async deleteSection(id: ObjectId) {
+    await this.sections.deleteOne({ _id: id });
+    return { msg: "Section deleted successfully!" };
+  }
+
   async checkSectionExists(id: ObjectId) {
     const section = await this.sections.readOne({ _id: id });
     if (section === null) {

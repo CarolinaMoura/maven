@@ -75,10 +75,10 @@ async function getuserData() {
     });
 
     tags.value = Array.from(allTags);
-    loaded.value = true;
   } catch {
     // User is not logged in
   }
+  loaded.value = true;
 }
 
 onBeforeMount(async () => {
@@ -136,7 +136,7 @@ onBeforeMount(async () => {
         <v-btn :value="`TRANSLATION`"> Contributed Translations </v-btn>
       </v-btn-toggle>
       <div v-if="view === `REQUEST`" class="requests-container">
-        <div v-if="requests" class="list">
+        <div v-if="requests && requests.length > 0" class="list">
           <div v-for="request in requests" v-bind:key="request._id">
             <TranslationRequestPreview :request="request" @refresh-requests="getuserData"></TranslationRequestPreview>
           </div>
@@ -147,7 +147,7 @@ onBeforeMount(async () => {
         <div v-if="contributions && contributions.translations.length > 0" class="list">
           <v-row v-for="(translation, idx) in contributions.translations" v-bind:key="translation._id">
             <v-col><SectionComponent :section="contributions.sections[idx]"></SectionComponent></v-col>
-            <v-col><SectionTranslationCard :section-translation="translation"></SectionTranslationCard></v-col>
+            <v-col><SectionTranslationCard :section-translation="translation" @refresh-section-translations="getuserData"></SectionTranslationCard></v-col>
             <v-divider></v-divider>
           </v-row>
         </div>

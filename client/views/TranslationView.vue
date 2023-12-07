@@ -11,17 +11,23 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const props = defineProps(["id"]);
 const loaded = ref(false);
 const translationRequest = ref();
+const error = ref(false);
 
 async function getTranslationRequest() {
-  console.log(props.id);
-  const fetchedTranslationRequest = await fetchy(`/api/translationRequest/${props.id}`, "GET");
-  console.log("fetchedTranslationRequest ", fetchedTranslationRequest);
-  translationRequest.value = fetchedTranslationRequest;
+  try {
+    const fetchedTranslationRequest = await fetchy(`/api/translationRequest/${props.id}`, "GET");
+    translationRequest.value = fetchedTranslationRequest;
+  } catch (e) {
+    console.log("ERROR");
+    translationRequest.value = undefined;
+    error.value = true;
+  } finally {
+    loaded.value = true;
+  }
 }
 
 onBeforeMount(async () => {
   await getTranslationRequest();
-  loaded.value = true;
 });
 </script>
 
@@ -32,10 +38,12 @@ onBeforeMount(async () => {
       <LoginWarning></LoginWarning>
     </section>
 
-    <div v-if="loaded">
-      <TranslationRequestPreview :request="translationRequest"></TranslationRequestPreview>
+    <div v-if="loaded && translationRequest">
+      <TranslationRequestPreview :request="translationRequest" @refreshRequests="getTranslationRequest"></TranslationRequestPreview>
       <SectionListComponent :sectionsIds="translationRequest.sections" :requestId="props.id" />
     </div>
+
+    <div v-if="error">Translation request could not be found.</div>
   </main>
 </template>
 
