@@ -2,6 +2,7 @@
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
+import LoginWarning from "../components/Login/LoginWarning.vue";
 import SectionListComponent from "../components/Section/SectionListComponent.vue";
 import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
 import { fetchy } from "../utils/fetchy";
@@ -28,7 +29,7 @@ onBeforeMount(async () => {
   <main class="view-container">
     <section>
       <h1 v-if="isLoggedIn"></h1>
-      <h1 v-else>Please login!</h1>
+      <LoginWarning></LoginWarning>
     </section>
 
     <div v-if="loaded">

@@ -93,8 +93,8 @@ onBeforeMount(async () => {
       </h1>
     </div>
 
-    <div v-if="loaded" class="row">
-      <div v-if="languageDistribution && languageDistribution.length > 0">
+    <div v-if="loaded">
+      <div v-if="languageDistribution && languageDistribution.length > 0" class="row">
         <PieChart :data="languageDistribution"></PieChart>
 
         <div class="column">
@@ -158,6 +158,9 @@ onBeforeMount(async () => {
   </main>
 </template>
 <style scoped>
+h1 {
+  font-weight: normal;
+}
 .requests-container {
   outline: 1px solid var(--tertiary);
   padding: 1em;
