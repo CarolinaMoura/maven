@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import SectionTranslationList from "../SectionTranslation/SectionTranslationList.vue";
 import SectionComponent from "./SectionComponent.vue";
 
@@ -50,7 +51,7 @@ onBeforeMount(async () => {
     <RouterLink :to="`/exportTranslation/${props.requestId}`" class="export-button"> EXPORT TRANSLATION</RouterLink>
   </section>
   <p v-else-if="loaded">No sections found</p>
-  <p v-else>Loading...</p>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>

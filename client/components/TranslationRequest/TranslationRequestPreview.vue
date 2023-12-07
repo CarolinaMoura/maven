@@ -5,6 +5,7 @@ import { onBeforeMount, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Author } from "../../types";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import LanguageTag from "../Tag/LanguageTag.vue";
 import Tag from "../Tag/TagComponent.vue";
 import DeleteTranslationRequestForm from "./DeleteTranslationRequestForm.vue";
@@ -90,9 +91,7 @@ async function toTranslations() {
     </div>
   </v-card>
 
-  <v-card v-else class="preview-card card" hover>
-    <div class="loading-state"><v-progress-circular indeterminate></v-progress-circular></div>
-  </v-card>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>

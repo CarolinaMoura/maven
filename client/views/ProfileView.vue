@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import TranslationRequestPreview from "@/components/TranslationRequest/TranslationRequestPreview.vue";
 import { onBeforeMount, ref } from "vue";
+import { fetchy } from "../utils/fetchy";
+import { LANGUAGE_MAP } from "../utils/languages";
 
 import PieChart from "../components/Profile/PieChart.vue";
 import SectionComponent from "../components/Section/SectionComponent.vue";
 import SectionTranslationCard from "../components/SectionTranslation/SectionTranslationCard.vue";
 import LanguageTag from "../components/Tag/LanguageTag.vue";
 import Tag from "../components/Tag/TagComponent.vue";
-import { fetchy } from "../utils/fetchy";
-import { LANGUAGE_MAP } from "../utils/languages";
+
+import LoaderComponent from "../components/LoaderComponent.vue";
 
 const loaded = ref(false);
-const showRequests = ref(true);
+const view = ref("REQUEST");
 const requests = ref();
 const contributions = ref();
 const tags = ref();
@@ -19,8 +21,9 @@ const languageDistribution = ref();
 
 const props = defineProps(["username"]);
 
-onBeforeMount(async () => {
+async function getuserData() {
   try {
+    loaded.value = false;
     const fetchedRequests = await fetchy(`/api/user/requests/${props.username}`, "GET");
     const fetchedContributions = await fetchy(`/api/user/contributions/${props.username}`, "GET");
     requests.value = fetchedRequests;
@@ -76,6 +79,10 @@ onBeforeMount(async () => {
   } catch {
     // User is not logged in
   }
+}
+
+onBeforeMount(async () => {
+  await getuserData();
 });
 </script>
 <template>
@@ -87,63 +94,66 @@ onBeforeMount(async () => {
     </div>
 
     <div v-if="loaded" class="row">
-      <PieChart v-if="languageDistribution && languageDistribution.length > 0" :data="languageDistribution"></PieChart>
-      <div v-else>No translations done</div>
+      <div v-if="languageDistribution && languageDistribution.length > 0">
+        <PieChart :data="languageDistribution"></PieChart>
 
-      <div class="column">
-        <v-card class="mx-auto pa-2">
-          <v-list>
-            <v-list-subheader>Languages translated to</v-list-subheader>
+        <div class="column">
+          <v-card class="mx-auto pa-2">
+            <v-list>
+              <v-list-subheader>Languages translated to</v-list-subheader>
 
-            <v-list-item>
-              <div class="tags-row">
-                <div v-for="language in languageDistribution" v-bind:key="`${language.language}-${language.value}`">
-                  <div class="row">
-                    <LanguageTag :langauge="language.language"></LanguageTag>
-                    <p>{{ language.value }}%</p>
+              <v-list-item>
+                <div class="tags-row">
+                  <div v-for="language in languageDistribution" v-bind:key="`${language.language}-${language.value}`">
+                    <div class="row">
+                      <LanguageTag :langauge="language.language"></LanguageTag>
+                      <p>{{ language.value }}%</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </v-list-item>
-          </v-list>
-        </v-card>
-        <v-card class="mx-auto pa-2">
-          <v-list>
-            <v-list-subheader>Type of documents translated</v-list-subheader>
-            <v-list-item>
-              <div class="tags-row">
-                <Tag v-for="tag in tags" v-bind:key="tag">{{ tag }}</Tag>
-              </div>
-            </v-list-item>
-          </v-list>
-        </v-card>
+              </v-list-item>
+            </v-list>
+          </v-card>
+          <v-card class="mx-auto pa-2">
+            <v-list>
+              <v-list-subheader>Type of documents translated</v-list-subheader>
+              <v-list-item>
+                <div class="tags-row">
+                  <Tag v-for="tag in tags" v-bind:key="tag">{{ tag }}</Tag>
+                </div>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </div>
       </div>
+      <div v-else>No translator stats to show for {{ props.username }}!</div>
     </div>
-    <div v-else>LOADING</div>
+    <LoaderComponent v-else></LoaderComponent>
 
     <div class="viewer">
-      <v-btn-toggle v-model="showRequests" rounded="0" color="#95AEB3" group variant="outlined">
-        <v-btn :value="true"> Requested Translations </v-btn>
-        <v-btn :value="false"> Contributed Translations </v-btn>
+      <v-btn-toggle v-model="view" rounded="0" color="#95AEB3" group variant="outlined">
+        <v-btn :value="`REQUEST`"> Requested Translations </v-btn>
+        <v-btn :value="`TRANSLATION`"> Contributed Translations </v-btn>
       </v-btn-toggle>
-      <div v-if="showRequests" class="requests-container">
+      <div v-if="view === `REQUEST`" class="requests-container">
         <div v-if="requests" class="list">
           <div v-for="request in requests" v-bind:key="request._id">
-            <TranslationRequestPreview :request="request"></TranslationRequestPreview>
+            <TranslationRequestPreview :request="request" @refresh-requests="getuserData"></TranslationRequestPreview>
           </div>
         </div>
-        <div v-else>Loading</div>
+        <div v-else>{{ props.username }} hasn't requested any translations yet!</div>
       </div>
-      <div v-else class="requests-container">
-        <div v-if="contributions" class="list">
+      <div v-else-if="view === `TRANSLATION`" class="requests-container">
+        <div v-if="contributions && contributions.length > 0" class="list">
           <v-row v-for="(translation, idx) in contributions.translations" v-bind:key="translation._id">
             <v-col><SectionComponent :section="contributions.sections[idx]"></SectionComponent></v-col>
             <v-col><SectionTranslationCard :section-translation="translation"></SectionTranslationCard></v-col>
             <v-divider></v-divider>
           </v-row>
         </div>
-        <div v-else>Loading</div>
+        <div v-else>{{ props.username }} hasn't translated anything yet!</div>
       </div>
+      <div v-else class="requests-container">Please select a view!</div>
     </div>
   </main>
 </template>
