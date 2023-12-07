@@ -97,6 +97,7 @@ const nonEmptyRule = [
 
 const yearRules = [
   (v: string) => {
+    if (!v) return true;
     if (v.length === 0) return true;
     const validYear = new RegExp("^[0-9]{4}$");
     if (validYear.test(v)) return true;

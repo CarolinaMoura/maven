@@ -61,7 +61,7 @@ async function toExport() {
             }}
           </p>
 
-          <p>{{ `Published ${document.year}` }}</p>
+          <p v-if="document.year">{{ `Published ${document.year}` }}</p>
           <small>
             Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }" @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small
           ><br />

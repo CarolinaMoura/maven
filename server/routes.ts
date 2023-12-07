@@ -400,8 +400,10 @@ class Routes {
 
     // filter by document
     const queryDocs: Filter<DocumentDoc> = {
-      _id: { $in: docIds },
-      year: { $gte: filter.yearFrom, $lte: filter.yearTo },
+      $or: [
+        { _id: { $in: docIds }, year: { $gte: filter.yearFrom, $lte: filter.yearTo } },
+        { _id: { $in: docIds }, year: { $eq: null } },
+      ],
     };
 
     let ok = false;

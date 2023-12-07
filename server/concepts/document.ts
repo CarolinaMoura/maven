@@ -8,7 +8,7 @@ export interface Author {
 export interface DocumentDoc extends BaseDoc {
   title: string;
   authors: Author[];
-  year: number;
+  year?: number | null;
   content: string;
   uploader: ObjectId;
   originalLanguage: ObjectId;
@@ -17,7 +17,7 @@ export interface DocumentDoc extends BaseDoc {
 export default class DocumentConcept {
   private readonly documents = new DocCollection<DocumentDoc>("documents");
 
-  async createDocument(title: string, authors: Author[], year: number, content: string, uploader: ObjectId, originalLanguage: ObjectId) {
+  async createDocument(title: string, authors: Author[], year: number | null, content: string, uploader: ObjectId, originalLanguage: ObjectId) {
     return await this.documents.createOne({ title, authors, content, year, uploader, originalLanguage });
   }
 
