@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TranslationRequestPreview from "@/components/TranslationRequest/TranslationRequestPreview.vue";
-import { onBeforeMount, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { fetchy } from "../utils/fetchy";
 
 import PieChart from "../components/Profile/PieChart.vue";
@@ -20,11 +20,11 @@ const languageDistribution = ref();
 
 const props = defineProps(["username"]);
 
-async function getuserData() {
+async function getuserData(username: string) {
   try {
     loaded.value = false;
-    const fetchedRequests = await fetchy(`/api/user/requests/${props.username}`, "GET");
-    const fetchedContributions = await fetchy(`/api/user/contributions/${props.username}`, "GET");
+    const fetchedRequests = await fetchy(`/api/user/requests/${username}`, "GET");
+    const fetchedContributions = await fetchy(`/api/user/contributions/${username}`, "GET");
     requests.value = fetchedRequests;
     contributions.value = fetchedContributions;
 
@@ -79,8 +79,12 @@ async function getuserData() {
   loaded.value = true;
 }
 
-onBeforeMount(async () => {
-  await getuserData();
+onMounted(async () => {
+  await getuserData(props.username);
+});
+
+watchEffect(async () => {
+  await getuserData(props.username);
 });
 </script>
 <template>
@@ -112,7 +116,7 @@ onBeforeMount(async () => {
               </v-list-item>
             </v-list>
           </v-card>
-          <v-card class="mx-auto pa-2">
+          <v-card class="mx-auto pa-2" v-if="tags.length > 0">
             <v-list>
               <v-list-subheader>Type of documents translated</v-list-subheader>
               <v-list-item>

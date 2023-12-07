@@ -18,7 +18,6 @@ async function getTranslationRequest() {
     const fetchedTranslationRequest = await fetchy(`/api/translationRequest/${props.id}`, "GET");
     translationRequest.value = fetchedTranslationRequest;
   } catch (e) {
-    console.log("ERROR");
     translationRequest.value = undefined;
     error.value = true;
   } finally {

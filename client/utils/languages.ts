@@ -1,5 +1,5 @@
 export const stringToColour = function (str: String) {
-  const saturation = 100;
+  const saturation = 90;
   const lightness = 75;
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

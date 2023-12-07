@@ -71,7 +71,6 @@ onBeforeMount(async () => {
 });
 
 async function copyToClipboard(text: string) {
-  console.log(text);
   await navigator.clipboard.writeText(text);
 }
 </script>

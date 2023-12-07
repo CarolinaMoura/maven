@@ -124,7 +124,6 @@ const updateWindowSize = () => {
 const updateLanguageFrom = (e: IExtendedTag | null, ix: number) => {
   if (!e) return;
   translations.value[ix].from = e;
-  console.log("entrei");
 };
 
 const updateLanguageTo = (e: IExtendedTag | null, ix: number) => {

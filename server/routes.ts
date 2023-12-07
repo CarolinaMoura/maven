@@ -321,9 +321,7 @@ class Routes {
   // Exporting the translation
   @Router.post("/export")
   async export(chosenTranslations: Array<ObjectId>) {
-    console.log(chosenTranslations);
     const translations = await Promise.all(chosenTranslations.map(async (chosenTranslation) => SectionTranslation.getSectionTranslation(chosenTranslation)));
-    console.log(translations);
     return translations.reduce((acc, cur) => acc + cur.translation + " ", "");
   }
 

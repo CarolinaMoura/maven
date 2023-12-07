@@ -12,9 +12,7 @@ const loaded = ref(false);
 const translationRequest = ref();
 
 async function getTranslationRequest() {
-  console.log(props.id);
   const fetchedTranslationRequest = await fetchy(`/api/translationRequest/${props.id}`, "GET");
-  console.log("fetchedTranslationRequest ", fetchedTranslationRequest);
   translationRequest.value = fetchedTranslationRequest;
 }
 

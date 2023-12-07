@@ -41,7 +41,7 @@ onBeforeMount(async () => {
         </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }">
-            <v-icon :class="`${currentRouteName == 'Profile' && 'selected'}`">mdi-account</v-icon>
+            <v-icon :class="`${currentRoute.fullPath === `/profile/${currentUsername}` && 'selected'}`">mdi-account</v-icon>
           </RouterLink>
         </li>
         <li v-if="isLoggedIn">
