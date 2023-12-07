@@ -6,13 +6,22 @@
     "strict": true,
     "sourceMap": true,
     "resolveJsonModule": true,
+    "allowJs": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": ["ESNext", "dom"],
+    "lib": [
+      "ESNext",
+      "dom"
+    ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     },
     "outDir": "../dist/client"
   },
-  "include": ["./**/*.ts", "./**/*.vue"]
+  "include": [
+    "./**/*.ts",
+    "./**/*.vue"
+  ]
 }

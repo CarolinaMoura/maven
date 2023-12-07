@@ -248,7 +248,37 @@ class Routes {
     if (!user.equals(request.requester)) {
       throw new Error("You did not create this request!");
     }
+
+    // get translation request and list of section ids
+    const translationRequest = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+    const sections = translationRequest.sections;
+
+    // get section translations based on section ids
+    const sectionTanslationPromises = sections.map(async (s) => {
+      return await SectionTranslation.getSectionTranslations({ section: s });
+    });
+
+    // delete all section translations
+    const sectionTranslations = await Promise.all(sectionTanslationPromises);
+    const flattenedSectionTranslations = sectionTranslations.flatMap((arr) => {
+      return arr;
+    });
+    const deleteTranslationPromises = flattenedSectionTranslations.map(async (t) => {
+      return await SectionTranslation.deleteSectionTranslation(t._id);
+    });
+
+    await Promise.all(deleteTranslationPromises);
+
+    // delete all sections
+    const deleteSectionPromises = sections.map(async (id) => {
+      return await Section.deleteSection(id);
+    });
+    await Promise.all(deleteSectionPromises);
+
+    // delete tag attachments
     await Tag.deleteTagAttachment(request.languageTo, request._id);
+
+    // delete translation request
     return await TranslationRequest.deleteTranslationRequest(new ObjectId(id));
   }
 
@@ -331,11 +361,17 @@ class Routes {
 
     const requests = await Promise.all(
       sections.map(async (s) => {
-        return await TranslationRequest.getTranslationRequestBySection(s._id);
+        return await Responses.translationRequest(await TranslationRequest.getTranslationRequestBySection(s._id));
       }),
     );
 
-    return { requests, sections, translations };
+    const documents = await Promise.all(
+      requests.map(async (r) => {
+        return await Responses.document(await Document.getDocument(r.document));
+      }),
+    );
+
+    return { requests, sections, translations, documents };
   }
 
   ////////////////
@@ -345,6 +381,9 @@ class Routes {
   async filterDocuments(filter: IFilter) {
     const infYear = 10000000000;
 
+    if (filter.yearFrom === undefined) {
+      filter.yearFrom = -infYear;
+    }
     if (filter.yearTo === undefined) {
       filter.yearTo = infYear;
     }

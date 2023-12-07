@@ -3,6 +3,7 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import ExportTranslationComponent from "../components/ExportTranslation/ExportTranslationComponent.vue";
+import LoginWarning from "../components/Login/LoginWarning.vue";
 import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
@@ -27,8 +28,7 @@ onBeforeMount(async () => {
   <main>
     <h1>Export Translation</h1>
     <section>
-      <h1 v-if="isLoggedIn"></h1>
-      <h1 v-else>Please login!</h1>
+      <LoginWarning v-if="!isLoggedIn"></LoginWarning>
     </section>
 
     <div v-if="loaded">

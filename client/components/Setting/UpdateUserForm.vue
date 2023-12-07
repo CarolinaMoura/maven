@@ -21,20 +21,42 @@ async function updatePassword() {
 </script>
 
 <template>
-  <h2>Update user details</h2>
-  <form @submit.prevent="updateUsername" class="pure-form">
-    <fieldset>
-      <legend>Change your username</legend>
-      <input type="text" placeholder="New username" v-model="username" required />
-      <button type="submit" class="pure-button pure-button-primary">Update username</button>
-    </fieldset>
-  </form>
+  <main class="column view-container">
+    <h2>Update user details</h2>
+    <v-card class="card">
+      <form @submit.prevent="updateUsername" class="pure-form">
+        <fieldset>
+          <legend>Change your username</legend>
+          <input type="text" placeholder="New username" v-model="username" required />
+          <button type="submit" class="btn-secondary">Update username</button>
+        </fieldset>
+      </form>
+    </v-card>
 
-  <form @submit.prevent="updatePassword" class="pure-form">
-    <fieldset>
-      <legend>Change your password</legend>
-      <input type="password" placeholder="New password" v-model="password" required />
-      <button type="submit" class="pure-button pure-button-primary">Update password</button>
-    </fieldset>
-  </form>
+    <v-card class="card">
+      <form @submit.prevent="updatePassword" class="pure-form">
+        <fieldset>
+          <legend>Change your password</legend>
+          <input type="password" placeholder="New password" v-model="password" required />
+          <button type="submit" class="btn-secondary">Update password</button>
+        </fieldset>
+      </form>
+    </v-card>
+  </main>
 </template>
+
+<style scoped>
+h2 {
+  font-weight: normal;
+}
+.btn-secondary {
+  margin-left: 1em;
+}
+.card {
+  color: var(--primary-text);
+  align-items: start;
+  background-color: var(--secondary-20);
+  border-radius: 10px;
+  padding: 1.5em;
+}
+</style>

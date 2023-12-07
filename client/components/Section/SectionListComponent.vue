@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import SectionTranslationList from "../SectionTranslation/SectionTranslationList.vue";
 import SectionComponent from "./SectionComponent.vue";
 
-const props = defineProps(["sectionsIds", "requestId"]);
+const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
 
@@ -40,17 +41,16 @@ onBeforeMount(async () => {
     <v-row>
       <v-col sm="6">
         <v-card-title>Original Text</v-card-title>
-        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section to view and rate all translations for that section)</v-card-subtitle>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section)</v-card-subtitle>
       </v-col>
     </v-row>
     <div class="sections-container" v-for="section in sections" :key="section._id">
       <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
       <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
     </div>
-    <RouterLink :to="`/exportTranslation/${props.requestId}`" class="export-button"> EXPORT TRANSLATION</RouterLink>
   </section>
   <p v-else-if="loaded">No sections found</p>
-  <p v-else>Loading...</p>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>
@@ -58,6 +58,7 @@ onBeforeMount(async () => {
   text-align: center;
   font-size: 2em;
 }
+
 h2 {
   margin-bottom: 0px;
 }

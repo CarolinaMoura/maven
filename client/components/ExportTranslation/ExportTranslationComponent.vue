@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useToastStore } from "@/stores/toast";
 import { onBeforeMount, ref } from "vue";
+import { useToastStore } from "../../stores/toast";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import SectionComponent from "../Section/SectionComponent.vue";
 import ChooseTranslationComponent from "./ChooseTranslationComponent.vue";
 import TranslationComponent from "./TranslationComponent.vue";
@@ -9,6 +10,7 @@ const props = defineProps(["sectionsIds"]);
 const loaded = ref(false);
 const sections = ref();
 const chosenTranslations = ref(Array<string | undefined>());
+const sectionsWithoutTranslation = ref<Array<Record<string, any>>>([]);
 const { showToast } = useToastStore();
 
 // let sections = ref<Array<Record<string, any>>>([]);
@@ -31,6 +33,7 @@ async function getSections() {
       if (chosenTranslation.found) {
         return chosenTranslation.translation;
       } else {
+        sectionsWithoutTranslation.value.push(section);
         return undefined;
       }
     }),
@@ -46,6 +49,8 @@ function updateChosen(sectionIdx: number, translationId: string) {
 }
 
 const displayTranslation = ref("");
+const isActive = ref(false);
+const dialogVisible = ref(false);
 async function exportTranslation() {
   if (chosenTranslations.value.includes(undefined)) {
     showToast({ message: "Exporting cannot be done without valid translations for each section", style: "error" });
@@ -57,6 +62,7 @@ async function exportTranslation() {
     body: { chosenTranslations: chosenTranslationsIds },
   });
   displayTranslation.value = exportedTranslation;
+  dialogVisible.value = true;
 }
 
 onBeforeMount(async () => {
@@ -71,71 +77,80 @@ async function copyToClipboard(text: string) {
 </script>
 
 <template>
+  <v-btn @click="exportTranslation" class="export-button">Export</v-btn>
+  <v-dialog v-model="dialogVisible" width="1000">
+    <v-card title="Translation">
+      <v-card-text> {{ displayTranslation }} </v-card-text>
+
+      <v-card-actions>
+        <v-btn @click="copyToClipboard(displayTranslation)" class="copy-button">
+          <v-icon>mdi-content-copy</v-icon>
+        </v-btn>
+        <v-spacer></v-spacer>
+
+        <v-btn text="Close" @click="dialogVisible = false"></v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
   <section class="sections" v-if="loaded && sections.length !== 0">
-    <div class="header-container">
-      <h2>Original Text</h2>
-    </div>
+    <v-row>
+      <v-col sm="6">
+        <v-card-title>Original Text</v-card-title>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Select a section to see all possible translations!)</v-card-subtitle>
+      </v-col>
+      <v-col sm="6">
+        <v-card-title>Translated Text</v-card-title>
+      </v-col>
+    </v-row>
+
     <div class="sections-container" v-for="(section, idx) in sections" :key="section._id">
-      <article @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }">
-        <SectionComponent :section="section" />
-      </article>
+      <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
       <div v-if="activeSection == section._id">
         <ChooseTranslationComponent v-bind:section="section" v-bind:chosenTranslation="chosenTranslations[idx]" @refresh-chosen="(id) => updateChosen(idx, id)" />
       </div>
-      <div v-else>
+      <div v-else-if="activeSection.length === 0">
         <TranslationComponent :translation-id="chosenTranslations[idx]" />
       </div>
+
+      <div v-if="idx === sections.length - 1" class="last-section-padding"></div>
     </div>
-
-    <v-dialog width="1000">
-      <template v-slot:activator="{ props }">
-        <v-btn v-bind="props" text="Export" @click="exportTranslation" class="export-button"> </v-btn>
-      </template>
-      <template v-slot:default="{ isActive }">
-        <v-card title="Translation">
-          <v-card-text> {{ displayTranslation }} </v-card-text>
-
-          <v-card-actions>
-            <v-btn @click="copyToClipboard(displayTranslation)" class="copy-button">
-              <v-icon>mdi-content-copy</v-icon>
-            </v-btn>
-            <v-spacer></v-spacer>
-
-            <v-btn text="Close" @click="isActive.value = false"></v-btn>
-          </v-card-actions>
-        </v-card>
-      </template>
-    </v-dialog>
   </section>
   <p v-else-if="loaded">No sections found</p>
-  <p v-else>Loading...</p>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>
+.active-section {
+  border: 2px solid var(--secondary);
+}
+
+.text-right {
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
 .export-button {
   text-align: center;
-  font-size: 2em;
-  width: 20%;
-  margin-left: 40%;
+  font-size: 1.5em;
+  width: auto;
+  margin: 0;
+  position: fixed;
+  bottom: 10px;
+  right: 30px;
+  text-transform: none;
+  font-size: 1em;
+  background-color: rgb(179, 203, 183);
 }
+
 h2 {
   margin-bottom: 0px;
 }
 
 .instruction {
-  margin-left: auto;
+  font-style: italic;
   overflow-y: auto;
   width: 90%;
-}
-
-.active-section {
-  border: 2px solid rgb(15, 133, 78);
-}
-
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
 }
 
 .sections {
@@ -146,13 +161,14 @@ h2 {
 }
 
 article {
-  background-color: var(--base-bg);
-  border-radius: 20px;
-  padding: 20px;
-  margin: 1px 0;
-  width: 100%;
+  border-radius: 5px;
   box-sizing: border-box;
   cursor: pointer;
+}
+
+.last-section-padding {
+  margin-bottom: 30px;
+  min-height: 30px;
 }
 
 .sections-container {

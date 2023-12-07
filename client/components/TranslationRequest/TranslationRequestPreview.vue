@@ -5,8 +5,9 @@ import { onBeforeMount, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Author } from "../../types";
 import { fetchy } from "../../utils/fetchy";
+import LoaderComponent from "../LoaderComponent.vue";
 import LanguageTag from "../Tag/LanguageTag.vue";
-import Tag from "../Tag/Tag.vue";
+import Tag from "../Tag/TagComponent.vue";
 import DeleteTranslationRequestForm from "./DeleteTranslationRequestForm.vue";
 import TranslationRequestFromDocumentForm from "./TranslationRequestFromDocumentForm.vue";
 const { currentUsername } = storeToRefs(useUserStore());
@@ -22,7 +23,8 @@ onBeforeMount(async () => {
   const fetchedDocument = await fetchy(`/api/document/${props.request.document}`, "GET");
   const fetchedTags = await fetchy(`/api/tag/object/${fetchedDocument._id}`, "GET");
   document.value = fetchedDocument;
-  tags.value = fetchedTags;
+
+  tags.value = fetchedTags.filter((t: any) => t && !t.isLanguage).map((t: any) => t.name);
   loaded.value = true;
 });
 
@@ -32,10 +34,18 @@ const emit = defineEmits(["refreshRequests"]);
 async function toTranslations() {
   await router.push({ path: `/translationRequest/${props.request._id}` });
 }
+
+async function toProfile(username: string) {
+  await router.push({ path: `/profile/${username}` });
+}
+
+async function toExport() {
+  await router.push({ path: `/exportTranslation/${props.request._id}` });
+}
 </script>
 
 <template>
-  <v-card v-if="loaded" class="preview-card card" hover>
+  <v-card v-if="loaded" class="preview-card card" hover @click="toTranslations">
     <div class="card-container">
       <div class="card-content">
         <div>
@@ -52,7 +62,7 @@ async function toTranslations() {
 
           <p>{{ `Published ${document.year}` }}</p>
           <small>
-            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"> {{ request.requester }} </RouterLink> </small
+            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }" @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small
           ><br />
           <small class="italics" v-if="request.description">"{{ request.description }}"</small>
         </div>
@@ -63,13 +73,13 @@ async function toTranslations() {
           <LanguageTag :langauge="request.languageTo"></LanguageTag>
         </div>
 
-        <div class="row">
+        <div class="tags-row">
           <Tag v-for="tag in tags" :key="tag">{{ tag }}</Tag>
         </div>
       </div>
 
       <div class="card-actions">
-        <v-tooltip text="See translations">
+        <v-tooltip text="View translation">
           <template v-slot:activator="{ props }">
             <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click="toTranslations"></v-btn>
           </template>
@@ -80,31 +90,45 @@ async function toTranslations() {
             <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
           </template>
         </v-tooltip>
+
+        <v-tooltip text="Export translation">
+          <template v-slot:activator="{ props }">
+            <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click="toExport"></v-btn>
+          </template>
+        </v-tooltip>
+
         <v-tooltip text="Delete request" v-if="currentUsername === request.requester">
           <template v-slot:activator="{ props }">
-            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')"></DeleteTranslationRequestForm>
+            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')"> </DeleteTranslationRequestForm>
           </template>
         </v-tooltip>
       </div>
     </div>
   </v-card>
 
-  <v-card v-else class="preview-card card" hover>
-    <div class="loading-state"><v-progress-circular indeterminate></v-progress-circular></div>
-  </v-card>
+  <LoaderComponent v-else></LoaderComponent>
 </template>
 
 <style scoped>
 a {
   color: var(--primary-text);
 }
+
 .italics {
   font-style: italic;
   font-weight: lighter;
 }
+
 h3 {
   font-size: 24px;
   font-weight: normal;
+}
+
+.tags-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5em;
+  flex-wrap: wrap;
 }
 
 .card-container {
@@ -125,6 +149,7 @@ h3 {
   flex-direction: column;
   row-gap: 1em;
 }
+
 .heading {
   display: flex;
   flex-direction: row;
@@ -137,6 +162,7 @@ h3 {
   row-gap: 0em;
   column-gap: 0em;
 }
+
 .preview-card.card {
   color: var(--primary-text);
   align-items: start;

@@ -22,8 +22,8 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="base">
-    <p class="text">{{ translation }}</p>
+  <div class="base" :class="{ 'no-translation': translation === 'No translation found' }">
+    <p class="text-body-1 font-weight-regular">{{ translation }}</p>
   </div>
 </template>
 
@@ -32,15 +32,18 @@ p {
   margin: 0em;
 }
 
-.text {
-  font-weight: bold;
-  font-size: 1.2em;
+.no-translation {
+  color: red;
+  font-style: italic;
 }
 
 .base {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1em;
+  margin: 1em;
+  background-color: var(--base-bg);
 }
 
 .base article:only-child {

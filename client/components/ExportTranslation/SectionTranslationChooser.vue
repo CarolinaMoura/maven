@@ -12,48 +12,20 @@ function chooseTranslation() {
 </script>
 
 <template>
-  <article @click="chooseTranslation" :class="{ 'is-chosen': isChosen }">{{ translation.translation }}</article>
+  <v-card hover class="section-translation-card" :class="{ 'is-chosen': isChosen }">
+    <p @click="chooseTranslation">{{ translation.translation }}</p>
+  </v-card>
 </template>
 
 <style scoped>
 .is-chosen {
-  border: 2px solid rgb(15, 133, 78);
-}
-
-article {
-  background-color: var(--base-bg);
-  border-radius: 20px;
-  padding: 20px;
-  margin: 1px 0;
-  width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-.v-card-actions {
-  display: flex;
-  flex-direction: column;
+  border: 2px solid var(--primary-dark);
 }
 
 .section-translation-card {
   background-color: var(--secondary-20);
   box-sizing: border-box;
   word-wrap: break-word;
-  width: 100%;
-}
-
-.title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.edit-translation {
-  margin: 0.5rem 1rem;
-}
-
-.buttons-bar {
-  display: flex;
-  justify-content: right;
-  gap: 0.5rem;
+  padding: 1em;
 }
 </style>
