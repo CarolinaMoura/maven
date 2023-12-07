@@ -30,12 +30,17 @@ const emptyForm = () => {
     <template v-slot:activator="{ props }">
       <v-btn variant="plain" v-bind="props" icon="mdi-plus-circle-outline"></v-btn>
     </template>
-
     <v-card min-width="400" max-width="500">
       <form @submit.prevent="createTag(tagName, isLanguage)">
-        <label for="tagName">Tag</label>
-        <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the tag name!" required> </v-textarea>
-        <v-btn type="submit" class="pure-button-primary pure-button">Create Tag</v-btn>
+        <template v-if=!isLanguage>
+          <label for="tagName">Tag</label>
+          <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the tag name" required> </v-textarea>
+        </template>
+        <template v-if=isLanguage>
+          <label for="tagName">Language</label>
+          <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the language" required> </v-textarea>
+        </template>
+        <v-btn type="submit" class="pure-button-primary pure-button">Create!</v-btn>
       </form>
     </v-card>
   </v-menu>

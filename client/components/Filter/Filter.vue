@@ -12,7 +12,6 @@ const { languageTags, otherTags } = storeToRefs(useTagStore());
 const translationRequestsStore = useTranslationRequestsStore();
 const router = useRouter();
 
-
 // TODO
 // CHECK IF LANGUAGES ARE VALID
 
@@ -152,7 +151,6 @@ onMounted(() => {
             </v-tooltip>
           </h4>
           <v-col cols="12">
-            <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
             <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
               <template v-slot:selection="data">
                 <v-chip :key="JSON.stringify(data.item)" size="small">
