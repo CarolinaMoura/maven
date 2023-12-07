@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["language"]);
+const emit = defineEmits(["refreshTags"]);
 const tagName = ref("");
 const isLanguage = ref(props.language);
 const menu = ref(false);
@@ -13,6 +14,7 @@ const createTag = async (tagName: string, isLanguage: boolean) => {
       body: { name: tagName, isLanguage },
     });
     menu.value = false;
+    emit("refreshTags");
   } catch (_) {
     return;
   }

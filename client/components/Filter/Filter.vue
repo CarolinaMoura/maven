@@ -10,6 +10,7 @@ import CreateTagForm from "../Tag/CreateTagForm.vue";
 
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const translationRequestsStore = useTranslationRequestsStore();
+const { getLanguageTags, getOtherTags } = useTagStore();
 const router = useRouter();
 
 // TODO
@@ -23,6 +24,15 @@ const router = useRouter();
 
 // TODO
 // JUST ONE FIELD IN LANGUAGE
+
+async function getLanguages() {
+  void getLanguageTags();
+}
+
+async function getTags() {
+  void getOtherTags();
+}
+
 
 function getTodaysYear(): number {
   const today = new Date();
@@ -44,10 +54,6 @@ const emptyTag: IExtendedTag = {
   name: "",
   isLanguage: true,
   _id: "0",
-};
-
-const navigateToTag = () => {
-  router.push({ name: 'Tag' });
 };
 
 const languages = computed(() => {
@@ -145,7 +151,7 @@ onMounted(() => {
               <template v-slot:activator="{ props }">
                 <v-row>
                   <div class="tag-text">Tags</div>
-                  <CreateTagForm :language=false v-bind="props"></CreateTagForm>
+                  <CreateTagForm :language=false v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
                 </v-row>
               </template>
             </v-tooltip>
@@ -187,7 +193,7 @@ onMounted(() => {
               <template v-slot:activator="{ props }">
                 <v-row>
                   <div class="tag-text">Language</div>
-                  <CreateTagForm :language="true" v-bind="props"></CreateTagForm>
+                  <CreateTagForm :language="true" v-bind="props" v-on:refresh-tags="getLanguages"></CreateTagForm>
                 </v-row>
               </template>
             </v-tooltip>
