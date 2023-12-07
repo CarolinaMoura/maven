@@ -331,11 +331,17 @@ class Routes {
 
     const requests = await Promise.all(
       sections.map(async (s) => {
-        return await TranslationRequest.getTranslationRequestBySection(s._id);
+        return await Responses.translationRequest(await TranslationRequest.getTranslationRequestBySection(s._id));
       }),
     );
 
-    return { requests, sections, translations };
+    const documents = await Promise.all(
+      requests.map(async (r) => {
+        return await Responses.document(await Document.getDocument(r.document));
+      }),
+    );
+
+    return { requests, sections, translations, documents };
   }
 
   ////////////////
