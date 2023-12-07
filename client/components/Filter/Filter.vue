@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { computed, onMounted, onUnmounted, ref, watchEffect } from "vue";
+import { useRouter } from "vue-router";
 import { useTagStore } from "../../stores/tags";
 import { useTranslationRequestsStore } from "../../stores/translationRequests";
 import { Tag } from "../../types";
 
+
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const translationRequestsStore = useTranslationRequestsStore();
+const router = useRouter();
+
 
 // TODO
 // CHECK IF LANGUAGES ARE VALID
@@ -40,6 +44,10 @@ const emptyTag: IExtendedTag = {
   name: "",
   isLanguage: true,
   _id: "0",
+};
+
+const navigateToTag = () => {
+  router.push({ name: 'Tag' });
 };
 
 const languages = computed(() => {
@@ -134,15 +142,14 @@ onMounted(() => {
         <div class="filter-option">
           <h4>
             Tags
-            <v-tooltip text="A document with at least one of the selected tags will match your search">
+            <v-tooltip text="Create a tag">
               <template v-slot:activator="{ props }">
-                <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+                <v-icon v-on="props">mdi-plus-circle</v-icon>
               </template>
             </v-tooltip>
           </h4>
           <v-col cols="12">
             <!-- <v-combobox v-model="select" :items="languageTags" label="" multiple></v-combobox> -->
-
             <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
               <template v-slot:selection="data">
                 <v-chip :key="JSON.stringify(data.item)" size="small">
@@ -164,7 +171,8 @@ onMounted(() => {
               </template>
             </v-tooltip>
           </h4>
-          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
+          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023"
+            :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
           <p style="text-align: center; margin-top: -0.8rem">
             From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
           </p>
@@ -179,28 +187,14 @@ onMounted(() => {
               <v-icon color="var(--primary-text-60)" size="x-small" @click="removeTranslationLine(ix)">mdi-close</v-icon>
               <div class="single-translation">
                 From
-                <v-select
-                  clearable
-                  :hide-details="true"
-                  class="language-selector"
-                  @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)"
-                  :return-object="true"
-                  @update:modelValue="(e) => updateLanguageFrom(e, ix)"
-                  :items="languages"
-                  label="original"
-                ></v-select>
+                <v-select clearable :hide-details="true" class="language-selector"
+                  @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)" :return-object="true"
+                  @update:modelValue="(e) => updateLanguageFrom(e, ix)" :items="languages" label="original"></v-select>
 
                 to
-                <v-select
-                  :hide-details="true"
-                  @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)"
-                  clearable
-                  class="language-selector"
-                  :return-object="true"
-                  @update:modelValue="(e) => updateLanguageTo(e, ix)"
-                  :items="languages"
-                  label="target"
-                ></v-select>
+                <v-select :hide-details="true" @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)" clearable
+                  class="language-selector" :return-object="true" @update:modelValue="(e) => updateLanguageTo(e, ix)"
+                  :items="languages" label="target"></v-select>
               </div>
             </div>
           </div>
@@ -233,6 +227,7 @@ onMounted(() => {
   /* align-items: center; */
   width: 100%;
 }
+
 .language-selector {
   padding: 1rem 0;
 }
@@ -240,6 +235,7 @@ onMounted(() => {
 .filter-button {
   text-decoration: underline;
 }
+
 .filter-option {
   margin: 0.5rem 0;
   display: flex;
@@ -247,9 +243,11 @@ onMounted(() => {
   gap: 1.2rem;
   font-size: 0.9rem;
 }
+
 h2 {
   text-align: center;
 }
+
 section {
   width: 100%;
   display: flex;

@@ -4,12 +4,14 @@ import { fetchy } from "../../utils/fetchy";
 
 const tagName = ref("");
 const isLanguage = ref(false);
+const menu = ref(false);
 
 const createTag = async (tagName: string, isLanguage: boolean) => {
   try {
     await fetchy("/api/tag", "POST", {
       body: { name: tagName, isLanguage },
     });
+    menu.value = false;
   } catch (_) {
     return;
   }
@@ -24,13 +26,11 @@ const emptyForm = () => {
 
 <template>
   <form @submit.prevent="createTag(tagName, isLanguage)">
-    <label for="tagName">Tag Name:</label>
-    <textarea id="tagName" v-model="tagName" placeholder="Type in Tag Name!" required> </textarea>
-
-    <input type="checkbox" id="checkbox" v-model="isLanguage" />
-    <label for="checkbox">Is Language: {{ isLanguage }}</label>
-
-    <button type="submit" class="pure-button-primary pure-button">Create Tag</button>
+    <label for="tagName">Tag</label>
+    <v-textarea id="tagName" v-model="tagName" placeholder="Type in Tag Name!" required> </v-textarea>
+    <v-switch v-model="isLanguage" :label="isLanguage ? 'This tag is a language' : 'This tag is not a language'"
+      :label-value="isLanguage" />
+    <v-btn type="submit" class="pure-button-primary pure-button">Create Tag</v-btn>
   </form>
 </template>
 
