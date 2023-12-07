@@ -6,6 +6,7 @@ const props = defineProps(["language"]);
 const tagName = ref("");
 const isLanguage = ref(props.language);
 const menu = ref(false);
+const emit = defineEmits(["refreshTags"]);
 
 const createTag = async (tagName: string, isLanguage: boolean) => {
   try {
@@ -16,6 +17,8 @@ const createTag = async (tagName: string, isLanguage: boolean) => {
   } catch (_) {
     return;
   }
+
+  emit("refreshTags");
   emptyForm();
 };
 

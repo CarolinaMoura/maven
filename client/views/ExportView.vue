@@ -3,7 +3,7 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import ExportTranslationComponent from "../components/ExportTranslation/ExportTranslationComponent.vue";
-import LoginWarning from "../components/Login/LoginWarning.vue";
+import TranslationRequestPreview from "../components/TranslationRequest/TranslationRequestPreview.vue";
 import { fetchy } from "../utils/fetchy";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
@@ -25,14 +25,16 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <main>
-    <h1>Export Translation</h1>
-    <section>
-      <LoginWarning v-if="!isLoggedIn"></LoginWarning>
-    </section>
+  <main class="view-container">
+    <div class="col">
+      <h1>Export Translation</h1>
+      <section v-if="loaded">
+        <TranslationRequestPreview :request="translationRequest"></TranslationRequestPreview>
+      </section>
 
-    <div v-if="loaded">
-      <ExportTranslationComponent :sectionsIds="translationRequest.sections" />
+      <div v-if="loaded">
+        <ExportTranslationComponent :sectionsIds="translationRequest.sections" />
+      </div>
     </div>
   </main>
 </template>
@@ -40,5 +42,12 @@ onBeforeMount(async () => {
 <style scoped>
 h1 {
   text-align: center;
+  font-weight: normal;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  row-gap: 3em;
 }
 </style>
