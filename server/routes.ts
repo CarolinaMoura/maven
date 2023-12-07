@@ -248,8 +248,38 @@ class Routes {
     if (!user.equals(request.requester)) {
       throw new Error("You did not create this request!");
     }
+
+    // get translation request and list of section ids
+    const translationRequest = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+    const sections = translationRequest.sections;
+
+    // get section translations based on section ids
+    const sectionTanslationPromises = sections.map(async (s) => {
+      return await SectionTranslation.getSectionTranslations({ section: s });
+    });
+
+    // delete all section translations
+    const sectionTranslations = await Promise.all(sectionTanslationPromises);
+    const flattenedSectionTranslations = sectionTranslations.flatMap((arr) => {
+      return arr;
+    });
+    const deleteTranslationPromises = flattenedSectionTranslations.map(async (t) => {
+      return await SectionTranslation.deleteSectionTranslation(t._id);
+    });
+
+    await Promise.all(deleteTranslationPromises);
+
+    // delete all sections
+    const deleteSectionPromises = sections.map(async (id) => {
+      return await Section.deleteSection(id);
+    });
+    await Promise.all(deleteSectionPromises);
+
+    // delete tag attachments
     await Tag.deleteTagAttachment(request.languageTo, request._id);
-    return await TranslationRequest.deleteTranslationRequest(new ObjectId(id));
+
+    // delete translation request
+    await SectionTranslation.deleteSectionTranslation(new ObjectId(id));
   }
 
   @Router.get("/translationRequest")
