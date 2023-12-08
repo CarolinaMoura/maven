@@ -342,8 +342,12 @@ class Routes {
 
   @Router.get("/votes/myVote")
   async getMyVote(session: WebSessionDoc, section: string) {
-    const user = WebSession.getUser(session);
-    return await Vote.getMyVote(new ObjectId(section), user);
+    try {
+      const user = WebSession.getUser(session);
+      return await Vote.getMyVote(new ObjectId(section), user);
+    } catch (e) {
+      ("NONE");
+    }
   }
   @Router.post("/votes/vote")
   async vote(session: WebSessionDoc, section: string, upvote: boolean) {

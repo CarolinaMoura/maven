@@ -46,7 +46,13 @@ export default class Responses {
   }
 
   static async sectionTranslation(sectionTranslation: SectionTranslationDoc) {
-    const translator = await User.getUserById(sectionTranslation.translator);
+    const translator = await User.getUserById(sectionTranslation.translator)
+      .then((u) => u)
+      .catch(() => {
+        return {
+          username: "Deleted user",
+        };
+      });
     return { ...sectionTranslation, translator: translator.username };
   }
 
