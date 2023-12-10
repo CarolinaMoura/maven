@@ -63,9 +63,8 @@ async function toExport() {
 
           <p v-if="document.year">{{ `Published ${document.year}` }}</p>
           <small>
-            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }" @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small
-          ><br />
-          <small class="italics" v-if="request.description">"{{ request.description }}"</small>
+            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"
+              @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small><br />
         </div>
 
         <div class="row small">
@@ -88,7 +87,8 @@ async function toExport() {
 
         <v-tooltip text="Request translation in a different language" v-if="isLoggedIn">
           <template v-slot:activator="{ props }">
-            <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
+            <TranslationRequestFromDocumentForm v-bind="props" :document="document"
+              @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
           </template>
         </v-tooltip>
 
@@ -100,7 +100,8 @@ async function toExport() {
 
         <v-tooltip text="Delete request" v-if="currentUsername === request.requester">
           <template v-slot:activator="{ props }">
-            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')"> </DeleteTranslationRequestForm>
+            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')">
+            </DeleteTranslationRequestForm>
           </template>
         </v-tooltip>
       </div>
