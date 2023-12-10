@@ -185,10 +185,10 @@ onMounted(() => {
               </v-tooltip></v-row
             >
           </h4>
-          <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider>
-          <p style="text-align: center; margin-top: -0.8rem">
+          <!-- <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider> -->
+          <!-- <p style="text-align: center; margin-top: -0.8rem">
             From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
-          </p>
+          </p> -->
         </div>
       </div>
       <div class="filter-type">
