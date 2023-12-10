@@ -61,6 +61,13 @@ async function submitRequest() {
         </v-list>
         <v-divider></v-divider>
 
+        <v-list>
+          <v-list-item subtitle="Provide more context or describe what you need help with (optional)"></v-list-item>
+          <v-list-item>
+            <v-textarea label="Request description" v-model="description"></v-textarea>
+          </v-list-item>
+        </v-list>
+
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="menu = false"> Cancel </v-btn>
