@@ -74,6 +74,7 @@ const canAppear = ref(false);
 const windowSize = ref(window.innerWidth);
 
 const select = ref([]);
+const value2 = ref([1900, getTodaysYear()]);
 const value = ref([1900, getTodaysYear()]);
 const translations = ref<ITranslation[]>([{ from: { ...emptyTag }, to: { ...emptyTag } }]);
 const completelyTranslated = ref(false);
@@ -86,7 +87,7 @@ const addNewTranslationField = () => {
 
 const submitFilters = async () => {
   let filteredTranslations = translations.value.filter(({ from, to }) => from._id !== "0" || to._id !== "0");
-
+  console.log("submitting filters");
   const filters = {
     tags: select.value.map((t: Tag) => t._id ?? ""),
     yearFrom: value.value[0],
@@ -138,6 +139,14 @@ onMounted(() => {
     window.removeEventListener("resize", updateWindowSize);
   });
 });
+
+const updateYearFilter = (years: number[]) => {
+  setTimeout(() => {
+    if (years[0] === value2.value[0] && years[1] === value2.value[1]) {
+      value.value = [...value2.value];
+    }
+  }, 500);
+};
 </script>
 
 <template>
@@ -185,10 +194,21 @@ onMounted(() => {
               </v-tooltip></v-row
             >
           </h4>
-          <!-- <v-range-slider v-model="value" step="1" :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15" track-size="2"></v-range-slider> -->
-          <!-- <p style="text-align: center; margin-top: -0.8rem">
-            From <b>{{ value[0] }}</b> to <b>{{ value[1] }}</b>
-          </p> -->
+          <v-range-slider
+            @update:model-value="() => updateYearFilter(value2)"
+            v-model="value2"
+            step="1"
+            :thumb-label="true"
+            elevation="2"
+            min="1900"
+            max="2023"
+            :hide-details="true"
+            thumb-size="15"
+            track-size="2"
+          ></v-range-slider>
+          <p style="text-align: center; margin-top: -0.8rem">
+            From <b>{{ value2[0] }}</b> to <b>{{ value2[1] }}</b>
+          </p>
         </div>
       </div>
       <div class="filter-type">
