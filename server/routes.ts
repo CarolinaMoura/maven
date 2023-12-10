@@ -465,8 +465,13 @@ class Routes {
 
     const fromTo: Map<string, Set<string>> = new Map([["0", new Set<string>()]]);
 
+    let thereIsEveryone: Boolean = false;
+
     for (const { from, to } of filter.translations) {
       fromTo.get("0")?.add(to);
+      if (from === "0") {
+        thereIsEveryone = true;
+      }
       if (fromTo.has(from)) {
         fromTo.get(from)?.add(to);
       } else {
@@ -475,16 +480,14 @@ class Routes {
     }
 
     const setLanguagesEveryone = fromTo.get("0") ?? [];
-
     // filter by translation request
     const toReturn = [];
     for (const doc of docs) {
       // get the specifics of the document
       const setLanguagesDocument = fromTo.get(doc.originalLanguage.toString()) ?? [];
-      const possibleToLanguage = [...setLanguagesDocument, ...setLanguagesEveryone];
-
+      const possibleToLanguage = [...setLanguagesDocument, ...(thereIsEveryone ? setLanguagesEveryone : [])];
       if (possibleToLanguage.includes("0")) {
-        toReturn.push(...(await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ document: doc._id }))));
+        toReturn.push(...(await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ document: new ObjectId(doc._id) }))));
       } else {
         const queryTranslationRequest = {
           document: doc._id,

@@ -87,7 +87,6 @@ const addNewTranslationField = () => {
 
 const submitFilters = async () => {
   let filteredTranslations = translations.value.filter(({ from, to }) => from._id !== "0" || to._id !== "0");
-  console.log("submitting filters");
   const filters = {
     tags: select.value.map((t: Tag) => t._id ?? ""),
     yearFrom: value.value[0],
