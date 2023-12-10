@@ -112,15 +112,10 @@ const closeForm = () => {
 </script>
 <template>
   <div :class="!isLoggedIn && `disabled`">
-    <button
-      :disabled="!isLoggedIn"
-      class="btn-primary"
-      @click="
-        () => {
-          formOpen = !formOpen;
-        }
-      "
-    >
+    <button :disabled="!isLoggedIn" class="btn-primary" @click="() => {
+        formOpen = !formOpen;
+      }
+      ">
       <v-icon>mdi-file-document-alert</v-icon>
       Request a translation
     </button>
@@ -141,18 +136,20 @@ const closeForm = () => {
 
           <div class="form-section">
             <h3 class="form-subheading">Tell us more about the document</h3>
-            <v-row
-              ><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule" color="#95AEB3"></v-text-field></v-col
-            ></v-row>
+            <v-row><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"
+                  color="#95AEB3"></v-text-field></v-col></v-row>
             <v-row>
-              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules" color="#95AEB3"></v-text-field></v-col>
-              <v-col :sm="8"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select></v-col>
+              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"
+                  color="#95AEB3"></v-text-field></v-col>
+              <v-col :sm="8"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips
+                  color="#95AEB3"></v-select></v-col>
             </v-row>
 
             <v-row>
               <v-col class="col">
                 <div v-for="(author, idx) in authors" v-bind:key="`author-${idx}`" class="row">
-                  <v-text-field :label="`Author #${idx + 1} (First)`" v-model="author.first" color="#95AEB3"></v-text-field>
+                  <v-text-field :label="`Author #${idx + 1} (First)`" v-model="author.first"
+                    color="#95AEB3"></v-text-field>
                   <v-text-field :label="`Author #${idx + 1} (Last)`" v-model="author.last" color="#95AEB3"></v-text-field>
 
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
@@ -167,7 +164,8 @@ const closeForm = () => {
           <div class="form-section">
             <h3 class="form-subheading">Document upload</h3>
 
-            <v-textarea label="Document Content" :placeholder="`Submit text content of the document here.`" v-model="content" :rules="nonEmptyRule" color="#95AEB3"></v-textarea>
+            <v-textarea label="Document Content" :placeholder="`Submit text content of the document here.`"
+              v-model="content" :rules="nonEmptyRule" color="#95AEB3"></v-textarea>
           </div>
           <v-divider></v-divider>
 
@@ -175,12 +173,11 @@ const closeForm = () => {
             <h3 class="form-subheading">Translation Request Details</h3>
 
             <v-row v-bind:style="{ 'align-items': 'center' }">
-              <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
+              <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES"
+                  :rules="selectRule" color="#95AEB3"></v-select></v-col>
               to
-              <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
-            </v-row>
-            <v-row>
-              <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with.`" color="#95AEB3"></v-textarea> </v-col>
+              <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES"
+                  :rules="selectRule" color="#95AEB3"></v-select></v-col>
             </v-row>
           </div>
 
@@ -232,5 +229,4 @@ h2 {
 
 .form-section {
   padding-bottom: 1.5em;
-}
-</style>
+}</style>
