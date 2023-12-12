@@ -150,7 +150,7 @@ const updateYearFilter = (years: number[]) => {
 
 <template>
   <section>
-    <button v-if="windowSize < 700" class="filter-button" @click="canAppear = !canAppear">
+    <button v-if="windowSize < 800" class="filter-button" @click="canAppear = !canAppear">
       Advanced search
       <v-icon v-if="canAppear" size="x-small">mdi-triangle-down</v-icon>
     </button>

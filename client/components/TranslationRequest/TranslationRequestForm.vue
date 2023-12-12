@@ -4,9 +4,10 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { Tag } from "../../types";
-import { fetchy } from "../../utils/fetchy";
+import CreateTagForm from "../Tag/CreateTagForm.vue";
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { getOtherTags } = useTagStore();
 
 const TAGS = computed(() => otherTags.value.map((t: Tag) => t.name));
 const LANGUAGES = computed(() => languageTags.value.map((t: Tag) => t.name));
@@ -52,28 +53,7 @@ function clearForm() {
 }
 
 async function submitRequest() {
-  if (isFormValid.value) {
-    try {
-      // create document first
-      const document = await fetchy("/api/document", "POST", {
-        body: {
-          title: title.value,
-          authors: authors.value,
-          year: Number.parseInt(year.value),
-          tags: tags.value,
-          content: content.value,
-          originalLanguage: originalLanguage.value,
-        },
-      });
-
-      // then use returned id to create request
-      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value, description: description.value } });
-      emit("refreshRequests");
-      closeForm();
-    } catch (e) {
-      return;
-    }
-  }
+  return;
 }
 
 const selectRule = [
@@ -104,6 +84,10 @@ const yearRules = [
     return "Must be a valid year";
   },
 ];
+
+async function getTags() {
+  void getOtherTags();
+}
 
 const closeForm = () => {
   formOpen.value = false;
@@ -144,9 +128,19 @@ const closeForm = () => {
             <v-row
               ><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule" color="#95AEB3"></v-text-field></v-col
             ></v-row>
-            <v-row>
+            <v-row style="display: flex; align-items: start">
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules" color="#95AEB3"></v-text-field></v-col>
-              <v-col :sm="8"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select></v-col>
+              <v-col :sm="8">
+                <v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-row class="tags-row" style="display: flex; align-items: center">
+                      <div class="tag-text">Didn't find the tag you were looking for? Create one</div>
+                      <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
+                    </v-row>
+                  </template>
+                </v-tooltip>
+              </v-col>
             </v-row>
 
             <v-row>
@@ -191,6 +185,14 @@ const closeForm = () => {
   </v-dialog>
 </template>
 <style scoped>
+.tags-row {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  padding: 0;
+}
 .disabled {
   cursor: not-allowed;
 }
