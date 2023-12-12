@@ -164,7 +164,6 @@ const updateYearFilter = (years: number[]) => {
               <template v-slot:activator="{ props }">
                 <v-row class="tags-row">
                   <div class="tag-text">Tags</div>
-                  <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
                 </v-row>
               </template>
             </v-tooltip>
