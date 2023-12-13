@@ -128,7 +128,7 @@ watchEffect(async () => {
           </v-card>
         </div>
       </div>
-      <div v-else>No translator stats to show for {{ props.username }}!</div>
+      <div v-else class="text">No translator stats to show for {{ props.username }}!</div>
     </div>
     <LoaderComponent v-else></LoaderComponent>
 
