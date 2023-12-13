@@ -194,10 +194,13 @@ const closeForm = () => {
   cursor: not-allowed;
 }
 
-h3,
+
 h2 {
+  font-family: tweb-bold;
+}
+
+h3 {
   font-weight: normal;
-  font-family: tweb;
 }
 
 h3 {
