@@ -160,7 +160,7 @@ watchEffect(async () => {
         </div>
         <div v-else>{{ props.username }} hasn't translated anything yet!</div>
       </div>
-      <div v-else class="requests-container">Please select a view!</div>
+      <div v-else class="requests-container text">Please select a view!</div>
     </div>
   </main>
 </template>
@@ -211,4 +211,10 @@ h1 {
 
 .viewer {
   width: 100%;
-}</style>
+}
+
+.text {
+  font-family: tweb;
+}
+</style>
+
