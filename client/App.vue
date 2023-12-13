@@ -31,8 +31,7 @@ onBeforeMount(async () => {
   <header>
     <nav>
       <div class="title">
-        <RouterLink :to="{ name: 'Home' }"
-          style="display: flex; justify-content: center; align-items: center; gap: 0.5em">
+        <RouterLink :to="{ name: 'Home' }" style="display: flex; justify-content: center; align-items: center; gap: 0.5em">
           <img src="../client/assets/images/logo.svg" />
           <h1>maven</h1>
         </RouterLink>
