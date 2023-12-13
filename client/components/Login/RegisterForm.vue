@@ -16,31 +16,39 @@ async function register() {
 </script>
 
 <template>
-  <v-card class="card">
-    <form class="pure-form pure-form-aligned" @submit.prevent="register">
-      <v-card-title>Register User</v-card-title>
-      <fieldset>
-        <div class="pure-control-group">
-          <label for="aligned-name">Username</label>
-          <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
-        </div>
-        <div class="pure-control-group">
-          <label for="aligned-password">Password</label>
-          <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
-        </div>
-        <div class="pure-controls">
-          <button type="submit" class="btn-primary">Register</button>
-        </div>
-      </fieldset>
-    </form>
-  </v-card>
+  <div class="text">
+    <v-card class="card">
+      <form class="pure-form pure-form-aligned" @submit.prevent="register">
+        <v-card-title>Register User</v-card-title>
+        <fieldset>
+          <div class="pure-control-group">
+            <label for="aligned-name">Username</label>
+            <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
+          </div>
+          <div class="pure-control-group">
+            <label for="aligned-password">Password</label>
+            <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
+          </div>
+          <div class="pure-controls">
+            <button type="submit" class="btn-primary">Register</button>
+          </div>
+        </fieldset>
+      </form>
+    </v-card>
+  </div>
 </template>
 
 <style scoped>
 h3 {
   display: flex;
+  font-family: tweb;
   justify-content: center;
 }
+
+.text {
+  font-family: tweb;
+}
+
 .card {
   color: var(--primary-text);
   align-items: start;

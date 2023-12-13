@@ -40,13 +40,16 @@ onBeforeMount(async () => {
   <section class="sections" v-if="loaded && sections.length !== 0">
     <v-row>
       <v-col sm="6">
-        <v-card-title>Original Text</v-card-title>
-        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section)</v-card-subtitle>
+        <v-card-title class="text">Original Text</v-card-title>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section to view or submit
+          translations)</v-card-subtitle>
       </v-col>
     </v-row>
     <div class="sections-container" v-for="section in sections" :key="section._id">
-      <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
-      <SectionTranslationList :section="section._id" v-if="section._id == activeSection" class="section-translation-list" />
+      <SectionComponent :section="section" @click="logSection(section._id)"
+        :class="{ 'active-section': section._id == activeSection }" />
+      <SectionTranslationList :section="section._id" v-if="section._id == activeSection"
+        class="section-translation-list" />
     </div>
   </section>
   <p v-else-if="loaded">No sections found</p>
@@ -61,6 +64,10 @@ onBeforeMount(async () => {
 
 h2 {
   margin-bottom: 0px;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .instruction {

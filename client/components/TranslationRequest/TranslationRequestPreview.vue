@@ -62,10 +62,11 @@ async function toExport() {
           </p>
 
           <p v-if="document.year">{{ `Published ${document.year}` }}</p>
-          <small>
-            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }" @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small
-          ><br />
-          <small class="italics" v-if="request.description">"{{ request.description }}"</small>
+          <p>
+            <small>
+              Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"
+                @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small><br />
+          </p>
         </div>
 
         <div class="row small">
@@ -80,27 +81,23 @@ async function toExport() {
       </div>
 
       <div class="card-actions">
-        <v-tooltip text="View translation">
-          <template v-slot:activator="{ props }">
-            <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click.stop="toTranslations"></v-btn>
-          </template>
-        </v-tooltip>
-
         <v-tooltip text="Request translation in a different language" v-if="isLoggedIn">
           <template v-slot:activator="{ props }">
-            <TranslationRequestFromDocumentForm v-bind="props" :document="document" @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
+            <TranslationRequestFromDocumentForm v-bind="props" :document="document"
+              @refresh-requests="emit('refreshRequests')"></TranslationRequestFromDocumentForm>
           </template>
         </v-tooltip>
 
         <v-tooltip text="Export translation">
           <template v-slot:activator="{ props }">
-            <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click.stop="toExport"></v-btn>
+            <v-btn variant="plain" v-bind="props" icon="mdi-export-variant" @click.stop="toExport"></v-btn>
           </template>
         </v-tooltip>
 
         <v-tooltip text="Delete request" v-if="currentUsername === request.requester">
           <template v-slot:activator="{ props }">
-            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')"> </DeleteTranslationRequestForm>
+            <DeleteTranslationRequestForm v-bind="props" :request="request" @refresh-requests="emit('refreshRequests')">
+            </DeleteTranslationRequestForm>
           </template>
         </v-tooltip>
       </div>
@@ -120,9 +117,14 @@ a {
   font-weight: lighter;
 }
 
+p {
+  font-family: tweb;
+}
+
 h3 {
   font-size: 24px;
   font-weight: normal;
+  font-family: tweb-bold;
 }
 
 .tags-row {

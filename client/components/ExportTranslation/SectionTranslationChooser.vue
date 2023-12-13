@@ -22,6 +22,10 @@ function chooseTranslation() {
   border: 2px solid var(--primary-dark);
 }
 
+p {
+  font-family: tweb;
+}
+
 .section-translation-card {
   background-color: var(--secondary-20);
   box-sizing: border-box;
