@@ -143,7 +143,7 @@ watchEffect(async () => {
             <TranslationRequestPreview :request="request" @refresh-requests="getuserData"></TranslationRequestPreview>
           </div>
         </div>
-        <div v-else>{{ props.username }} hasn't requested any translations yet!</div>
+        <div v-else class="text">{{ props.username }} hasn't requested any translations yet!</div>
       </div>
       <div v-else-if="view === `TRANSLATION`" class="requests-container">
         <div v-if="contributions && contributions.translations.length > 0" class="list">
@@ -158,7 +158,7 @@ watchEffect(async () => {
             <v-divider></v-divider>
           </v-row>
         </div>
-        <div v-else>{{ props.username }} hasn't translated anything yet!</div>
+        <div v-else class="text">{{ props.username }} hasn't translated anything yet!</div>
       </div>
       <div v-else class="requests-container text">Please select a view!</div>
     </div>
