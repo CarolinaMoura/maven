@@ -31,25 +31,31 @@ onBeforeMount(async () => {
   <header>
     <nav>
       <div class="title">
-        <RouterLink :to="{ name: 'Home' }" style="display: flex; justify-content: center; align-items: center; gap: 0.5em">
+        <RouterLink :to="{ name: 'Home' }"
+          style="display: flex; justify-content: center; align-items: center; gap: 0.5em">
           <img src="../client/assets/images/logo.svg" />
           <h1>maven</h1>
         </RouterLink>
       </div>
       <ul>
         <li>
-          <RouterLink :to="{ name: 'Home' }"> <v-icon :class="`${currentRouteName == 'Home' && 'selected'}`">mdi-home</v-icon> </RouterLink>
+          <RouterLink :to="{ name: 'Home' }"> <v-icon
+              :class="`${currentRouteName == 'Home' && 'selected'}`">mdi-home</v-icon> </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }">
-            <v-icon :class="`${currentRoute.fullPath === `/profile/${currentUsername}` && 'selected'}`">mdi-account</v-icon>
+          <RouterLink :to="{ name: 'Profile', params: { username: currentUsername } }"
+            :class="{ underline: currentRouteName == 'Profile' }">
+            <v-icon
+              :class="`${currentRoute.fullPath === `/profile/${currentUsername}` && 'selected'}`">mdi-account</v-icon>
           </RouterLink>
         </li>
         <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }"> <v-icon :class="`${currentRouteName == 'Settings' && 'selected'}`">mdi-cog</v-icon> </RouterLink>
+          <RouterLink :to="{ name: 'Settings' }"> <v-icon
+              :class="`${currentRouteName == 'Settings' && 'selected'}`">mdi-cog</v-icon> </RouterLink>
         </li>
         <li v-else>
-          <RouterLink :to="{ name: 'Login' }"> <v-icon :class="`${currentRouteName == 'Login' && 'selected'}`">mdi-login</v-icon> </RouterLink>
+          <RouterLink :to="{ name: 'Login' }"> <v-icon
+              :class="`${currentRouteName == 'Login' && 'selected'}`">mdi-account</v-icon> </RouterLink>
         </li>
       </ul>
     </nav>
