@@ -149,14 +149,14 @@ const updateYearFilter = (years: number[]) => {
 </script>
 
 <template>
-  <section>
-    <button v-if="windowSize < 700" class="filter-button" @click="canAppear = !canAppear">
-      Advanced search
-      <v-icon v-if="canAppear" size="x-small">mdi-triangle-down</v-icon>
-    </button>
-    <div v-if="canAppear || windowSize >= 700">
-      <!-- <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button> -->
-      <div class="text">
+  <div class="text">
+    <section>
+      <button v-if="windowSize < 700" class="filter-button" @click="canAppear = !canAppear">
+        Advanced search
+        <v-icon v-if="canAppear" size="x-small">mdi-triangle-down</v-icon>
+      </button>
+      <div v-if="canAppear || windowSize >= 700">
+        <!-- <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button> -->
         <div class="filter-type">
           <h2>Document filters</h2>
           <div class="filter-option">
@@ -168,24 +168,39 @@ const updateYearFilter = (years: number[]) => {
                     <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
                   </v-row>
                 </template>
-              </v-tooltip></v-row
-            >
-          </h4>
-          <v-range-slider
-            @update:model-value="() => updateYearFilter(value2)"
-            v-model="value2"
-            step="1"
-            :thumb-label="true"
-            elevation="2"
-            min="1900"
-            max="2023"
-            :hide-details="true"
-            thumb-size="15"
-            track-size="2"
-          ></v-range-slider>
-          <p style="text-align: center; margin-top: -0.8rem">
-            From <b>{{ value2[0] }}</b> to <b>{{ value2[1] }}</b>
-          </p>
+              </v-tooltip>
+            </h4>
+            <v-col cols="12">
+              <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
+                <template v-slot:selection="data">
+                  <v-chip :key="JSON.stringify(data.item)" size="small">
+                    <template v-slot:prepend>
+                      <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
+                    </template>
+                    {{ data.item.title }}
+                  </v-chip>
+                </template>
+              </v-select>
+            </v-col>
+          </div>
+          <div class="filter-option">
+            <h4>
+              <v-row class="tags-row">
+                <div class="tag-text">Year Published</div>
+                <v-tooltip text="Select the range of years of publication of the original document">
+                  <template v-slot:activator="{ props }">
+                    <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+                  </template>
+                </v-tooltip>
+              </v-row>
+            </h4>
+            <v-range-slider @update:model-value="() => updateYearFilter(value2)" v-model="value2" step="1"
+              :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15"
+              track-size="2"></v-range-slider>
+            <p style="text-align: center; margin-top: -0.8rem">
+              From <b>{{ value2[0] }}</b> to <b>{{ value2[1] }}</b>
+            </p>
+          </div>
         </div>
         <div class="filter-type">
           <h2>Translation filters</h2>
@@ -226,8 +241,8 @@ const updateYearFilter = (years: number[]) => {
           </v-col>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <style scoped>
@@ -236,13 +251,13 @@ const updateYearFilter = (years: number[]) => {
   font-weight: normal;
 }
 
-.text {
-  font-family: tweb;
-}
-
 .tag-text {
   font-size: 18px;
   margin: 0;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .translation-line {
