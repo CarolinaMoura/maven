@@ -4,9 +4,10 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { Tag } from "../../types";
-import { fetchy } from "../../utils/fetchy";
+import CreateTagForm from "../Tag/CreateTagForm.vue";
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { getOtherTags } = useTagStore();
 
 const TAGS = computed(() => otherTags.value.map((t: Tag) => t.name));
 const LANGUAGES = computed(() => languageTags.value.map((t: Tag) => t.name));
@@ -52,28 +53,7 @@ function clearForm() {
 }
 
 async function submitRequest() {
-  if (isFormValid.value) {
-    try {
-      // create document first
-      const document = await fetchy("/api/document", "POST", {
-        body: {
-          title: title.value,
-          authors: authors.value,
-          year: Number.parseInt(year.value),
-          tags: tags.value,
-          content: content.value,
-          originalLanguage: originalLanguage.value,
-        },
-      });
-
-      // then use returned id to create request
-      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value, description: description.value } });
-      emit("refreshRequests");
-      closeForm();
-    } catch (e) {
-      return;
-    }
-  }
+  return;
 }
 
 const selectRule = [
@@ -105,6 +85,10 @@ const yearRules = [
   },
 ];
 
+async function getTags() {
+  void getOtherTags();
+}
+
 const closeForm = () => {
   formOpen.value = false;
   clearForm();
@@ -113,10 +97,15 @@ const closeForm = () => {
 <template>
   <div class="text">
     <div :class="!isLoggedIn && `disabled`">
-      <button :disabled="!isLoggedIn" class="btn-primary" @click="() => {
-        formOpen = !formOpen;
-      }
-        ">
+      <button
+        :disabled="!isLoggedIn"
+        class="btn-primary"
+        @click="
+          () => {
+            formOpen = !formOpen;
+          }
+        "
+      >
         <v-icon>mdi-translate-variant</v-icon>
         Request a translation
       </button>
@@ -138,20 +127,28 @@ const closeForm = () => {
 
           <div class="form-section">
             <h3 class="form-subheading">Tell us more about the document</h3>
-            <v-row><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule"
-                  color="#95AEB3"></v-text-field></v-col></v-row>
-            <v-row>
-              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules"
-                  color="#95AEB3"></v-text-field></v-col>
-              <v-col :sm="8"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips
-                  color="#95AEB3"></v-select></v-col>
+            <v-row
+              ><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule" color="#95AEB3"></v-text-field></v-col
+            ></v-row>
+            <v-row style="display: flex; align-items: start">
+              <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules" color="#95AEB3"></v-text-field></v-col>
+              <v-col :sm="8">
+                <v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-row class="tags-row" style="display: flex; align-items: center">
+                      <div class="tag-text">Didn't find the tag you were looking for? Create one</div>
+                      <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
+                    </v-row>
+                  </template>
+                </v-tooltip>
+              </v-col>
             </v-row>
 
             <v-row>
               <v-col class="col">
                 <div v-for="(author, idx) in authors" v-bind:key="`author-${idx}`" class="row">
-                  <v-text-field :label="`Author #${idx + 1} (First)`" v-model="author.first"
-                    color="#95AEB3"></v-text-field>
+                  <v-text-field :label="`Author #${idx + 1} (First)`" v-model="author.first" color="#95AEB3"></v-text-field>
                   <v-text-field :label="`Author #${idx + 1} (Last)`" v-model="author.last" color="#95AEB3"></v-text-field>
 
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
@@ -166,8 +163,7 @@ const closeForm = () => {
           <div class="form-section">
             <h3 class="form-subheading">Document upload</h3>
 
-            <v-textarea label="Document Content" :placeholder="`Submit text content of the document here.`"
-              v-model="content" :rules="nonEmptyRule" color="#95AEB3"></v-textarea>
+            <v-textarea label="Document Content" :placeholder="`Submit text content of the document here.`" v-model="content" :rules="nonEmptyRule" color="#95AEB3"></v-textarea>
           </div>
           <v-divider></v-divider>
 
@@ -175,11 +171,9 @@ const closeForm = () => {
             <h3 class="form-subheading">Translation Request Details</h3>
 
             <v-row v-bind:style="{ 'align-items': 'center' }">
-              <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES"
-                  :rules="selectRule" color="#95AEB3"></v-select></v-col>
+              <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
               <div class="text">to</div>
-              <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES"
-                  :rules="selectRule" color="#95AEB3"></v-select></v-col>
+              <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
             </v-row>
           </div>
 
@@ -190,10 +184,17 @@ const closeForm = () => {
   </v-dialog>
 </template>
 <style scoped>
+.tags-row {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  padding: 0;
+}
 .disabled {
   cursor: not-allowed;
 }
-
 
 h2 {
   font-family: tweb-bold;
