@@ -148,8 +148,13 @@ watchEffect(async () => {
       <div v-else-if="view === `TRANSLATION`" class="requests-container">
         <div v-if="contributions && contributions.translations.length > 0" class="list">
           <v-row v-for="(translation, idx) in contributions.translations" v-bind:key="translation._id">
-            <v-col><SectionComponent :section="contributions.sections[idx]"></SectionComponent></v-col>
-            <v-col><SectionTranslationCard :section-translation="translation" @refresh-section-translations="getuserData"></SectionTranslationCard></v-col>
+            <v-col>
+              <SectionComponent :section="contributions.sections[idx]"></SectionComponent>
+            </v-col>
+            <v-col>
+              <SectionTranslationCard :section-translation="translation" @refresh-section-translations="getuserData">
+              </SectionTranslationCard>
+            </v-col>
             <v-divider></v-divider>
           </v-row>
         </div>
@@ -162,7 +167,9 @@ watchEffect(async () => {
 <style scoped>
 h1 {
   font-weight: normal;
+  font-family: tweb;
 }
+
 .requests-container {
   outline: 1px solid var(--tertiary);
   padding: 1em;
@@ -178,6 +185,7 @@ h1 {
   gap: 1em;
   flex-wrap: wrap;
 }
+
 .tags-row {
   padding: 0.25em;
   display: flex;
@@ -196,11 +204,11 @@ h1 {
 .view-container.column {
   gap: 3em;
 }
+
 .column {
   align-items: start;
 }
 
 .viewer {
   width: 100%;
-}
-</style>
+}</style>

@@ -156,110 +156,90 @@ const updateYearFilter = (years: number[]) => {
     </button>
     <div v-if="canAppear || windowSize >= 700">
       <!-- <button class="clear-all-filters" @click="clearAllFilters()">CLEAR ALL</button> -->
-      <div class="filter-type">
-        <h2>Document filters</h2>
-        <div class="filter-option">
-          <h4>
-            <v-tooltip>
-              <template v-slot:activator="{ props }">
-                <v-row class="tags-row">
-                  <div class="tag-text">Tags</div>
-                  <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
-                </v-row>
-              </template>
-            </v-tooltip>
-          </h4>
-          <v-col cols="12">
-            <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
-              <template v-slot:selection="data">
-                <v-chip :key="JSON.stringify(data.item)" size="small">
-                  <template v-slot:prepend>
-                    <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
-                  </template>
-                  {{ data.item.title }}
-                </v-chip>
-              </template>
-            </v-select>
-          </v-col>
-        </div>
-        <div class="filter-option">
-          <h4>
-            <v-row class="tags-row">
-              <div class="tag-text">Year Published</div>
-              <v-tooltip text="Select the range of years of publication of the original document">
+      <div class="text">
+        <div class="filter-type">
+          <h2>Document filters</h2>
+          <div class="filter-option">
+            <h4>
+              <v-tooltip>
                 <template v-slot:activator="{ props }">
-                  <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+                  <v-row class="tags-row">
+                    <div class="tag-text">Tags</div>
+                    <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
+                  </v-row>
                 </template>
-              </v-tooltip></v-row
-            >
-          </h4>
-          <v-range-slider
-            @update:model-value="() => updateYearFilter(value2)"
-            v-model="value2"
-            step="1"
-            :thumb-label="true"
-            elevation="2"
-            min="1900"
-            max="2023"
-            :hide-details="true"
-            thumb-size="15"
-            track-size="2"
-          ></v-range-slider>
-          <p style="text-align: center; margin-top: -0.8rem">
-            From <b>{{ value2[0] }}</b> to <b>{{ value2[1] }}</b>
-          </p>
+              </v-tooltip>
+            </h4>
+            <v-col cols="12">
+              <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
+                <template v-slot:selection="data">
+                  <v-chip :key="JSON.stringify(data.item)" size="small">
+                    <template v-slot:prepend>
+                      <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
+                    </template>
+                    {{ data.item.title }}
+                  </v-chip>
+                </template>
+              </v-select>
+            </v-col>
+          </div>
+          <div class="filter-option">
+            <h4>
+              <v-row class="tags-row">
+                <div class="tag-text">Year Published</div>
+                <v-tooltip text="Select the range of years of publication of the original document">
+                  <template v-slot:activator="{ props }">
+                    <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
+                  </template>
+                </v-tooltip>
+              </v-row>
+            </h4>
+            <v-range-slider @update:model-value="() => updateYearFilter(value2)" v-model="value2" step="1"
+              :thumb-label="true" elevation="2" min="1900" max="2023" :hide-details="true" thumb-size="15"
+              track-size="2"></v-range-slider>
+            <p style="text-align: center; margin-top: -0.8rem">
+              From <b>{{ value2[0] }}</b> to <b>{{ value2[1] }}</b>
+            </p>
+          </div>
         </div>
-      </div>
-      <div class="filter-type">
-        <h2>Translation filters</h2>
-        <div class="filter-option">
-          <h4>
-            <v-tooltip>
-              <template v-slot:activator="{ props }">
-                <v-row class="tags-row">
-                  <div class="tag-text">Language</div>
-                  <CreateTagForm :language="true" v-bind="props" v-on:refresh-tags="getLanguages"></CreateTagForm>
-                </v-row>
-              </template>
-            </v-tooltip>
-          </h4>
-          <div v-for="(translation, ix) in translations" :key="ix">
-            <div class="translation-line">
-              <v-icon color="var(--primary-text-60)" size="x-small" @click="removeTranslationLine(ix)">mdi-close</v-icon>
-              <div class="single-translation">
-                From
-                <v-select
-                  clearable
-                  :hide-details="true"
-                  class="language-selector"
-                  @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)"
-                  :return-object="true"
-                  @update:modelValue="(e) => updateLanguageFrom(e, ix)"
-                  :items="languages"
-                  label="original"
-                ></v-select>
+        <div class="filter-type">
+          <h2>Translation filters</h2>
+          <div class="filter-option">
+            <h4>
+              <v-tooltip>
+                <template v-slot:activator="{ props }">
+                  <v-row class="tags-row">
+                    <div class="tag-text">Language</div>
+                    <CreateTagForm :language="true" v-bind="props" v-on:refresh-tags="getLanguages"></CreateTagForm>
+                  </v-row>
+                </template>
+              </v-tooltip>
+            </h4>
+            <div v-for="(translation, ix) in translations" :key="ix">
+              <div class="translation-line">
+                <v-icon color="var(--primary-text-60)" size="x-small"
+                  @click="removeTranslationLine(ix)">mdi-close</v-icon>
+                <div class="single-translation">
+                  From
+                  <v-select clearable :hide-details="true" class="language-selector"
+                    @click:clear="() => updateLanguageFrom({ ...emptyTag }, ix)" :return-object="true"
+                    @update:modelValue="(e) => updateLanguageFrom(e, ix)" :items="languages" label="__"></v-select>
 
-                to
-                <v-select
-                  :hide-details="true"
-                  @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)"
-                  clearable
-                  class="language-selector"
-                  :return-object="true"
-                  @update:modelValue="(e) => updateLanguageTo(e, ix)"
-                  :items="languages"
-                  label="target"
-                ></v-select>
+                  to
+                  <v-select :hide-details="true" @click:clear="() => updateLanguageTo({ ...emptyTag }, ix)" clearable
+                    class="language-selector" :return-object="true" @update:modelValue="(e) => updateLanguageTo(e, ix)"
+                    :items="languages" label="__"></v-select>
+                </div>
               </div>
             </div>
+            <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
           </div>
-          <v-btn variant="plain" @click="addNewTranslationField()">+ ADD A NEW LINE</v-btn>
         </div>
-      </div>
-      <div class="filter-type">
-        <v-col cols="12">
-          <v-btn block rounded="lg" size="large" @click="clearAllFilters()">CLEAR FILTERS</v-btn>
-        </v-col>
+        <div class="filter-type">
+          <v-col cols="12">
+            <v-btn block rounded="lg" size="large" @click="clearAllFilters()">CLEAR FILTERS</v-btn>
+          </v-col>
+        </div>
       </div>
     </div>
   </section>
@@ -269,6 +249,10 @@ const updateYearFilter = (years: number[]) => {
 * {
   color: var(--primary-text);
   font-weight: normal;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .tag-text {

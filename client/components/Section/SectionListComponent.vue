@@ -40,7 +40,7 @@ onBeforeMount(async () => {
   <section class="sections" v-if="loaded && sections.length !== 0">
     <v-row>
       <v-col sm="6">
-        <v-card-title>Original Text</v-card-title>
+        <v-card-title class="text">Original Text</v-card-title>
         <v-card-subtitle class="instruction" v-if="!activeSection">(Click on a section to view or submit
           translations)</v-card-subtitle>
       </v-col>
@@ -64,6 +64,10 @@ onBeforeMount(async () => {
 
 h2 {
   margin-bottom: 0px;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .instruction {

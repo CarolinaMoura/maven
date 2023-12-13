@@ -62,9 +62,11 @@ async function toExport() {
           </p>
 
           <p v-if="document.year">{{ `Published ${document.year}` }}</p>
-          <small>
-            Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"
-              @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small><br />
+          <p>
+            <small>
+              Requested by <RouterLink :to="{ name: 'Profile', params: { username: request.requester } }"
+                @click.stop="toProfile(request.requester)"> {{ request.requester }} </RouterLink> </small><br />
+          </p>
         </div>
 
         <div class="row small">
@@ -121,9 +123,14 @@ a {
   font-weight: lighter;
 }
 
+p {
+  font-family: tweb;
+}
+
 h3 {
   font-size: 24px;
   font-weight: normal;
+  font-family: tweb-bold;
 }
 
 .tags-row {

@@ -48,6 +48,19 @@ async function updatePassword() {
 <style scoped>
 h2 {
   font-weight: normal;
+  font-family: tweb;
+}
+
+legend {
+  font-family: tweb;
+}
+
+button {
+  font-family: tweb;
+}
+
+input {
+  font-family: tweb;
 }
 
 .btn-secondary {

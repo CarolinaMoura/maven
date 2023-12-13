@@ -79,6 +79,8 @@ nav {
 h1 {
   font-size: 2em;
   margin: 0;
+  font-family: tweb;
+  padding-bottom: .1em;
 }
 
 .title {

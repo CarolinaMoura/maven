@@ -41,6 +41,7 @@ onBeforeMount(async () => {
 h1 {
   text-align: center;
   font-weight: normal;
+  font-family: tweb;
 }
 
 .col {

@@ -97,12 +97,12 @@ async function copyToClipboard(text: string) {
   <section class="sections" v-if="loaded && sections.length !== 0">
     <v-row>
       <v-col sm="6">
-        <v-card-title>Original Text</v-card-title>
+        <v-card-title class="text">Original Text</v-card-title>
         <v-card-subtitle class="instruction" v-if="!activeSection">(Select a section to see all possible
           translations!)</v-card-subtitle>
       </v-col>
       <v-col sm="6">
-        <v-card-title>Translated Text</v-card-title>
+        <v-card-title class="text">Translated Text</v-card-title>
       </v-col>
     </v-row>
 
@@ -127,6 +127,10 @@ async function copyToClipboard(text: string) {
 <style scoped>
 .active-section {
   border: 2px solid var(--secondary);
+}
+
+.text {
+  font-family: tweb;
 }
 
 .text-right {

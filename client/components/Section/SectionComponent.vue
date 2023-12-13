@@ -16,5 +16,6 @@ const props = defineProps(["section"]);
 <style scoped>
 .section {
   background-color: var(--base-bg);
+  font-family: tweb;
 }
 </style>
