@@ -78,7 +78,7 @@ async function copyToClipboard(text: string) {
 </script>
 
 <template>
-  <v-btn @click="exportTranslation" class="export-button">Export</v-btn>
+  <v-btn @click="exportTranslation" class="export-button text">Export</v-btn>
   <v-dialog v-model="dialogVisible" width="1000">
     <v-card title="Translation">
       <v-card-text> {{ displayTranslation }} </v-card-text>
