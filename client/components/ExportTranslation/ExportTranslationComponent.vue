@@ -72,6 +72,8 @@ onBeforeMount(async () => {
 
 async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text);
+  showToast({ message: "Translation copied!", style: "success" });
+
 }
 </script>
 
@@ -96,7 +98,8 @@ async function copyToClipboard(text: string) {
     <v-row>
       <v-col sm="6">
         <v-card-title>Original Text</v-card-title>
-        <v-card-subtitle class="instruction" v-if="!activeSection">(Select a section to see all possible translations!)</v-card-subtitle>
+        <v-card-subtitle class="instruction" v-if="!activeSection">(Select a section to see all possible
+          translations!)</v-card-subtitle>
       </v-col>
       <v-col sm="6">
         <v-card-title>Translated Text</v-card-title>
@@ -104,9 +107,11 @@ async function copyToClipboard(text: string) {
     </v-row>
 
     <div class="sections-container" v-for="(section, idx) in sections" :key="section._id">
-      <SectionComponent :section="section" @click="logSection(section._id)" :class="{ 'active-section': section._id == activeSection }" />
+      <SectionComponent :section="section" @click="logSection(section._id)"
+        :class="{ 'active-section': section._id == activeSection }" />
       <div v-if="activeSection == section._id">
-        <ChooseTranslationComponent v-bind:section="section" v-bind:chosenTranslation="chosenTranslations[idx]" @refresh-chosen="(id) => updateChosen(idx, id)" />
+        <ChooseTranslationComponent v-bind:section="section" v-bind:chosenTranslation="chosenTranslations[idx]"
+          @refresh-chosen="(id) => updateChosen(idx, id)" />
       </div>
       <div v-else-if="activeSection.length === 0">
         <TranslationComponent :translation-id="chosenTranslations[idx]" />
