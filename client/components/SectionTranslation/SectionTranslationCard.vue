@@ -64,46 +64,51 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="!isEdit">
-    <v-card hover class="section-translation-card">
-      <div class="display">
-        <div class="column">
-          <p>
-            <b>Translator: </b><RouterLink :to="{ name: 'Profile', params: { username: props.sectionTranslation.translator } }"> {{ props.sectionTranslation.translator }} </RouterLink>
-          </p>
-          <p><b>Translation: </b>{{ props.sectionTranslation.translation }}</p>
-        </div>
-        <div class="button-col">
-          <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
+  <div class="text">
+    <div v-if="!isEdit">
+      <v-card hover class="section-translation-card">
+        <div class="display">
+          <div class="column">
+            <p>
+              <b>Translator: </b>
+              <RouterLink :to="{ name: 'Profile', params: { username: props.sectionTranslation.translator } }"> {{
+                props.sectionTranslation.translator }} </RouterLink>
+            </p>
+            <p><b>Translation: </b>{{ props.sectionTranslation.translation }}</p>
+          </div>
+          <div class="button-col">
+            <VoteComponent :section="props.sectionTranslation" :votes="totalVotes" @refreshVotes="getVotes" />
 
-          <v-tooltip text="Edit translation">
+            <v-tooltip text="Edit translation">
+              <template v-slot:activator="{ props }">
+                <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon="mdi-pencil" v-bind="props"
+                  variant="plain" size="x-small" @click="enterEditMode"></v-btn>
+              </template>
+            </v-tooltip>
+
+            <DeleteSectionTranslation v-if="isLoggedIn && currentUsername === translatorName"
+              :section-translation="props.sectionTranslation"
+              @refresh-section-translations="emit('refreshSectionTranslations')"></DeleteSectionTranslation>
+          </div>
+        </div>
+      </v-card>
+    </div>
+    <div v-else>
+      <v-card hover class="section-translation-card">
+        <v-card-title>Edit Translation</v-card-title>
+
+        <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation"
+          v-model="edition"></v-textarea>
+        <div class="button-row">
+          <v-tooltip text="Save translation">
             <template v-slot:activator="{ props }">
-              <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon="mdi-pencil" v-bind="props" variant="plain" size="x-small" @click="enterEditMode"></v-btn>
+              <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon="mdi-content-save" v-bind="props"
+                variant="plain" size="x-small" @click="enterViewMode"></v-btn>
             </template>
           </v-tooltip>
-
-          <DeleteSectionTranslation
-            v-if="isLoggedIn && currentUsername === translatorName"
-            :section-translation="props.sectionTranslation"
-            @refresh-section-translations="emit('refreshSectionTranslations')"
-          ></DeleteSectionTranslation>
         </div>
-      </div>
-    </v-card>
-  </div>
-  <div v-else>
-    <v-card hover class="section-translation-card">
-      <v-card-title>Edit Translation</v-card-title>
-
-      <v-textarea label="Translation" auto-grow variant="outlined" class="edit-translation" v-model="edition"></v-textarea>
-      <div class="button-row">
-        <v-tooltip text="Save translation">
-          <template v-slot:activator="{ props }">
-            <v-btn v-if="isLoggedIn && currentUsername === translatorName" icon="mdi-content-save" v-bind="props" variant="plain" size="x-small" @click="enterViewMode"></v-btn>
-          </template>
-        </v-tooltip>
-      </div>
-    </v-card>
+      </v-card>
+    </div>
   </div>
 </template>
 
@@ -118,6 +123,10 @@ a {
   align-items: center;
 }
 
+.text {
+  font-family: tweb;
+}
+
 .button-row {
   display: flex;
   flex-direction: row;
@@ -129,12 +138,14 @@ a {
   flex-direction: column;
   align-items: start;
 }
+
 .display {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: start;
 }
+
 .v-card-actions {
   display: flex;
   flex-direction: column;

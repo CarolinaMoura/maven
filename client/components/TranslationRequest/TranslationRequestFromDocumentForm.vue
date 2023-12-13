@@ -40,7 +40,7 @@ async function submitRequest() {
   <div class="text-center">
     <v-menu v-model="menu" :close-on-content-click="false" location="end">
       <template v-slot:activator="{ props }">
-        <v-btn variant="plain" v-bind="props" icon="mdi-file-document-alert"></v-btn>
+        <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant"></v-btn>
       </template>
 
       <v-card min-width="400" max-width="500">
@@ -60,14 +60,6 @@ async function submitRequest() {
           </v-list-item>
         </v-list>
         <v-divider></v-divider>
-
-        <v-list>
-          <v-list-item subtitle="Provide more context or describe what you need help with (optional)"></v-list-item>
-          <v-list-item>
-            <v-textarea label="Request description" v-model="description"></v-textarea>
-          </v-list-item>
-        </v-list>
-
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="menu = false"> Cancel </v-btn>

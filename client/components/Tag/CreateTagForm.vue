@@ -75,7 +75,7 @@ const emptyForm = () => {
         </template>
         <template v-if="isLanguage">
           <label for="tagName">Language</label>
-          <v-textarea rows="1" id="tagName" v-model="tagName" placeholder="Enter the language" required> </v-textarea>
+          <v-textarea rows="1" id="tagName" v-model="tagName" class="text" placeholder=" Enter the language" required> </v-textarea>
         </template>
         <v-btn type="submit" class="pure-button-primary pure-button">Create!</v-btn>
       </form>
@@ -99,5 +99,9 @@ textarea {
   padding: 0.5em;
   border-radius: 4px;
   resize: none;
+}
+
+.text {
+  font-family: tweb;
 }
 </style>

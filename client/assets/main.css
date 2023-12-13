@@ -4,7 +4,7 @@
   --red: #cf6262;
   --base-bg: #f1f3f5;
 
-  --primary: #A1BB9D;
+  --primary: #6c6f6c;
   --primary-dark: rgb(53, 132, 43);
   --secondary: #95AEB3;
   --secondary-20: rgba(149, 174, 179, 0.2);
@@ -17,6 +17,29 @@
   --primary-text-60: rgba(71, 71, 71, 0.6);
 
 }
+
+@font-face {
+  font-family: 'garamond';
+  src: url('./EBGaramond-VariableFont_wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'nunito';
+  src: url('./NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf') format('truetype');
+}
+
+
+@font-face {
+  font-family: 'tweb';
+  src: url('./TitilliumWeb-Regular.ttf') format('truetype');
+}
+
+
+@font-face {
+  font-family: 'tweb-bold';
+  src: url('./TitilliumWeb-SemiBold.ttf') format('truetype');
+}
+
 
 .view-container {
   padding: 2em;
@@ -80,10 +103,6 @@ button[disabled] {
   background-color: var(--secondary);
   color: white !important;
   outline: 2px solid var(--secondary);
-
-
-
-
 
 }
 

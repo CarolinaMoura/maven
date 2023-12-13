@@ -187,10 +187,37 @@ const updateYearFilter = (years: number[]) => {
               <div class="tag-text">Year Published</div>
               <v-tooltip text="Select the range of years of publication of the original document">
                 <template v-slot:activator="{ props }">
+                  <v-row class="tags-row">
+                    <div class="tag-text">Tags</div>
+                    <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
+                  </v-row>
+                </template>
+              </v-tooltip>
+            </v-row>
+          </h4>
+          <v-col cols="12">
+            <v-select v-model="select" return-object :items="nonLanguages" label="" multiple>
+              <template v-slot:selection="data">
+                <v-chip :key="JSON.stringify(data.item)" size="small">
+                  <template v-slot:prepend>
+                    <v-avatar class="bg-accent text-uppercase" start>{{ data.item.title.slice(0, 1) }}</v-avatar>
+                  </template>
+                  {{ data.item.title }}
+                </v-chip>
+              </template>
+            </v-select>
+          </v-col>
+        </div>
+        <div class="filter-option">
+          <h4>
+            <v-row class="tags-row">
+              <div class="tag-text">Year Published</div>
+              <v-tooltip text="Select the range of years of publication of the original document">
+                <template v-slot:activator="{ props }">
                   <v-icon v-bind="props">mdi-information-variant-circle-outline</v-icon>
                 </template>
-              </v-tooltip></v-row
-            >
+              </v-tooltip>
+            </v-row>
           </h4>
           <v-range-slider
             @update:model-value="() => updateYearFilter(value2)"
@@ -235,7 +262,7 @@ const updateYearFilter = (years: number[]) => {
                   :return-object="true"
                   @update:modelValue="(e) => updateLanguageFrom(e, ix)"
                   :items="languages"
-                  label="original"
+                  label="__"
                 ></v-select>
 
                 to
@@ -247,7 +274,7 @@ const updateYearFilter = (years: number[]) => {
                   :return-object="true"
                   @update:modelValue="(e) => updateLanguageTo(e, ix)"
                   :items="languages"
-                  label="target"
+                  label="__"
                 ></v-select>
               </div>
             </div>
@@ -273,6 +300,10 @@ const updateYearFilter = (years: number[]) => {
 .tag-text {
   font-size: 18px;
   margin: 0;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .translation-line {

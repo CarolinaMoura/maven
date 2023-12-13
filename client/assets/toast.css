@@ -8,12 +8,15 @@
   max-width: 60em;
   margin: 0 auto;
   z-index: 9999;
+  font-family: tweb;
+
   color: #fff;
 }
 
 .error {
   background-color: #fa5252;
 }
+
 .success {
   background-color: #40c057;
 }

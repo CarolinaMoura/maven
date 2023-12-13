@@ -95,19 +95,21 @@ const closeForm = () => {
 };
 </script>
 <template>
-  <div :class="!isLoggedIn && `disabled`">
-    <button
-      :disabled="!isLoggedIn"
-      class="btn-primary"
-      @click="
-        () => {
-          formOpen = !formOpen;
-        }
-      "
-    >
-      <v-icon>mdi-file-document-alert</v-icon>
-      Request a translation
-    </button>
+  <div class="text">
+    <div :class="!isLoggedIn && `disabled`">
+      <button
+        :disabled="!isLoggedIn"
+        class="btn-primary"
+        @click="
+          () => {
+            formOpen = !formOpen;
+          }
+        "
+      >
+        <v-icon>mdi-translate-variant</v-icon>
+        Request a translation
+      </button>
+    </div>
   </div>
 
   <v-dialog v-model="formOpen" width="90%">
@@ -152,7 +154,7 @@ const closeForm = () => {
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
 
-                <button class="btn-secondary add-author-btn" @click="addAuthor()" type="button">Add author</button>
+                <button class="btn-secondary add-author-btn text" @click="addAuthor()" type="button">Add author</button>
               </v-col>
             </v-row>
           </div>
@@ -170,15 +172,12 @@ const closeForm = () => {
 
             <v-row v-bind:style="{ 'align-items': 'center' }">
               <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
-              to
+              <div class="text">to</div>
               <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
-            </v-row>
-            <v-row>
-              <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with.`" color="#95AEB3"></v-textarea> </v-col>
             </v-row>
           </div>
 
-          <button class="btn-primary">Submit request</button>
+          <button class="btn-primary text">Submit request</button>
         </v-container>
       </v-form>
     </v-card>
@@ -197,17 +196,26 @@ const closeForm = () => {
   cursor: not-allowed;
 }
 
-h3,
 h2 {
+  font-family: tweb-bold;
+}
+
+h3 {
   font-weight: normal;
 }
 
 h3 {
   padding: 1em 0 1.5em 0;
+  font-family: tweb;
 }
 
 h2 {
   padding-bottom: 0.5em;
+  font-family: tweb;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .col {
@@ -234,5 +242,6 @@ h2 {
 
 .form-section {
   padding-bottom: 1.5em;
+  font-family: tweb;
 }
 </style>
