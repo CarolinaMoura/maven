@@ -81,12 +81,6 @@ async function toExport() {
       </div>
 
       <div class="card-actions">
-        <v-tooltip text="View translation">
-          <template v-slot:activator="{ props }">
-            <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant" @click.stop="toTranslations"></v-btn>
-          </template>
-        </v-tooltip>
-
         <v-tooltip text="Request translation in a different language" v-if="isLoggedIn">
           <template v-slot:activator="{ props }">
             <TranslationRequestFromDocumentForm v-bind="props" :document="document"
@@ -96,7 +90,7 @@ async function toExport() {
 
         <v-tooltip text="Export translation">
           <template v-slot:activator="{ props }">
-            <v-btn variant="plain" v-bind="props" icon="mdi-file-export-outline" @click.stop="toExport"></v-btn>
+            <v-btn variant="plain" v-bind="props" icon="mdi-export-variant" @click.stop="toExport"></v-btn>
           </template>
         </v-tooltip>
 

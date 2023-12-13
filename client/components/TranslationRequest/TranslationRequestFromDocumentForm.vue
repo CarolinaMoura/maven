@@ -40,7 +40,7 @@ async function submitRequest() {
   <div class="text-center">
     <v-menu v-model="menu" :close-on-content-click="false" location="end">
       <template v-slot:activator="{ props }">
-        <v-btn variant="plain" v-bind="props" icon="mdi-file-document-alert"></v-btn>
+        <v-btn variant="plain" v-bind="props" icon="mdi-translate-variant"></v-btn>
       </template>
 
       <v-card min-width="400" max-width="500">

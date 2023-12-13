@@ -117,7 +117,7 @@ const closeForm = () => {
         formOpen = !formOpen;
       }
         ">
-        <v-icon>mdi-file-document-alert</v-icon>
+        <v-icon>mdi-translate-variant</v-icon>
         Request a translation
       </button>
     </div>
