@@ -72,11 +72,12 @@ onBeforeMount(async () => {
 
 async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text);
+  showToast({ message: "Translation copied!", style: "success" });
 }
 </script>
 
 <template>
-  <v-btn @click="exportTranslation" class="export-button">Export</v-btn>
+  <v-btn @click="exportTranslation" class="export-button text">Export</v-btn>
   <v-dialog v-model="dialogVisible" width="1000">
     <v-card title="Translation">
       <v-card-text> {{ displayTranslation }} </v-card-text>
@@ -95,11 +96,11 @@ async function copyToClipboard(text: string) {
   <section class="sections" v-if="loaded && sections.length !== 0">
     <v-row>
       <v-col sm="6">
-        <v-card-title>Original Text</v-card-title>
+        <v-card-title class="text">Original Text</v-card-title>
         <v-card-subtitle class="instruction" v-if="!activeSection">(Select a section to see all possible translations!)</v-card-subtitle>
       </v-col>
       <v-col sm="6">
-        <v-card-title>Translated Text</v-card-title>
+        <v-card-title class="text">Translated Text</v-card-title>
       </v-col>
     </v-row>
 
@@ -124,6 +125,10 @@ async function copyToClipboard(text: string) {
   border: 2px solid var(--secondary);
 }
 
+.text {
+  font-family: tweb;
+}
+
 .text-right {
   padding-right: 20px;
   padding-bottom: 20px;
@@ -140,7 +145,8 @@ async function copyToClipboard(text: string) {
   right: 30px;
   text-transform: none;
   font-size: 1em;
-  background-color: rgb(179, 203, 183);
+  background-color: rgb(114, 193, 126);
+  font-weight: bold;
 }
 
 h2 {

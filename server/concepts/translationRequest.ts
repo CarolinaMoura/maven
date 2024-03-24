@@ -15,8 +15,8 @@ export default class TranslationRequestConcept {
   async createTranslationRequest(document: ObjectId, sections: Array<ObjectId>, languageTo: ObjectId, requester: ObjectId, description: string) {
     return await this.translationRequests.createOne({ document, sections, languageTo, requester, description });
   }
-  async deleteTranslationRequest(id: ObjectId) {
-    await this.translationRequests.deleteOne({ _id: id });
+  async deleteTranslationRequest(filter: Filter<TranslationRequestDoc>) {
+    await this.translationRequests.deleteOne(filter);
     return { msg: "Deleted translation request!" };
   }
 

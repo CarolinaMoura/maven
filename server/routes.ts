@@ -6,6 +6,42 @@ import { WebSessionDoc } from "./concepts/websession";
 import { Router, getExpressRouter } from "./framework/router";
 import Responses from "./responses";
 
+const auxDeleteTranslationRequest = async (id: string) => {
+  const request = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+
+  // get translation request and list of section ids
+  const translationRequest = await TranslationRequest.getTranslationRequest(new ObjectId(id));
+  const sections = translationRequest.sections;
+
+  // get section translations based on section ids
+  const sectionTanslationPromises = sections.map(async (s) => {
+    return await SectionTranslation.getSectionTranslations({ section: s });
+  });
+
+  // delete all section translations
+  const sectionTranslations = await Promise.all(sectionTanslationPromises);
+  const flattenedSectionTranslations = sectionTranslations.flatMap((arr) => {
+    return arr;
+  });
+  const deleteTranslationPromises = flattenedSectionTranslations.map(async (t) => {
+    return await SectionTranslation.deleteSectionTranslation(t._id);
+  });
+
+  await Promise.all(deleteTranslationPromises);
+
+  // delete all sections
+  const deleteSectionPromises = sections.map(async (id) => {
+    return await Section.deleteSection(id);
+  });
+  await Promise.all(deleteSectionPromises);
+
+  // delete tag attachments
+  await Tag.deleteTagAttachment(request.languageTo, request._id);
+
+  // delete translation request
+  return await TranslationRequest.deleteTranslationRequest({ _id: new ObjectId(id) });
+};
+
 class Routes {
   @Router.get("/session")
   async getSessionUser(session: WebSessionDoc) {
@@ -38,6 +74,10 @@ class Routes {
   @Router.delete("/users")
   async deleteUser(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
+    const toDelete = await TranslationRequest.getTranslationRequests({ requester: user });
+    for (const tr of toDelete) {
+      await auxDeleteTranslationRequest(tr._id.toString());
+    }
     WebSession.end(session);
     return await User.delete(user);
   }
@@ -279,7 +319,7 @@ class Routes {
     await Tag.deleteTagAttachment(request.languageTo, request._id);
 
     // delete translation request
-    return await TranslationRequest.deleteTranslationRequest(new ObjectId(id));
+    return await TranslationRequest.deleteTranslationRequest({ _id: new ObjectId(id) });
   }
 
   @Router.get("/translationRequest")
@@ -302,8 +342,12 @@ class Routes {
 
   @Router.get("/votes/myVote")
   async getMyVote(session: WebSessionDoc, section: string) {
-    const user = WebSession.getUser(session);
-    return await Vote.getMyVote(new ObjectId(section), user);
+    try {
+      const user = WebSession.getUser(session);
+      return await Vote.getMyVote(new ObjectId(section), user);
+    } catch (e) {
+      ("NONE");
+    }
   }
   @Router.post("/votes/vote")
   async vote(session: WebSessionDoc, section: string, upvote: boolean) {
@@ -421,8 +465,13 @@ class Routes {
 
     const fromTo: Map<string, Set<string>> = new Map([["0", new Set<string>()]]);
 
+    let thereIsEveryone: Boolean = false;
+
     for (const { from, to } of filter.translations) {
       fromTo.get("0")?.add(to);
+      if (from === "0") {
+        thereIsEveryone = true;
+      }
       if (fromTo.has(from)) {
         fromTo.get(from)?.add(to);
       } else {
@@ -431,16 +480,14 @@ class Routes {
     }
 
     const setLanguagesEveryone = fromTo.get("0") ?? [];
-
     // filter by translation request
     const toReturn = [];
     for (const doc of docs) {
       // get the specifics of the document
       const setLanguagesDocument = fromTo.get(doc.originalLanguage.toString()) ?? [];
-      const possibleToLanguage = [...setLanguagesDocument, ...setLanguagesEveryone];
-
+      const possibleToLanguage = [...setLanguagesDocument, ...(thereIsEveryone ? setLanguagesEveryone : [])];
       if (possibleToLanguage.includes("0")) {
-        toReturn.push(...(await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ document: doc._id }))));
+        toReturn.push(...(await Responses.translationRequests(await TranslationRequest.getTranslationRequests({ document: new ObjectId(doc._id) }))));
       } else {
         const queryTranslationRequest = {
           document: doc._id,

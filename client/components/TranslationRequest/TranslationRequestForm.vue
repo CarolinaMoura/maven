@@ -4,9 +4,10 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useTagStore } from "../../stores/tags";
 import { Tag } from "../../types";
-import { fetchy } from "../../utils/fetchy";
+import CreateTagForm from "../Tag/CreateTagForm.vue";
 const { languageTags, otherTags } = storeToRefs(useTagStore());
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { getOtherTags } = useTagStore();
 
 const TAGS = computed(() => otherTags.value.map((t: Tag) => t.name));
 const LANGUAGES = computed(() => languageTags.value.map((t: Tag) => t.name));
@@ -52,28 +53,7 @@ function clearForm() {
 }
 
 async function submitRequest() {
-  if (isFormValid.value) {
-    try {
-      // create document first
-      const document = await fetchy("/api/document", "POST", {
-        body: {
-          title: title.value,
-          authors: authors.value,
-          year: Number.parseInt(year.value),
-          tags: tags.value,
-          content: content.value,
-          originalLanguage: originalLanguage.value,
-        },
-      });
-
-      // then use returned id to create request
-      await fetchy("/api/translationRequest", "POST", { query: { document: document._id, languageTo: targetLanguage.value, description: description.value } });
-      emit("refreshRequests");
-      closeForm();
-    } catch (e) {
-      return;
-    }
-  }
+  return;
 }
 
 const selectRule = [
@@ -105,25 +85,31 @@ const yearRules = [
   },
 ];
 
+async function getTags() {
+  void getOtherTags();
+}
+
 const closeForm = () => {
   formOpen.value = false;
   clearForm();
 };
 </script>
 <template>
-  <div :class="!isLoggedIn && `disabled`">
-    <button
-      :disabled="!isLoggedIn"
-      class="btn-primary"
-      @click="
-        () => {
-          formOpen = !formOpen;
-        }
-      "
-    >
-      <v-icon>mdi-file-document-alert</v-icon>
-      Request a translation
-    </button>
+  <div class="text">
+    <div :class="!isLoggedIn && `disabled`">
+      <button
+        :disabled="!isLoggedIn"
+        class="btn-primary"
+        @click="
+          () => {
+            formOpen = !formOpen;
+          }
+        "
+      >
+        <v-icon>mdi-translate-variant</v-icon>
+        Request a translation
+      </button>
+    </div>
   </div>
 
   <v-dialog v-model="formOpen" width="90%">
@@ -144,9 +130,19 @@ const closeForm = () => {
             <v-row
               ><v-col><v-text-field label="Document Title" v-model="title" :rules="nonEmptyRule" color="#95AEB3"></v-text-field></v-col
             ></v-row>
-            <v-row>
+            <v-row style="display: flex; align-items: start">
               <v-col :sm="4"><v-text-field label="Year Published" v-model="year" :rules="yearRules" color="#95AEB3"></v-text-field></v-col>
-              <v-col :sm="8"><v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select></v-col>
+              <v-col :sm="8">
+                <v-select label="Tags" v-model="tags" :items="TAGS" multiple chips color="#95AEB3"></v-select>
+                <v-tooltip>
+                  <template v-slot:activator="{ props }">
+                    <v-row class="tags-row" style="display: flex; align-items: center">
+                      <div class="tag-text">Didn't find the tag you were looking for? Create one</div>
+                      <CreateTagForm :language="false" v-bind="props" v-on:refresh-tags="getTags"></CreateTagForm>
+                    </v-row>
+                  </template>
+                </v-tooltip>
+              </v-col>
             </v-row>
 
             <v-row>
@@ -158,7 +154,7 @@ const closeForm = () => {
                   <v-btn v-if="authors.length > 1" variant="plain" @click="deleteAuthor(idx)" :icon="`mdi-close`"></v-btn>
                 </div>
 
-                <button class="btn-secondary add-author-btn" @click="addAuthor()" type="button">Add author</button>
+                <button class="btn-secondary add-author-btn text" @click="addAuthor()" type="button">Add author</button>
               </v-col>
             </v-row>
           </div>
@@ -176,36 +172,50 @@ const closeForm = () => {
 
             <v-row v-bind:style="{ 'align-items': 'center' }">
               <v-col :sm="5"><v-select label="Original language" v-model="originalLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
-              to
+              <div class="text">to</div>
               <v-col :sm="5"><v-select label="Target language" v-model="targetLanguage" :items="LANGUAGES" :rules="selectRule" color="#95AEB3"></v-select></v-col>
-            </v-row>
-            <v-row>
-              <v-col> <v-textarea label="Request description" v-model="description" :placeholder="`Provide more context or describe what you need help with.`" color="#95AEB3"></v-textarea> </v-col>
             </v-row>
           </div>
 
-          <button class="btn-primary">Submit request</button>
+          <button class="btn-primary text">Submit request</button>
         </v-container>
       </v-form>
     </v-card>
   </v-dialog>
 </template>
 <style scoped>
+.tags-row {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  padding: 0;
+}
 .disabled {
   cursor: not-allowed;
 }
 
-h3,
 h2 {
+  font-family: tweb-bold;
+}
+
+h3 {
   font-weight: normal;
 }
 
 h3 {
   padding: 1em 0 1.5em 0;
+  font-family: tweb;
 }
 
 h2 {
   padding-bottom: 0.5em;
+  font-family: tweb;
+}
+
+.text {
+  font-family: tweb;
 }
 
 .col {
@@ -232,5 +242,6 @@ h2 {
 
 .form-section {
   padding-bottom: 1.5em;
+  font-family: tweb;
 }
 </style>
