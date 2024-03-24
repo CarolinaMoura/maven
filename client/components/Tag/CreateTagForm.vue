@@ -25,7 +25,7 @@ const createTag = async (tagName: string, isLanguage: boolean) => {
 
 const emptyForm = () => {
   tagName.value = "";
-  isLanguage.value = false;
+  isLanguage.value = props.language;
 };
 </script>
 
